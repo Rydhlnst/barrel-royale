@@ -20,8 +20,7 @@ const toc = [
   { id: "bots", label: "7. Fair play" },
   { id: "architecture", label: "8. Architecture" },
   { id: "security", label: "9. Safety and transparency" },
-  { id: "compliance", label: "10. Compliance" },
-  { id: "sources", label: "11. Sources" },
+  { id: "sources", label: "10. Sources" },
 ];
 
 export default function Litepaper() {
@@ -114,7 +113,7 @@ export default function Litepaper() {
             ["Max per transaction", "5"],
             ["Mint order", "OG Roughnecks, then Crew (24 hours), then public"],
             ["Class reveal", "Commit-reveal seed, hash published before the first mint"],
-            ["Mint proceeds", "Audit, legal review, art and the first season's prizes"],
+            ["Mint proceeds", "Audit, art and the first season's prizes"],
           ]}
         />
         <h3>Revenue split</h3>
@@ -198,14 +197,7 @@ export default function Litepaper() {
         </ul>
       </Section>
 
-      <Section id="compliance" title="10. Compliance">
-        <p>
-          {site.reward} claims run through a quick eligibility check, since stock tokens are not offered in every region, and the reward program is
-          reviewed by counsel before claims open. The game itself and {site.token} rewards are open to every player. Nothing here is financial advice.
-        </p>
-      </Section>
-
-      <Section id="sources" title="11. Sources">
+      <Section id="sources" title="10. Sources">
         <ul>
           <li>
             <a href="https://docs.robinhood.com/chain/oracles-and-price-feeds" target="_blank" rel="noopener">

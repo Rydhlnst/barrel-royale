@@ -35,21 +35,12 @@ pnpm dev
 - Tailwind berjalan lewat `postcss.config.mjs`. Loader `@tailwindcss/turbopack` sudah dibuang karena di dev sering menyajikan CSS lama.
 - Nama, tagline, token, dan link ada di `apps/web/lib/site.ts`. Tombol Play mengarah ke prototipe di artifact. Link X dan Discord masih `#`.
 - Contract address $ROYAL diambil dari env `NEXT_PUBLIC_ROYAL_CA`. Sebelum diisi, chip CA menampilkan "posted at launch". Setelah diisi, muncul tombol Copy dan link ke explorer. Variabel ini dibaca saat build, jadi perlu redeploy setelah mengisinya.
-- Warna art ada di `apps/web/lib/palette.ts`, sedangkan token UI ada di `apps/web/app/globals.css`. Nilai keduanya sama. Detail brand lengkapnya ada di [docs/brand.md](docs/brand.md).
+- Warna art ada di `apps/web/lib/palette.ts`, sedangkan token UI ada di `apps/web/app/globals.css`. Nilai keduanya sama.
 - Font yang dipakai adalah Silkscreen, Pixelify Sans, dan Nunito dari Google Fonts (lisensi OFL).
 
 ## Dokumen
 
-| File | Isi |
-| --- | --- |
-| [docs/research-pixels.md](docs/research-pixels.md) | Cara kerja Pixels: gameplay, ekonomi dan token, NFT, roadmap 2022–2026, apa yang berhasil dan apa yang gagal |
-| [docs/research-tech.md](docs/research-tech.md) | Stack Pixels (dari bundle-nya), stack yang direkomendasikan, Robinhood Chain, dan anti-bot |
-| [docs/brand.md](docs/brand.md) | Brand Barrel Royale: logo, warna, tipografi, komponen |
-| [docs/game-design.md](docs/game-design.md) | Desain game draft 2: evaluasi prototipe, gameplay baru (tekanan, kilang, kontrak, brace, crew raid), reward XOM yang tahan bot, risiko |
-| [docs/deploy.md](docs/deploy.md) | Deploy ke VPS: Docker Compose (web + Postgres) lewat Coolify atau Docker biasa |
-| [docs/design-reference.md](docs/design-reference.md) | Patokan struktur dari pixels.xyz. Warnanya sudah digantikan oleh brand.md |
-| [docs/roadmap.md](docs/roadmap.md) | Fase teknis 0–5, estimasi waktu, dan risiko (ditulis untuk draft 1) |
-| `research/pixels-site/` | Bahan mentah scrape pixels.xyz (Firecrawl): screenshot, HTML, branding |
+Catatan riset, desain game, brand, dan panduan deploy disimpan di luar repo ini.
 
 ## Stack yang direncanakan
 

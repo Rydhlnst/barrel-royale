@@ -17,3 +17,6 @@ research/pixels-site/
 *.log
 .DS_Store
 Thumbs.db
+
+# internal notes (research, design, legal risks) stay on this machine only
+docs/

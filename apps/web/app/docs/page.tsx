@@ -15,7 +15,7 @@ const toc = [
   { id: "rigs", label: "Rigs" },
   { id: "wells", label: "Wells and pressure" },
   { id: "refinery", label: "Refinery and products" },
-  { id: "selling", label: "Selling and contracts" },
+  { id: "selling", label: "Selling and export" },
   { id: "incidents", label: "Storms and sabotage" },
   { id: "progress", label: "Upgrades, fleet and shifts" },
   { id: "crews", label: "Crews and seasons" },
@@ -24,7 +24,6 @@ const toc = [
   { id: "xom", label: `${site.reward} rewards` },
   { id: "fees", label: "Where the money goes" },
   { id: "trust", label: "Safety and transparency" },
-  { id: "eligibility", label: `Who can claim ${site.reward}` },
   { id: "contracts", label: "Contracts" },
   { id: "faq", label: "FAQ" },
 ];
@@ -280,13 +279,6 @@ export default function Docs() {
         </ul>
       </Section>
 
-      <Section id="eligibility" title={`Who can claim ${site.reward}`}>
-        <Note title="Good to know.">
-          {site.reward} claims run through a quick eligibility check, since stock tokens are not offered in every region. Every rig plays the full game and
-          earns {site.token}.
-        </Note>
-      </Section>
-
       <Section id="contracts" title="Contracts">
         <p>Official addresses appear here and on the official X account. Always double-check an address before you use it.</p>
         <Table
@@ -307,7 +299,7 @@ export default function Docs() {
         <h3>Do I need a rig to play?</h3>
         <p>No. Everyone can play for free, and free players can work shifts on other rigs.</p>
         <h3>Is {site.reward} a share in Exxon Mobil?</h3>
-        <p>It is a token that tracks the Exxon Mobil share price on Robinhood Chain, without voting or shareholder rights.</p>
+        <p>It is a token on Robinhood Chain that tracks the Exxon Mobil share price.</p>
         <h3>Is {site.name} affiliated with Exxon Mobil or Robinhood?</h3>
         <p>No. {site.name} is an independent game built on Robinhood Chain.</p>
         <h3>What if the price feed pauses?</h3>

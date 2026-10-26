@@ -82,11 +82,11 @@ const phases: { when: string; status: Status; title: string; icon: readonly stri
     icon: barrel,
     items: [
       { text: "Audit report published" },
-      { text: `Eligibility check for ${site.reward} claims` },
+      { text: `${site.reward} claim page in the app` },
       { text: "On-chain game on mainnet; Season 1 and crew wars start" },
       { text: `First weekly ${site.reward} claim, including ${site.reward} bought since launch` },
     ],
-    gate: `no open critical audit findings and a written legal opinion on ${site.reward} claims`,
+    gate: "no open critical audit findings",
   },
   {
     when: "After Season 1",
