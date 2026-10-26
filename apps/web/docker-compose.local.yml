@@ -1,0 +1,5 @@
+# Without Coolify: publish the web container on a host port.
+services:
+  web:
+    ports:
+      - "${WEB_PORT:-3000}:3000"

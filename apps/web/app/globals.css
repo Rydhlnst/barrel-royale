@@ -1,0 +1,440 @@
+@import "tailwindcss";
+
+/* Brand values match lib/palette.ts, which the pixel art uses. */
+@theme {
+  --color-brand-sun: #ffd54a;
+  --color-brand-sun-deep: #ffb22e;
+  --color-brand-sun-pale: #fff1c2;
+  --color-brand-sky: #eaf7ff;
+  --color-brand-red: #e8453c;
+  --color-brand-sea: #1a73d9;
+  --color-brand-sea-deep: #0f55b0;
+  --color-brand-foam: #d3e8ff;
+  --color-brand-ink: #1e2a4a;
+  --color-brand-ink-2: #4a5878;
+  --color-brand-leaf: #15905f;
+
+  --font-logo: var(--font-silkscreen), ui-monospace, monospace;
+  --font-display: var(--font-pixelify), ui-monospace, monospace;
+  --font-body: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  background: var(--color-brand-ink);
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-brand-sky);
+  color: var(--color-brand-ink);
+  font-family: var(--font-body);
+  font-weight: 500;
+}
+
+svg,
+img {
+  image-rendering: pixelated;
+}
+
+/*
+  Pixel scrollbars: a pale track with an ink edge and a red thumb with an ink
+  frame and a bevel, like the buttons. Chrome ignores these when scrollbar-color
+  is set, so the standard property is only for browsers without ::-webkit-scrollbar.
+*/
+::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-brand-sun-pale);
+  box-shadow: inset 3px 0 0 var(--color-brand-ink);
+}
+::-webkit-scrollbar-track:horizontal {
+  box-shadow: inset 0 3px 0 var(--color-brand-ink);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-brand-red);
+  border: 3px solid var(--color-brand-ink);
+  box-shadow:
+    inset -3px -3px 0 rgb(0 0 0 / 0.25),
+    inset 3px 3px 0 rgb(255 255 255 / 0.35);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #ff5a4f;
+}
+::-webkit-scrollbar-thumb:active {
+  background: var(--color-brand-sun-deep);
+}
+::-webkit-scrollbar-corner {
+  background: var(--color-brand-sun-pale);
+}
+/* slimmer bars inside scrolling rows and panels */
+.overflow-x-auto::-webkit-scrollbar,
+.overflow-y-auto::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+@supports not selector(::-webkit-scrollbar) {
+  html {
+    scrollbar-color: var(--color-brand-red) var(--color-brand-sun-pale);
+  }
+}
+
+::selection {
+  background: var(--color-brand-sun);
+  color: var(--color-brand-ink);
+}
+
+/*
+  Pixel frames. Four box-shadows, one per side and each as wide as the element,
+  draw an outline whose corners stay empty: the notched corner of pixel art.
+  --pxb is the outline width, --pxc its colour; the drop is a strip under it.
+*/
+:root {
+  --pxb: 4px;
+  --pxc: var(--color-brand-ink);
+  --pixel-ring:
+    0 calc(var(--pxb) * -1) 0 0 var(--pxc), 0 var(--pxb) 0 0 var(--pxc),
+    calc(var(--pxb) * -1) 0 0 0 var(--pxc), var(--pxb) 0 0 0 var(--pxc);
+  --pixel-drop: 0 calc(var(--pxb) * 2.5) 0 0 var(--pxd, rgb(30 42 74 / 0.28));
+}
+
+/* The ring is recomputed wherever --pxb or --pxc change, so every frame can set its own */
+.box, .btn, .frame, .pixel, .pixel-sm, .doc-prose .note, .doc-prose .formula, .doc-prose .table-wrap {
+  --pixel-ring:
+    0 calc(var(--pxb) * -1) 0 0 var(--pxc), 0 var(--pxb) 0 0 var(--pxc),
+    calc(var(--pxb) * -1) 0 0 0 var(--pxc), var(--pxb) 0 0 0 var(--pxc);
+  --pixel-drop: 0 calc(var(--pxb) * 2.5) 0 0 var(--pxd, rgb(30 42 74 / 0.28));
+}
+
+@utility pixel {
+  --pxb: 4px;
+  box-shadow: var(--pixel-ring);
+}
+@utility pixel-sm {
+  --pxb: 3px;
+  box-shadow: var(--pixel-ring);
+}
+@utility pixel-drop {
+  box-shadow: var(--pixel-ring), var(--pixel-drop);
+}
+
+/* Components sit in a layer so Tailwind utilities (hidden, sm:…) can override them */
+@layer components {
+  /* White letters with a chunky ink outline and a hard drop, as in the banner title */
+  .outlined {
+    color: #fff;
+    text-shadow:
+      -3px 0 0 var(--color-brand-ink), 3px 0 0 var(--color-brand-ink), 0 -3px 0 var(--color-brand-ink), 0 3px 0 var(--color-brand-ink),
+      -3px -3px 0 var(--color-brand-ink), 3px -3px 0 var(--color-brand-ink), -3px 3px 0 var(--color-brand-ink), 3px 3px 0 var(--color-brand-ink),
+      0 8px 0 var(--color-brand-ink), -3px 8px 0 var(--color-brand-ink), 3px 8px 0 var(--color-brand-ink);
+  }
+  .outlined-sm {
+    color: #fff;
+    text-shadow:
+      -2px 0 0 var(--color-brand-ink), 2px 0 0 var(--color-brand-ink), 0 -2px 0 var(--color-brand-ink), 0 2px 0 var(--color-brand-ink),
+      -2px -2px 0 var(--color-brand-ink), 2px -2px 0 var(--color-brand-ink), -2px 2px 0 var(--color-brand-ink), 2px 2px 0 var(--color-brand-ink),
+      0 5px 0 var(--color-brand-ink), -2px 5px 0 var(--color-brand-ink), 2px 5px 0 var(--color-brand-ink);
+  }
+
+  /* Cards: a pixel frame (see the pixel utilities below) on white, with a pixel drop */
+  .box {
+    --pxb: 4px;
+    background: #fff;
+    box-shadow: var(--pixel-ring), var(--pixel-drop);
+  }
+
+  /*
+    Buttons in the Pixels style: notched pixel frame, a bevel (light top-left,
+    dark bottom-right) and a pixel drop; pressing flips the bevel and drops it.
+  */
+  .btn {
+    --pxb: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 52px;
+    margin: 4px;
+    padding: 0 24px;
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    background: var(--btn-bg);
+    color: var(--btn-fg);
+    box-shadow:
+      inset -4px -4px 0 0 rgb(0 0 0 / 0.2),
+      inset 4px 4px 0 0 rgb(255 255 255 / 0.35),
+      var(--pixel-ring),
+      var(--pixel-drop);
+    transition: transform 80ms steps(2), box-shadow 80ms steps(2);
+  }
+  .btn:hover {
+    transform: translateY(-2px);
+  }
+  .btn:active {
+    transform: translateY(4px);
+    box-shadow:
+      inset 4px 4px 0 0 rgb(0 0 0 / 0.2),
+      inset -4px -4px 0 0 rgb(255 255 255 / 0.2),
+      var(--pixel-ring);
+  }
+  .btn:focus-visible {
+    outline: 3px solid var(--color-brand-sea);
+    outline-offset: 3px;
+  }
+  .btn-sun { --btn-bg: var(--color-brand-sun); --btn-fg: var(--color-brand-ink); }
+  .btn-white { --btn-bg: #fff; --btn-fg: var(--color-brand-ink); }
+  .btn-red { --btn-bg: var(--color-brand-red); --btn-fg: #fff; }
+
+  @media (max-width: 639px) {
+    .btn {
+      min-height: 46px;
+      padding: 0 16px;
+      font-size: 17px;
+    }
+  }
+
+  .btn:disabled {
+    opacity: 0.55;
+    cursor: progress;
+    transform: none;
+  }
+
+  /* Text inputs: white with a pixel frame that turns red on focus */
+  .field {
+    --pxb: 3px;
+    --pxc: var(--color-brand-ink);
+    --pixel-ring:
+      0 calc(var(--pxb) * -1) 0 0 var(--pxc), 0 var(--pxb) 0 0 var(--pxc),
+      calc(var(--pxb) * -1) 0 0 0 var(--pxc), var(--pxb) 0 0 0 var(--pxc);
+    width: 100%;
+    margin: 3px 0;
+    padding: 12px 14px;
+    background: #fff;
+    box-shadow: var(--pixel-ring), inset 3px 3px 0 0 rgb(30 42 74 / 0.08);
+    outline: none;
+    font-size: 16px;
+  }
+  .field:focus {
+    --pxc: var(--color-brand-red);
+  }
+
+  /* Tilted "photo" frames for the gameplay scenes */
+  .frame {
+    --pxb: 4px;
+    background: #fff;
+    padding: 8px;
+    box-shadow: var(--pixel-ring), var(--pixel-drop);
+  }
+
+  /* Long-form text on the docs, litepaper and roadmap pages */
+  .doc-prose {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    font-size: 17px;
+    line-height: 1.65;
+  }
+  .doc-prose section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .doc-prose section + section {
+    margin-top: 36px;
+    padding-top: 36px;
+    border-top: 3px dashed rgb(30 42 74 / 0.2);
+  }
+  .doc-prose h2 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(30px, 4vw, 40px);
+    line-height: 1.1;
+  }
+  .doc-prose h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 22px;
+    margin-top: 8px;
+  }
+  .doc-prose ul,
+  .doc-prose ol {
+    display: grid;
+    gap: 8px;
+    padding-left: 22px;
+  }
+  .doc-prose ul { list-style: square; }
+  .doc-prose ol { list-style: decimal; }
+  .doc-prose li::marker { color: var(--color-brand-red); font-weight: 800; }
+  .doc-prose a { color: var(--color-brand-sea-deep); font-weight: 800; text-decoration: underline; text-underline-offset: 3px; }
+  .doc-prose code {
+    font-family: ui-monospace, monospace;
+    font-size: 0.88em;
+    background: var(--color-brand-sun-pale);
+    border: 2px solid rgb(30 42 74 / 0.15);
+    padding: 0 6px;
+  }
+  .doc-prose .note {
+    --pxb: 4px;
+    background: var(--color-brand-sun-pale);
+    box-shadow: var(--pixel-ring);
+    padding: 14px 16px;
+  }
+  .doc-prose .note b { color: var(--color-brand-red); }
+  .doc-prose .formula {
+    --pxb: 4px;
+    --pxd: var(--color-brand-sea);
+    background: #fff;
+    box-shadow: var(--pixel-ring), var(--pixel-drop);
+    padding: 16px 18px;
+    font-family: ui-monospace, monospace;
+    font-weight: 700;
+    overflow-x: auto;
+  }
+  .doc-prose .table-wrap {
+    --pxb: 4px;
+    overflow-x: auto;
+    background: #fff;
+    box-shadow: var(--pixel-ring), var(--pixel-drop);
+  }
+  .doc-prose table { width: 100%; min-width: 520px; border-collapse: collapse; font-size: 15px; }
+  .doc-prose th {
+    text-align: left;
+    padding: 10px 14px;
+    background: var(--color-brand-sun);
+    border-bottom: 3px solid var(--color-brand-ink);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .doc-prose td { padding: 10px 14px; border-top: 2px solid #e1eaf2; vertical-align: top; }
+  .doc-prose tr:nth-child(even) td { background: #f6fbff; }
+
+  .sunburst {
+    background: var(--color-brand-sun) url("/sunburst.png") center / cover no-repeat;
+    image-rendering: pixelated;
+  }
+
+  /*
+    The hero's rays, centred on the rig. Up to 1984px wide the scene is
+    height-limited, so the horizon sits 54/150 of its height above its bottom
+    edge; wider than that it is width-limited and the horizon is 54/480 of the
+    width up.
+  */
+  .hero-scene {
+    --scene-h: clamp(320px, 44vw, 620px);
+    height: var(--scene-h);
+  }
+  .hero-rays {
+    position: absolute;
+    left: 50%;
+    bottom: calc(var(--scene-h) * 0.36);
+    width: max(2400px, 170vw);
+    aspect-ratio: 1;
+    transform: translate(-50%, 50%);
+    background: url("/sunburst.png") center / 100% 100% no-repeat;
+    image-rendering: pixelated;
+    pointer-events: none;
+  }
+  @media (min-width: 1984px) {
+    .hero-rays {
+      bottom: 11.25vw;
+    }
+  }
+
+  /* The closing scene: 480 × 120 with the horizon 64 art pixels above the bottom */
+  .finale-scene {
+    --scene-h: clamp(240px, 30vw, 420px);
+    height: var(--scene-h);
+  }
+  .finale-rays {
+    position: absolute;
+    left: 50%;
+    bottom: calc(var(--scene-h) * 0.5333);
+    width: max(2400px, 170vw);
+    aspect-ratio: 1;
+    transform: translate(-50%, 50%);
+    background: url("/sunburst.png") center / 100% 100% no-repeat;
+    image-rendering: pixelated;
+    pointer-events: none;
+  }
+  @media (min-width: 1680px) {
+    .finale-rays {
+      bottom: 13.33vw;
+    }
+  }
+}
+
+/* ---------- motion ---------- */
+
+@keyframes ticker {
+  to { transform: translate3d(-25%, 0, 0); }
+}
+.ticker-track { animation: ticker 70s linear infinite; }
+
+@keyframes frame-a { 0%, 49.9% { opacity: 1; } 50%, 100% { opacity: 0; } }
+@keyframes frame-b { 0%, 49.9% { opacity: 0; } 50%, 100% { opacity: 1; } }
+.frame-a { animation: frame-a 0.5s infinite; }
+.frame-b { animation: frame-b 0.5s infinite; }
+.pump { animation-duration: 1.4s; }
+.needle { animation-duration: 2.8s; }
+
+.flicker { animation-duration: 0.3s; }
+
+@keyframes drift {
+  from { transform: translate(490px, 0); }
+  to { transform: translate(-30px, 0); }
+}
+.drift { animation: drift 200s linear infinite; }
+
+@keyframes gull-fly {
+  from { transform: translate(500px, 0); }
+  to { transform: translate(-20px, 0); }
+}
+.gull { animation: gull-fly 40s linear infinite; }
+.gull .frame-a, .gull .frame-b { animation-duration: 0.7s; }
+
+@keyframes waves { to { transform: translateX(32px); } }
+.waves { animation: waves 4s steps(16) infinite; }
+
+@keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-1px); } }
+.bob { animation: bob 2s steps(2) infinite; }
+
+@keyframes sail {
+  from { transform: translateX(-140px); }
+  to { transform: translateX(100vw); }
+}
+.sail { left: 0; animation: sail 40s linear infinite, bob 2s steps(2) infinite; }
+
+@keyframes twinkle { 0%, 70%, 100% { opacity: 0; } 75%, 95% { opacity: 1; } }
+.twinkle { opacity: 0; animation: twinkle 3.5s steps(1) infinite; }
+
+@keyframes blink { 0%, 60% { opacity: 1; } 61%, 100% { opacity: 0; } }
+.blink { animation: blink 1.2s infinite; }
+
+@keyframes smoke { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-4px); opacity: 0; } }
+.smoke { animation: smoke 2s steps(4) infinite; }
+
+@keyframes rain { to { transform: translate(-6px, 16px); } }
+.rain { animation: rain 0.4s linear infinite; }
+
+@keyframes flash { 0%, 88%, 92%, 100% { opacity: 0; } 89%, 91% { opacity: 0.35; } }
+@keyframes flash-bolt { 0%, 87%, 93%, 100% { opacity: 0; } 88%, 92% { opacity: 1; } }
+.flash { opacity: 0; animation: flash 5s infinite; }
+.flash-bolt { opacity: 0; animation: flash-bolt 5s infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .frame-b { opacity: 0; }
+  .sail { transform: translateX(40vw); }
+  .gull { transform: translate(120px, 0); }
+  .drift:nth-of-type(odd) { transform: translate(60px, 0); }
+  .drift:nth-of-type(even) { transform: translate(380px, 0); }
+}

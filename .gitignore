@@ -1,0 +1,19 @@
+# dependencies and builds
+node_modules/
+.next/
+out/
+dist/
+
+# secrets (the example file is safe to share)
+.env*
+!.env.example
+
+# scraped third-party pages kept only for local reference
+research/pixels-site/
+
+# tooling and OS
+.firecrawl/
+.vercel/
+*.log
+.DS_Store
+Thumbs.db

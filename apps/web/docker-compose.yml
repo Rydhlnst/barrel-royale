@@ -1,0 +1,45 @@
+# Barrel Royale on one VPS: the web app and its Postgres.
+#
+# Coolify: add a "Docker Compose" resource pointing at this repo with base
+# directory /apps/web. The SERVICE_* variables below are filled in by Coolify:
+# SERVICE_FQDN_WEB_3000 gives the web service a domain (with HTTPS) on port
+# 3000, and SERVICE_PASSWORD_POSTGRES is a generated password.
+#
+# Plain Docker: create a .env next to this file with POSTGRES_PASSWORD=… and run
+#   docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --build
+# and the site is on http://localhost:3000.
+
+services:
+  web:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_ROYAL_CA: ${NEXT_PUBLIC_ROYAL_CA:-}
+    environment:
+      - SERVICE_FQDN_WEB_3000
+      - DATABASE_URL=postgres://royale:${SERVICE_PASSWORD_POSTGRES:-${POSTGRES_PASSWORD:-royale}}@db:5432/royale
+    # Coolify's proxy reaches the container directly; no host port needed
+    expose:
+      - "3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: postgres:17-alpine
+    environment:
+      - POSTGRES_USER=royale
+      - POSTGRES_PASSWORD=${SERVICE_PASSWORD_POSTGRES:-${POSTGRES_PASSWORD:-royale}}
+      - POSTGRES_DB=royale
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U royale -d royale"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  pgdata:
