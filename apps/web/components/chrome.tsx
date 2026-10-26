@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { site } from "@/lib/site";
 import { PixelIcon } from "@/components/pixel/sprite";
-import { base, crownBarrel, xMark } from "@/components/pixel/sprites";
+import { base, logoMark, xMark } from "@/components/pixel/sprites";
 import { Button } from "@/components/ui";
 import { FinaleScene } from "@/components/scenes/finale-scene";
 
@@ -18,7 +18,7 @@ export const pages = [
 export function Logo({ className = "", outlined = true }: { className?: string; outlined?: boolean }) {
   return (
     <Link href="/" className={`flex shrink-0 items-center gap-3 ${className}`} aria-label={`${site.name} home`}>
-      <PixelIcon rows={crownBarrel} palette={base} scale={3} />
+      <PixelIcon rows={logoMark} palette={base} scale={3} className="pixel-sm m-[3px] shrink-0" />
       <span className={`font-logo text-base font-bold uppercase sm:text-2xl ${outlined ? "outlined-sm" : "text-brand-ink"}`}>
         Barrel <span className="text-brand-red">Royale</span>
       </span>

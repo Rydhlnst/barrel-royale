@@ -32,28 +32,28 @@ const features = [
     eyebrow: "Wells",
     title: "Ride the pressure",
     body: "Every well builds pressure while it pumps. Open the choke and it pays out faster, but past the red line it blows and the well is down until you cap it. Steady hands out-earn greedy ones.",
-    hat: [C.hat, C.hatShade],
+    hat: [C.hat, C.hatLight],
   },
   {
     scene: <RefineScene />,
     eyebrow: "Refinery",
     title: "Refine for the margin",
     body: "Crude and gas come out of the ground; diesel, jet fuel and LNG come out of your refinery. Chain the units, watch six markets, and sell whichever product pays best today.",
-    hat: [C.red, C.redDeep],
+    hat: [C.red, C.redLight],
   },
   {
     scene: <StormScene />,
     eyebrow: "Incidents",
     title: "Brace for the storm",
     body: "Storms and sabotage hit on a clock. When the alarm sounds you get a few seconds to shut valves and lash down the cargo. Hold the rig and earn a bonus; miss it and oil goes overboard.",
-    hat: [C.white, C.steelLight],
+    hat: [C.white, C.sky],
   },
   {
     scene: <CrewScene />,
     eyebrow: "Crews",
     title: "Win the crew war",
     body: "Crews of up to 20 rigs share a leaderboard each season, send saboteurs at their rivals and cover each other's decks. The top three crews split the season's bonus pool.",
-    hat: [C.sea, C.seaDeep],
+    hat: [C.sea, C.foam],
   },
 ];
 

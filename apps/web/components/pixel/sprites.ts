@@ -1,12 +1,14 @@
 import { C } from "@/lib/palette";
 import type { Palette } from "./sprite";
 
-// Shared keys: K ink outline, W white, H/h hard hat, S/s skin, M mustache,
-// T shirt, O/o overalls, Y/y gold, R/r barrel red, G/g steel, D oil, L oil shine.
+// Shared keys: K ink outline, W white, H/E/h hard hat (body, shine, shade), S/s skin,
+// M mustache, T shirt, O/o overalls, U overall button, Y/y gold, R/r barrel red,
+// G/g steel, D oil, L oil shine.
 export const base: Palette = {
   K: C.ink,
   W: C.white,
   H: C.hat,
+  E: C.hatLight,
   h: C.hatShade,
   S: C.skin,
   s: C.skinShade,
@@ -14,6 +16,7 @@ export const base: Palette = {
   T: C.shirt,
   O: C.overall,
   o: C.overallShade,
+  U: C.button,
   Y: C.sun,
   y: C.sunDeep,
   R: C.red,
@@ -26,34 +29,55 @@ export const base: Palette = {
   b: C.seaDeep,
 };
 
-/** The roughneck from the Barrel Royale icon; swap H/h for other crews' hard hats. */
+/** The roughneck from the Barrel Royale logo, pixel for pixel; swap H/E for other crews' hard hats. */
 export const roughneck = [
   "................",
-  ".....KKKKKK.....",
-  "....KHHHHHHK....",
-  "...KHHWHHHHHK...",
-  "..KhhhhhhhhhhK..",
+  "......KKKK......",
+  ".....KEEHHK.....",
+  "....KEHHHHHK....",
+  "...KHHHHHHHHK...",
   "..KKKKKKKKKKKK..",
   "...KSSSSSSSSK...",
-  "...KSKSSSSKSK...",
+  "...KSSKSSKSSK...",
   "...KSSSSSSSSK...",
-  "...KSSSssSSSK...",
-  "...KMMMMMMMMK...",
-  "....KSSSSSSK....",
-  "..KKOTTTTTTOKK..",
-  ".KOOOOTTTTOOooK.",
-  ".KSKOOOOOOOOKSK.",
-  ".KSKOOOYYOOOKSK.",
-  "..KKOOOOOOOOKK..",
+  "...KSMMMMMMSK...",
+  "....KSSssSSK....",
+  ".....KKKKKK.....",
+  "....KOTTTTOK....",
+  "...KOOOTTOOOK...",
+  "..KSOOOOOOOOSK..",
+  "..KSOOOUUOOOSK..",
+  "...KOOOOOOOOK...",
   "...KOOOKKOOOK...",
   "...KKKK..KKKK...",
 ] as const;
 
 export const roughneckHead = roughneck.slice(0, 12);
 
-export const hat = (H: string, h: string): Palette => ({ ...base, H, h });
+/** Another crew's hard hat: its colour and the shine on top. */
+export const hat = (H: string, E: string): Palette => ({ ...base, H, E });
 
-/** The logo mark: a red barrel wearing a crown. */
+/** The logo mark: the roughneck under the sunburst, cropped square from the app icon. */
+export const logoMark = [
+  "yyyyYYKKKKyyyYYY",
+  "yyyyyKEEHHKyYYYY",
+  "yyyyKEHHHHHKYYYY",
+  "WyyKHHHHHHHHKYYy",
+  "YYKKKKKKKKKKKKyy",
+  "YYYKSSSSSSSSKyyy",
+  "YYYKSSKSSKSSKyyy",
+  "yYYKSSSSSSSSKyyy",
+  "yyyKSMMMMMMSKYYY",
+  "yyyyKSSssSSKUYYY",
+  "yyyyUKKKKKKUUyyy",
+  "YYYYKOTTTTOKUyyy",
+  "YYYKOOOTTOOOKyyy",
+  "YyKSOOOOOOOOSKYY",
+  "yyKSOOOUUOOOSKYY",
+  "yyyKOOOOOOOOKyYY",
+] as const;
+
+/** A red barrel wearing a crown: the icon for rigs and joining. */
 export const crownBarrel = [
   ".K.....KK.....K.",
   "KYK...KYYK...KYK",

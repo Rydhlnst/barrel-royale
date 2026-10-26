@@ -130,9 +130,9 @@ export function CrewScene() {
       <Sprite rows={crate} palette={base} x={6} y={44} />
       <Sprite rows={crate} palette={base} x={16} y={44} />
       <Sprite rows={crate} palette={base} x={11} y={34} />
-      <Sprite rows={roughneck} palette={hat(C.red, C.redDeep)} x={30} y={34} />
+      <Sprite rows={roughneck} palette={hat(C.red, C.redLight)} x={30} y={34} />
       <Sprite rows={roughneck} palette={base} x={46} y={28} />
-      <Sprite rows={roughneck} palette={hat(C.white, C.steelLight)} x={62} y={36} />
+      <Sprite rows={roughneck} palette={hat(C.white, C.sky)} x={62} y={36} />
       <Sprite rows={icons.coin} palette={base} x={78} y={10} className="bob" />
     </Scene>
   );

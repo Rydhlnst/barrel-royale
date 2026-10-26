@@ -8,6 +8,7 @@ export const C = {
   sky: "#eaf7ff",
   red: "#e8453c",
   redDeep: "#b8322b",
+  redLight: "#f58a80",
   sea: "#1a73d9",
   seaDeep: "#0f55b0",
   foam: "#96c8ff",
@@ -19,17 +20,19 @@ export const C = {
   leaf: "#15905f",
   white: "#ffffff",
 
-  // the roughneck
-  hat: "#ff8a1f",
+  // the roughneck, as drawn in the logo
+  hat: "#ff7a1b",
+  hatLight: "#ffb86e",
   hatShade: "#e0650f",
-  skin: "#f5c08f",
-  skinShade: "#d99a68",
-  mustache: "#8a5a2b",
-  shirt: "#e6eef8",
+  skin: "#f6c18f",
+  skinShade: "#d9965f",
+  mustache: "#5a381f",
+  shirt: "#e3e8ee",
   wood: "#8a5a2b",
   woodDark: "#5c3a1a",
-  overall: "#2b6fd6",
-  overallShade: "#1e55b0",
+  overall: "#1a73d9",
+  overallShade: "#0f55b0",
+  button: "#feec96",
 
   // crude and fire
   oil: "#2a3150",
