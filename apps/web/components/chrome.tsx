@@ -111,10 +111,8 @@ export function Footer({ children }: { children?: React.ReactNode }) {
               <XButton className="h-11! w-11!" />
             </nav>
           </div>
-          <p className="max-w-4xl text-sm leading-relaxed">
-            {site.name} is an independent game on Robinhood Chain, not affiliated with Exxon Mobil or Robinhood. {site.reward} stock tokens are tokenized
-            debt securities issued by Robinhood Assets (Jersey) Limited that track the Exxon Mobil share price without shareholder rights, available
-            outside the US, Canada, the UK and Switzerland. Nothing on this site is financial advice.
+          <p className="text-xs opacity-70">
+            © {site.name} · An independent game, not affiliated with Exxon Mobil or Robinhood · Not financial advice
           </p>
         </div>
       </footer>

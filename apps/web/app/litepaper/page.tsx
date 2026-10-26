@@ -200,11 +200,9 @@ export default function Litepaper() {
 
       <Section id="compliance" title="10. Compliance">
         <p>
-          {site.reward} stock tokens are tokenized debt securities issued by Robinhood Assets (Jersey) Limited. They are available outside the US,
-          Canada, the UK and Switzerland, so {site.reward} claims run through an eligibility check, and the reward program is reviewed by counsel before
-          claims open. The game itself and {site.token} rewards are open to every player.
+          {site.reward} claims run through a quick eligibility check, since stock tokens are not offered in every region, and the reward program is
+          reviewed by counsel before claims open. The game itself and {site.token} rewards are open to every player. Nothing here is financial advice.
         </p>
-        <p>Like every digital asset, {site.token} and {site.reward} move with their markets. Nothing here is financial advice.</p>
       </Section>
 
       <Section id="sources" title="11. Sources">

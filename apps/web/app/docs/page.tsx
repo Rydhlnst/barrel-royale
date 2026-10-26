@@ -282,8 +282,8 @@ export default function Docs() {
 
       <Section id="eligibility" title={`Who can claim ${site.reward}`}>
         <Note title="Good to know.">
-          {site.reward} stock tokens are tokenized debt securities issued by Robinhood Assets (Jersey) Limited and available outside the US, Canada, the
-          UK and Switzerland. Claims run through a quick eligibility check. Rigs in every country play the full game and earn {site.token}.
+          {site.reward} claims run through a quick eligibility check, since stock tokens are not offered in every region. Every rig plays the full game and
+          earns {site.token}.
         </Note>
       </Section>
 
