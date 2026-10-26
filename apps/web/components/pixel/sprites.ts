@@ -57,25 +57,67 @@ export const roughneckHead = roughneck.slice(0, 12);
 /** Another crew's hard hat: its colour and the shine on top. */
 export const hat = (H: string, E: string): Palette => ({ ...base, H, E });
 
-/** The logo mark: the roughneck under the sunburst, cropped square from the app icon. */
-export const logoMark = [
-  "yyyyYYKKKKyyyYYY",
-  "yyyyyKEEHHKyYYYY",
-  "yyyyKEHHHHHKYYYY",
-  "WyyKHHHHHHHHKYYy",
-  "YYKKKKKKKKKKKKyy",
-  "YYYKSSSSSSSSKyyy",
-  "YYYKSSKSSKSSKyyy",
-  "yYYKSSSSSSSSKyyy",
-  "yyyKSMMMMMMSKYYY",
-  "yyyyKSSssSSKUYYY",
-  "yyyyUKKKKKKUUyyy",
-  "YYYYKOTTTTOKUyyy",
-  "YYYKOOOTTOOOKyyy",
-  "YyKSOOOOOOOOSKYY",
-  "yyKSOOOUUOOOSKYY",
-  "yyyKOOOOOOOOKyYY",
+/**
+ * The logo, the app icon pixel for pixel: the roughneck between a barrel and a
+ * drop of crude under the sunburst, on the deck over the sea. Its own palette
+ * keeps the icon's exact colours.
+ */
+export const logo = [
+  "yyyyyyyyyYYYYYYYyyyyyyyyYYYYYYYY",
+  "yyyyyyyyyyYYYYYYyyyyyyyYYYYYYYYY",
+  "YyyyyyyyyyYYYYYYyyyyyyyYYYYYYYYy",
+  "YYyyyyyyyyyYYYYWyyyyyyYYYYYYYYyy",
+  "YYYyyyyyyyyYYYYYyyyyyWYYYYYYYyyy",
+  "YYYYyyyyyyyyYYYYyyyyyYYYYYYYyyyy",
+  "YYYYYyyyyyyyYYYYyyyyyYYYYYYyyyyy",
+  "YYYYYYyyyyyyYYKKKKyyyYYYYYyyyyyy",
+  "YYYYYYYyyyyyyKhhHHKyYYYYWyyyyyyy",
+  "YYYYYYYYyyyyKhHHHHHKYYYYyyyyyyyy",
+  "YYYYYYYYWyyKHHHHHHHHKYYyyyyyyyyy",
+  "yyYYYYYYYYKKKKKKKKKKKKyyyyyyyyyY",
+  "yyyyYYYYYYYKSSSSSSSSKyyyyyKyyYYY",
+  "yyyKKKKKYYYKSSKSSKSSKyyyyKDKYYYY",
+  "yyKRRRRrKYYKSSSSSSSSKyyyYKDKYYYY",
+  "yyKKKKKKKyyKSMMMMMMSKYYYKDDDKYYY",
+  "yyKWRRRrKyyyKSSssSSKfYYYKLDDKYYY",
+  "yyKWRRRrKyyyfKKKKKKffyyKLDDDDKyy",
+  "YYKWRRRrKYYYKBTTTTBKfyyKLDDDDKyy",
+  "YYKKKKKKKYYKBBBTTBBBKyyKDDDDDKyy",
+  "YYKRRRRrKyKSBBBBBBBBSKYYKDDDKyyy",
+  "YYYKKKKKyyKSBBBffBBBSKYYYKKKyyyy",
+  "YYYYyyyyyyyKBBBBBBBBKyYYYYYYYyyy",
+  "YYyyyyyyyyyKBBBKKBBBKyyYYYYYYYYy",
+  "yyyyyyyyyyYKKKKyyKKKKyyyYYYYYYYY",
+  "KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK",
+  "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+  "gggggggggggggggggggggggggggggggg",
+  "KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK",
+  "BBBBBffBBBBBBBBBBBBBBBBBBffBBBBB",
+  "BFFBBffFFBBBBFFBBBBFFBBBBffBBBBF",
+  "BBBBBffBBBBBBBBBBBBBBBBBBffBBBBB",
 ] as const;
+
+export const logoPalette: Palette = {
+  y: "#ffb22e",
+  Y: "#ffd54a",
+  K: "#1e2a4a",
+  B: "#1a73d9",
+  S: "#f6c18f",
+  s: "#d9965f",
+  G: "#9aa6b5",
+  g: "#78849a",
+  D: "#2a3150",
+  L: "#8fc4ff",
+  f: "#feec96",
+  R: "#e8453c",
+  r: "#b8322b",
+  H: "#ff7a1b",
+  h: "#ffb86e",
+  F: "#96c8ff",
+  W: "#ffffff",
+  M: "#5a381f",
+  T: "#e3e8ee",
+};
 
 /** A red barrel wearing a crown: the icon for rigs and joining. */
 export const crownBarrel = [

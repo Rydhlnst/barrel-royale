@@ -84,7 +84,7 @@ function Header() {
     <header className="absolute inset-x-0 top-0 z-30">
       <div className="mx-auto flex max-w-7xl items-center gap-8 px-4 py-4 sm:px-8">
         <Logo />
-        <nav aria-label="Main" className="hidden gap-5 lg:flex">
+        <nav aria-label="Main" className="hidden gap-5 xl:flex">
           {nav.map((n) => (
             <a key={n.label} href={n.href} className="font-display text-base font-bold text-brand-ink hover:text-brand-red">
               {n.label}

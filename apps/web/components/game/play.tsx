@@ -8,7 +8,7 @@ import { UNITS, BRACE_SECONDS } from "@/lib/game/content";
 import * as E from "@/lib/game/engine";
 import { GameStore, type Target } from "@/lib/game/store";
 import { PixelIcon } from "@/components/pixel/sprite";
-import { base, logoMark } from "@/components/pixel/sprites";
+import { logo, logoPalette } from "@/components/pixel/sprites";
 import { Bar, DispatchPanel, MarketPanel, QuartersPanel, SlotPanel, StoragePanel, ValveDrill, fmt, mmss, secs } from "./panels";
 import { World } from "./world/world";
 import { SPOTS } from "./world/map";
@@ -131,7 +131,7 @@ export default function Play() {
       {/* HUD */}
       <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex flex-wrap items-start gap-2 p-3 sm:gap-3 sm:p-4">
         <Link href="/" className="pointer-events-auto mr-auto flex items-center gap-2" aria-label={`${site.name} home`}>
-          <PixelIcon rows={logoMark} palette={base} scale={3} className="pixel-sm m-[3px] shrink-0" />
+          <PixelIcon rows={logo} palette={logoPalette} scale={2} className="pixel-sm m-[3px] h-12 w-12 shrink-0 sm:h-16 sm:w-16" />
           <span className="outlined-sm hidden font-logo text-lg font-bold uppercase sm:inline">
             Rig <span className="text-brand-sun">#0417</span>
           </span>
