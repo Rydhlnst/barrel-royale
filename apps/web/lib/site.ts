@@ -8,6 +8,7 @@ export const site = {
   token: "$ROYAL",
   reward: "XOM",
   tagline: "Pump crude. Earn Exxon.",
+  url: "https://barrelroyale.io",
   title: "Barrel Royale · Pump crude. Earn Exxon.",
   description:
     "An offshore drilling game on Robinhood Chain. Drill wells, refine and sell barrels at prices that track the energy market, and claim weekly XOM stock tokens for the oil your rig produces.",

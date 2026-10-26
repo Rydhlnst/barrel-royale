@@ -10,9 +10,10 @@ const pixelify = Pixelify_Sans({ variable: "--font-pixelify", weight: ["500", "7
 const nunito = Nunito({ variable: "--font-nunito", weight: ["500", "700", "800"], subsets: ["latin"] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(site.url),
   title: site.title,
   description: site.description,
-  openGraph: { title: site.title, description: site.description, type: "website" },
+  openGraph: { title: site.title, description: site.description, type: "website", url: "/", siteName: site.name },
   twitter: { card: "summary_large_image", title: site.title, description: site.description },
 };
 
