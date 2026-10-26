@@ -11,6 +11,8 @@ import {
   POINTS,
   PRODUCTS,
   PRODUCT_ORDER,
+  ROYAL_DAILY_CAP,
+  ROYAL_PER_BARREL,
   START_COINS,
   STORM_EVERY,
   STORM_WARNING,
@@ -40,7 +42,11 @@ export type Storm = { phase: "brace"; endsAt: number; order: number[]; step: num
 export type Game = {
   version: 1;
   savedAt: number;
+  /** In-game money for drilling, units and upgrades. It never leaves the game. */
   coins: number;
+  /** $ROYAL earned by exporting barrels, and how much of the daily quota is used today. */
+  royal: number;
+  exported: { day: number; royal: number };
   level: number;
   slots: Slot[];
   storage: Record<Product, number>;
@@ -63,6 +69,7 @@ type Rng = () => number;
 const zeroes = () => Object.fromEntries(PRODUCT_ORDER.map((p) => [p, 0])) as Record<Product, number>;
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
 const round = (v: number) => Math.round(v * 100) / 100;
+const dayOf = (now: number) => Math.floor(now / 86_400_000);
 
 export const levelInfo = (g: Game) => LEVELS[g.level - 1];
 export const storageUsed = (g: Game) => PRODUCT_ORDER.reduce((sum, p) => sum + g.storage[p], 0);
@@ -80,6 +87,8 @@ export function newGame(now: number): Game {
     version: 1,
     savedAt: now,
     coins: START_COINS,
+    royal: 0,
+    exported: { day: dayOf(now), royal: 0 },
     level: 1,
     slots,
     storage: zeroes(),
@@ -204,7 +213,7 @@ function endStorm(g: Game, now: number) {
     g.coins += bonus;
     g.points += POINTS.storm;
     g.stormsHeld++;
-    log(g, now, `Rig held through the storm. Bonus +${bonus} $ROYAL.`);
+    log(g, now, `Rig held through the storm. Bonus +${bonus} coins.`);
   } else {
     const share = 0.3 * (1 - held);
     let lost = 0;
@@ -266,7 +275,7 @@ export function drill(prev: Game, now: number, i: number, product: Raw): Result 
   return act(prev, now, (g) => {
     if (!usable(g, i) || g.slots[i].kind !== "empty") return "!That slot isn't free.";
     const cost = WELLS[product].cost;
-    if (g.coins < cost) return `!Drilling ${PRODUCTS[product].name.toLowerCase()} costs ${cost} $ROYAL.`;
+    if (g.coins < cost) return `!Drilling ${PRODUCTS[product].name.toLowerCase()} costs ${cost} coins.`;
     g.coins -= cost;
     g.slots[i] = { kind: "well", product, choke: "normal", pressure: 20, held: 0, blown: false };
     log(g, now, `Struck ${PRODUCTS[product].name.toLowerCase()} in slot ${i + 1}.`);
@@ -321,7 +330,7 @@ export function cap(prev: Game, now: number, i: number, drillDone: boolean): Res
     const s = g.slots[i];
     if (s.kind !== "well" || !s.blown) return "!That well is running fine.";
     if (!drillDone) {
-      if (g.coins < CAP_COST) return `!Capping costs ${CAP_COST} $ROYAL, or run the capping drill.`;
+      if (g.coins < CAP_COST) return `!Capping costs ${CAP_COST} coins, or run the capping drill.`;
       g.coins -= CAP_COST;
     }
     s.blown = false;
@@ -344,7 +353,7 @@ export function build(prev: Game, now: number, i: number, unit: UnitKind): Resul
   return act(prev, now, (g) => {
     if (!usable(g, i) || g.slots[i].kind !== "empty") return "!That slot isn't free.";
     const cost = UNITS[unit].cost;
-    if (g.coins < cost) return `!A ${UNITS[unit].name.toLowerCase()} unit costs ${cost} $ROYAL.`;
+    if (g.coins < cost) return `!A ${UNITS[unit].name.toLowerCase()} unit costs ${cost} coins.`;
     g.coins -= cost;
     g.slots[i] = { kind: "unit", unit, level: 1, recipe: 0, progress: 0 };
     log(g, now, `Built a ${UNITS[unit].name.toLowerCase()} unit in slot ${i + 1}.`);
@@ -358,7 +367,7 @@ export function upgradeUnit(prev: Game, now: number, i: number): Result {
     if (s.kind !== "unit") return "!No unit there.";
     if (s.level >= 3) return "!Already at the top level.";
     const cost = UNIT_UPGRADE_COST[s.level + 1];
-    if (g.coins < cost) return `!The upgrade costs ${cost} $ROYAL.`;
+    if (g.coins < cost) return `!The upgrade costs ${cost} coins.`;
     g.coins -= cost;
     s.level++;
     log(g, now, `${UNITS[s.unit].name} upgraded to level ${s.level}.`);
@@ -384,8 +393,29 @@ export function sell(prev: Game, now: number, p: Product): Result {
     const value = Math.round(qty * price(g, p));
     g.storage[p] = 0;
     g.coins += value;
-    log(g, now, `Sold ${qty} bbl ${PRODUCTS[p].name.toLowerCase()} at ${g.index[p].toFixed(2)}×: +${value} $ROYAL.`);
-    return `Sold ${qty} bbl for +${value} $ROYAL`;
+    log(g, now, `Sold ${qty} bbl ${PRODUCTS[p].name.toLowerCase()} at ${g.index[p].toFixed(2)}×: +${value} coins.`);
+    return `Sold ${qty} bbl for +${value} coins`;
+  });
+}
+
+/** $ROYAL left in today's export quota (UTC day). */
+export const exportLeft = (g: Game, now: number) => (g.exported.day === dayOf(now) ? round(ROYAL_DAILY_CAP - g.exported.royal) : ROYAL_DAILY_CAP);
+
+/** Ship barrels out through the export terminal for $ROYAL, up to the daily quota. */
+export function exportBarrels(prev: Game, now: number, p: Product): Result {
+  return act(prev, now, (g) => {
+    const have = g.storage[p];
+    if (!have) return "!Nothing to export.";
+    const left = exportLeft(g, now);
+    if (left <= 0) return `!Today's export quota of ${ROYAL_DAILY_CAP} $ROYAL is full. It resets at 00:00 UTC.`;
+    const qty = Math.min(have, Math.floor(left / ROYAL_PER_BARREL + 1e-9));
+    const earned = round(qty * ROYAL_PER_BARREL);
+    if (g.exported.day !== dayOf(now)) g.exported = { day: dayOf(now), royal: 0 };
+    g.storage[p] -= qty;
+    g.royal = round(g.royal + earned);
+    g.exported.royal = round(g.exported.royal + earned);
+    log(g, now, `Exported ${qty} bbl ${PRODUCTS[p].name.toLowerCase()}: +${earned.toFixed(2)} $ROYAL.`);
+    return `Exported ${qty} bbl for +${earned.toFixed(2)} $ROYAL`;
   });
 }
 
@@ -399,8 +429,8 @@ export function fill(prev: Game, now: number, id: number): Result {
     g.points += POINTS.contract;
     g.contractsFilled++;
     g.contracts = g.contracts.filter((x) => x.id !== id);
-    log(g, now, `Contract filled: ${c.qty} bbl ${PRODUCTS[c.product].name.toLowerCase()} for +${c.reward} $ROYAL.`);
-    return `Contract filled: +${c.reward} $ROYAL`;
+    log(g, now, `Contract filled: ${c.qty} bbl ${PRODUCTS[c.product].name.toLowerCase()} for +${c.reward} coins.`);
+    return `Contract filled: +${c.reward} coins`;
   });
 }
 
@@ -408,7 +438,7 @@ export function upgradeRig(prev: Game, now: number): Result {
   return act(prev, now, (g) => {
     if (g.level >= LEVELS.length) return "!Your rig is at the top level.";
     const next = LEVELS[g.level];
-    if (g.coins < next.cost) return `!The next level costs ${next.cost} $ROYAL.`;
+    if (g.coins < next.cost) return `!The next level costs ${next.cost} coins.`;
     g.coins -= next.cost;
     g.level++;
     log(g, now, `Rig upgraded to level ${g.level}: ${next.slots} deck slots, ${next.storage} bbl storage.`);

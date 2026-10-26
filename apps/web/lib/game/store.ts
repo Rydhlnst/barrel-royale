@@ -16,7 +16,12 @@ function load(now: number): E.Game {
     const raw = localStorage.getItem(SAVE_KEY);
     if (raw) {
       const g = JSON.parse(raw) as E.Game;
-      if (g.version === 1 && Array.isArray(g.slots)) return E.tick(g, now);
+      if (g.version === 1 && Array.isArray(g.slots)) {
+        // saves from before the export terminal only had coins
+        g.royal ??= 0;
+        g.exported ??= { day: 0, royal: 0 };
+        return E.tick(g, now);
+      }
     }
   } catch {
     // a broken or blocked save starts a fresh rig

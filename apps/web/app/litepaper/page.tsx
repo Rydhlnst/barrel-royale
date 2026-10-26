@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { site } from "@/lib/site";
+import { ROYAL_DAILY_CAP, ROYAL_PER_BARREL } from "@/lib/game/content";
 import { DocPage, Formula, Note, Section, Table } from "@/components/doc/doc";
+
+const fmt = (n: number) => n.toLocaleString("en-US");
 
 export const metadata: Metadata = {
   title: `Litepaper · ${site.name}`,
@@ -37,7 +40,7 @@ export default function Litepaper() {
 
       <Section id="summary" title="1. Summary">
         <p>
-          Players own rigs (NFTs), drill wells, manage well pressure, refine crude and gas into six energy products and sell them for {site.token}. Each
+          Players own rigs (NFTs), drill wells, manage well pressure, refine crude and gas into six energy products, sell them for in-game coins and export them for {site.token}. Each
           product&apos;s price follows a real benchmark through an on-chain oracle. A fixed share of project revenue buys {site.reward}, the Exxon Mobil
           stock token on Robinhood Chain, which is shared every week by the rigs that produce.
         </p>
@@ -96,10 +99,11 @@ export default function Litepaper() {
       <Section id="economy" title="5. Economy">
         <h3>{site.token}</h3>
         <p>
-          {site.token} is a fixed-supply ERC-20 with a fair launch: no presale and no private round. In-game sales are paid from the game rewards pool
-          under a daily cap of 500,000 {site.token}. The pool is refilled by buybacks from revenue and by {site.token} that players spend on drilling,
-          capping blowouts, repairs, refinery fuel, upgrades, raids and cosmetics. The goal is for at least 70% of what the pool pays out to come back
-          through play, shown on a public dashboard.
+          {site.token} is a fixed-supply ERC-20 with a fair launch: no presale and no private round. In-game sales pay coins, which never leave the game. The
+          only way play turns into {site.token} is the export terminal: {fmt(10 / ROYAL_PER_BARREL)} bbl of any product ships out for 10 {site.token},
+          up to {ROYAL_DAILY_CAP} {site.token} per rig per day. Exports are paid from the game rewards pool, which is refilled by buybacks from revenue
+          and by the {site.token} players spend on class upgrades, raids and cosmetics. The rate and the quota are set so the pool pays out no more than
+          flows back in, and both are shown on a public dashboard.
         </p>
         <h3>Rig mint</h3>
         <Table

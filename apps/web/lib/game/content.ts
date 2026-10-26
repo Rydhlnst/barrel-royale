@@ -73,3 +73,11 @@ export const BRACE_SECONDS = 8;
 export const OFFLINE_CAP = 2 * 60 * 60;
 
 export const POINTS = { barrel: 1, contract: 5, storm: 5 };
+
+/**
+ * The export terminal is the only way barrels become $ROYAL: 1,000 bbl of any
+ * product ships out for 10 $ROYAL, up to a daily quota per rig. Selling on the
+ * market pays in-game coins instead, which never leave the game.
+ */
+export const ROYAL_PER_BARREL = 0.01;
+export const ROYAL_DAILY_CAP = 50;

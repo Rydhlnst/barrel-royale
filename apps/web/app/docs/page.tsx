@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { site } from "@/lib/site";
+import { ROYAL_DAILY_CAP, ROYAL_PER_BARREL } from "@/lib/game/content";
 import { DocPage, Formula, Note, Section, Table } from "@/components/doc/doc";
+
+const fmt = (n: number) => n.toLocaleString("en-US");
 
 export const metadata: Metadata = {
   title: `Docs · ${site.name}`,
@@ -82,8 +85,7 @@ export default function Docs() {
           ]}
         />
         <p>
-          Push past the red line and the well <b>blows out</b>: it stops and loses the barrels still in it until you cap it. Capping costs a little{" "}
-          {site.token}, or nothing at all if you close the valves in order during the capping drill. Good roughnecks run Overdrive and back off just in
+          Push past the red line and the well <b>blows out</b>: it stops and loses the barrels still in it until you cap it. Capping costs a few coins, or nothing at all if you close the valves in order during the capping drill. Good roughnecks run Overdrive and back off just in
           time.
         </p>
       </Section>
@@ -103,8 +105,8 @@ export default function Docs() {
         />
       </Section>
 
-      <Section id="selling" title="Selling and contracts">
-        <p>There are two ways to sell, and the best crews use both.</p>
+      <Section id="selling" title="Selling, contracts and export">
+        <p>Barrels leave the rig three ways, and the best crews use all of them.</p>
         <ul>
           <li>
             <b>Spot market.</b> Sell any time at the product&apos;s index.
@@ -112,7 +114,15 @@ export default function Docs() {
           <li>
             <b>Dispatch board.</b> Tanker contracts at a fixed price, 10 to 30% above base, with a deadline, such as 40 bbl of diesel within 2 hours.
           </li>
+          <li>
+            <b>Export terminal.</b> Ship barrels out for {site.token}: {fmt(10 / ROYAL_PER_BARREL)} bbl of any product earns 10 {site.token}, up to{" "}
+            {ROYAL_DAILY_CAP} {site.token} per rig per day.
+          </li>
         </ul>
+        <p>
+          The market and contracts pay in-game coins, which buy wells, refinery units and upgrades and never leave the game. Exports are the only way
+          play turns into {site.token}, so every barrel is a choice: grow the rig now, or bank {site.token}.
+        </p>
         <Formula>spot sale = base value × index × rig multiplier</Formula>
         <p>
           The index is the benchmark&apos;s price now divided by its price at the start of the season, kept between 0.5× and 2× so the economy stays

@@ -11,6 +11,8 @@ import {
   PRODUCTS,
   PRODUCT_ORDER,
   RAWS,
+  ROYAL_DAILY_CAP,
+  ROYAL_PER_BARREL,
   UNITS,
   UNIT_UPGRADE_COST,
   WARN_AT,
@@ -251,10 +253,19 @@ export function SlotPanel({ store, game, now, i }: { store: GameStore; game: E.G
   );
 }
 
-export function MarketPanel({ store, game }: { store: GameStore; game: E.Game }) {
+export function MarketPanel({ store, game, now }: { store: GameStore; game: E.Game; now: number }) {
   return (
     <>
-      <p className="text-sm text-brand-ink-2">Prices follow each product&apos;s index, between 0.5× and 2×. They move every few seconds.</p>
+      <p className="text-sm text-brand-ink-2">
+        Sell for coins at each product&apos;s index, between 0.5× and 2×; prices move every few seconds. Or export through the terminal:{" "}
+        {fmt(10 / ROYAL_PER_BARREL)} bbl ships out for 10 {site.token}, up to {ROYAL_DAILY_CAP} {site.token} a day.
+      </p>
+      <p className="pixel-sm flex items-center justify-between bg-brand-sun px-3 py-2 text-sm font-bold">
+        <span>Export quota left today</span>
+        <span className="font-display tabular-nums">
+          {E.exportLeft(game, now).toFixed(2)} / {ROYAL_DAILY_CAP} {site.token}
+        </span>
+      </p>
       <ul className="flex flex-col gap-2">
         {PRODUCT_ORDER.map((p) => {
           const h = game.history[p];
@@ -274,6 +285,14 @@ export function MarketPanel({ store, game }: { store: GameStore; game: E.Game })
               </span>
               <button type="button" className="btn btn-sun min-h-10! px-3! text-base!" disabled={!game.storage[p]} onClick={() => store.run((g, t) => E.sell(g, t, p))}>
                 Sell
+              </button>
+              <button
+                type="button"
+                className="btn btn-white min-h-10! px-3! text-base!"
+                disabled={!game.storage[p] || E.exportLeft(game, now) <= 0}
+                onClick={() => store.run((g, t) => E.exportBarrels(g, t, p))}
+              >
+                Export
               </button>
             </li>
           );

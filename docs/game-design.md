@@ -134,7 +134,9 @@ Satu sesi (shift) sebaiknya 5–10 menit dengan beberapa keputusan nyata, bukan 
 ## 6. Ekonomi
 
 - **Fee waterfall dan pembagian treasury** tetap mengikuti whitepaper: biaya operasional, cadangan, lalu [45%] XOM, [40%] tim, [10%] likuiditas, [5%] crew war.
-- **Sink $ROYAL tambahan:** cap blowout, perbaikan setelah badai, bahan bakar kilang, deposit kontrak, raid, dan kosmetik.
+- **Dua mata uang (masukan Oktober 2026).** Jual di market dan kontrak dibayar **coins**, yang hanya berlaku di dalam game untuk drill, kilang, dan upgrade. $ROYAL hanya didapat lewat **terminal ekspor**: 1.000 bbl produk apa pun = 10 $ROYAL, kuota [50] $ROYAL per rig per hari. Aturannya ada di `ROYAL_PER_BARREL` dan `ROYAL_DAILY_CAP` di `apps/web/lib/game/content.ts`.
+- **Cek boncos:** nilai $ROYAL yang keluar lewat ekspor harus lebih kecil dari buyback (20% sisa fee) ditambah $ROYAL yang dibelanjakan lagi. Kalkulatornya: https://claude.ai/artifact/RRcguBppETvvpaz5cokhF6
+- **Sink $ROYAL:** upgrade kelas rig, raid, dan kosmetik. Cap blowout, perbaikan, dan bahan bakar kilang sekarang dibayar coins.
 - **Dashboard publik:** target minimal [70%] $ROYAL yang dibayar pool kembali lewat sink.
 
 ## 7. Risiko yang perlu diputuskan pemilik

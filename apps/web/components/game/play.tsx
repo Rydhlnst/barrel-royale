@@ -117,7 +117,8 @@ export default function Play() {
   const nearSlot = nearPad >= 0 ? game.slots[nearPad] : null;
 
   const stats = [
-    { label: site.token, value: fmt(game.coins), tone: "bg-brand-sun" },
+    { label: site.token, value: game.royal.toFixed(2), tone: "bg-brand-sun" },
+    { label: "Coins", value: fmt(game.coins), tone: "bg-white" },
     { label: "Storage", value: `${used}/${info.storage}`, tone: used >= info.storage ? "bg-[#ffd9d4]" : "bg-white" },
     { label: "Rig", value: `Lv ${game.level}`, tone: "bg-white" },
     { label: "Points", value: fmt(game.points), tone: "bg-white" },
@@ -196,7 +197,7 @@ export default function Play() {
           </header>
           <div className="flex flex-col gap-4 overflow-y-auto p-4">
             {padIndex(shown) >= 0 && <SlotPanel key={shown} store={store} game={game} now={now} i={padIndex(shown)} />}
-            {shown === "market" && <MarketPanel store={store} game={game} />}
+            {shown === "market" && <MarketPanel store={store} game={game} now={now} />}
             {shown === "dispatch" && <DispatchPanel store={store} game={game} now={now} />}
             {shown === "storage" && <StoragePanel store={store} game={game} />}
             {shown === "quarters" && <QuartersPanel store={store} game={game} />}
