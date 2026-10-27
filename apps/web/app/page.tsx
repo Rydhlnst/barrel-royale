@@ -378,7 +378,7 @@ function PlayCopy() {
     <div className="mx-auto flex max-w-3xl flex-col items-center gap-5 text-center">
       <h2 className="outlined font-logo text-4xl font-bold uppercase leading-tight sm:text-6xl">The rig is open</h2>
       <p className="pixel max-w-xl bg-white/90 px-4 py-3 text-lg">
-        No wallet needed. Drill your first wells, ride the pressure and fill a contract in a few minutes, right in your browser.
+        Connect your wallet, drill your first wells, ride the pressure and fill a contract in a few minutes, right in your browser.
       </p>
       <div className="flex flex-wrap justify-center gap-3">
         <Button href={site.links.play} variant="red">

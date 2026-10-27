@@ -3,7 +3,9 @@ import * as E from "./engine";
 // One live game for the page: ticks the engine, saves to the browser, and lets
 // both React (HUD, panels) and Phaser (the world) read and change it.
 
-const SAVE_KEY = "barrel-royale-game-v1";
+// One save per wallet. Rigs played before wallets were needed live under the bare key and move to the first wallet that connects.
+const LEGACY_KEY = "barrel-royale-game-v1";
+const saveKey = (account: string) => `${LEGACY_KEY}:${account.toLowerCase()}`;
 const TICK_MS = 250;
 
 export type Target = "market" | "dispatch" | "storage" | "quarters" | `pad:${number}`;
@@ -11,9 +13,13 @@ export type Toast = { id: number; text: string; tone: "good" | "bad" };
 
 type Snapshot = { game: E.Game; now: number; nearby: Target | null; toast: Toast | null };
 
-function load(now: number): E.Game {
+function load(key: string, now: number): E.Game {
   try {
-    const raw = localStorage.getItem(SAVE_KEY);
+    let raw = localStorage.getItem(key);
+    if (!raw) {
+      raw = localStorage.getItem(LEGACY_KEY);
+      if (raw) localStorage.removeItem(LEGACY_KEY);
+    }
     if (raw) {
       const g = JSON.parse(raw) as E.Game;
       if (g.version === 1 && Array.isArray(g.slots)) {
@@ -50,9 +56,12 @@ export class GameStore {
     this.input.paused = paused;
   }
 
-  constructor() {
+  private readonly key: string;
+
+  constructor(account: string) {
     const now = Date.now();
-    this.snap = { game: load(now), now, nearby: null, toast: null };
+    this.key = saveKey(account);
+    this.snap = { game: load(this.key, now), now, nearby: null, toast: null };
   }
 
   start() {
@@ -87,7 +96,7 @@ export class GameStore {
 
   save() {
     try {
-      localStorage.setItem(SAVE_KEY, JSON.stringify(this.snap.game));
+      localStorage.setItem(this.key, JSON.stringify(this.snap.game));
     } catch {
       // private windows can refuse storage; the game still runs
     }

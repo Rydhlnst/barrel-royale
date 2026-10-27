@@ -28,7 +28,7 @@ const steps = [
 ];
 
 const faq = [
-  ["Does joining cost anything?", "No. Joining is free and needs no transaction. You only connect a wallet when you mint."],
+  ["Does joining cost anything?", "No. Joining is free and needs no transaction."],
   ["Can I use more than one wallet?", "One spot per wallet and per X account keeps the list fair. Duplicate and bot entries are removed before the snapshot."],
   ["What does a whitelist spot give me?", `Early access to the rig mint and the alpha, in the order of your tier. Once you hold a rig, ${site.reward} rewards follow the rules in the docs.`],
   ["When is the snapshot?", "It will be announced on X at least a week ahead."],

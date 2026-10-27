@@ -62,7 +62,7 @@ export default function Docs() {
       toc={{ title: "Docs", items: toc }}
     >
       <Note title="Play it today.">
-        The browser game is live at <a href={site.links.play}>Play</a>, no wallet needed. On-chain play rolls out in stages along the{" "}
+        The browser game is live at <a href={site.links.play}>Play</a>: connect your wallet and start drilling. On-chain play rolls out in stages along the{" "}
         <a href={site.links.roadmap}>roadmap</a>, and the numbers below are tuned with every community playtest.
       </Note>
 
@@ -97,7 +97,7 @@ export default function Docs() {
       <Section id="start" title="Getting started">
         <ol>
           <li>
-            Open <a href={site.links.play}>Play</a>. Your rig saves in your browser.
+            Open <a href={site.links.play}>Play</a> and connect your wallet on Robinhood Chain. Your rig is saved to your address.
           </li>
           <li>Walk with WASD or the arrow keys (the joystick on a phone). Step up to an empty pad and press E to drill; light crude is the quickest start.</li>
           <li>Keep the choke on Normal for your first wells and watch the pressure gauge. Press F at a well to change its choke.</li>

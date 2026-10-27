@@ -4,7 +4,7 @@ import { PlayClient } from "@/components/game/play-client";
 
 export const metadata: Metadata = {
   title: `Play · ${site.name}`,
-  description: `Walk your own offshore rig in the browser: drill wells, ride the pressure, refine, fill contracts and brace for storms. No wallet needed.`,
+  description: `Connect your wallet and walk your own offshore rig: drill wells, ride the pressure, refine, fill contracts and brace for storms.`,
 };
 
 export default function PlayPage() {

@@ -9,6 +9,7 @@ import * as E from "@/lib/game/engine";
 import { GameStore, type Target } from "@/lib/game/store";
 import { PixelIcon } from "@/components/pixel/sprite";
 import { logo, logoPalette } from "@/components/pixel/sprites";
+import { shortAddress } from "@/lib/wallet";
 import { Bar, DispatchPanel, MarketPanel, QuartersPanel, SlotPanel, StoragePanel, ValveDrill, fmt, mmss, secs } from "./panels";
 import { World } from "./world/world";
 import { SPOTS } from "./world/map";
@@ -72,8 +73,8 @@ function Stick({ store }: { store: GameStore }) {
   );
 }
 
-export default function Play() {
-  const [store] = useState(() => new GameStore());
+export default function Play({ account, onDisconnect }: { account: string; onDisconnect: () => void }) {
+  const [store] = useState(() => new GameStore(account));
   const snap = useSyncExternalStore(store.subscribe, store.get, store.get);
   const [panel, setPanel] = useState<Target | null>(null);
   const { game, now, nearby, toast } = snap;
@@ -131,12 +132,20 @@ export default function Play() {
 
       {/* HUD */}
       <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex flex-wrap items-start gap-2 p-3 sm:gap-3 sm:p-4">
-        <Link href="/" className="pointer-events-auto mr-auto flex items-center gap-2" aria-label={`${site.name} home`}>
+        <Link href="/" className="pointer-events-auto flex items-center gap-2" aria-label={`${site.name} home`}>
           <PixelIcon rows={logo} palette={logoPalette} scale={2} className="pixel-sm m-[3px] h-12 w-12 shrink-0 sm:h-16 sm:w-16" />
           <span className="outlined-sm hidden font-logo text-lg font-bold uppercase sm:inline">
             Rig <span className="text-brand-sun">#0417</span>
           </span>
         </Link>
+        <button
+          type="button"
+          onClick={onDisconnect}
+          title="Disconnect this wallet"
+          className="pointer-events-auto pixel-sm mr-auto self-center bg-white px-2 py-0.5 font-mono text-xs font-bold sm:text-sm"
+        >
+          {shortAddress(account)}
+        </button>
         <dl className="pointer-events-auto flex flex-wrap justify-end gap-2 sm:gap-3">
           {stats.map((s) => (
             <div key={s.label} className={`pixel-sm flex min-w-[64px] flex-col px-2 py-0.5 sm:min-w-[80px] sm:px-3 ${s.tone}`}>
