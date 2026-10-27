@@ -6,7 +6,7 @@ export const POINTS_REFERRAL = 5;
 
 /** Rank cut-offs at snapshot. */
 export const tiers = [
-  { name: "OG Roughneck", upTo: 500, perks: ["Guaranteed rig mint", "Closed alpha access", "OG role in Discord"] },
+  { name: "OG Roughneck", upTo: 500, perks: ["Guaranteed rig mint", "Closed alpha access", "OG badge in the game"] },
   { name: "Crew", upTo: 2500, perks: ["Whitelist mint window before public", "Alpha waitlist"] },
   { name: "Deckhand", upTo: Infinity, perks: ["First in line for the public mint", "Launch updates"] },
 ] as const;

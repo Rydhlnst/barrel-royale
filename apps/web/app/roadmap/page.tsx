@@ -32,7 +32,7 @@ const phases: { when: string; status: Status; title: string; icon: readonly stri
     items: [
       { text: "Whitelist open, with referral ranks and three tiers" },
       { text: "Browser game live: pressure and choke, refinery, Dispatch contracts, storm brace", ok: true },
-      { text: "X and Discord open; quests checked by the team" },
+      { text: "X account open; quests checked by the team" },
       { text: "Snapshot date announced at least a week ahead" },
     ],
     gate: "snapshot taken and tiers published",

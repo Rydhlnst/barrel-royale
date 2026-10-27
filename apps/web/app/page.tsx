@@ -73,7 +73,7 @@ const classes: { kind: RigClass; name: string; rarity: string; body: string; mul
 
 const roadmap = [
   { when: "Done", status: "Done", title: "Foundation", items: ["Game loop and XOM reward model", "Website, docs and litepaper", "Playable browser prototype"] },
-  { when: "Now", status: "Now", title: "Whitelist and community", items: ["Whitelist with referral ranks", "Browser game live at /play", "X and Discord open"] },
+  { when: "Now", status: "Now", title: "Whitelist and community", items: ["Whitelist with referral ranks", "Browser game live at /play", "X account open"] },
   { when: "Launch day", status: "Launch", title: "Barrel Royale goes live", items: [`${site.token} on Robinhood Chain`, "Rig mint opens, class seed hash posted first", "Contracts and treasury multisig published"] },
   { when: "Weeks 1–2", status: "Next", title: "Treasury on-chain", items: ["Rig class reveal", "FeeSplitter live, first treasury report", `First ${site.reward} purchases into the vault`] },
   { when: "Weeks 3–6", status: "Planned", title: "On-chain game, testnet", items: ["Your rig NFT becomes your in-game rig", "Pressure, refinery and storm drills", "Audit starts"] },

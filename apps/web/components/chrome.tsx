@@ -103,7 +103,7 @@ export function Footer({ children }: { children?: React.ReactNode }) {
           <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
             <Logo />
             <nav aria-label="Footer" className="flex flex-wrap items-center gap-6 font-display font-bold">
-              {[...pages, { label: "Discord", href: site.links.discord }].map((n) => (
+              {pages.map((n) => (
                 <a key={n.label} href={n.href} className="text-brand-sun hover:text-white">
                   {n.label}
                 </a>

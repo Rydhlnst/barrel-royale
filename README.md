@@ -33,7 +33,7 @@ pnpm dev
   - Aturan poin dan tier ada di `lib/whitelist-rules.ts`.
 - Gaya pixel: tombol dan kotak memakai bingkai pixel bersudut takik (`--pixel-ring` di `app/globals.css`, utility `pixel`, `pixel-sm`, dan `pixel-drop`).
 - Tailwind berjalan lewat `postcss.config.mjs`. Loader `@tailwindcss/turbopack` sudah dibuang karena di dev sering menyajikan CSS lama.
-- Nama, tagline, token, dan link ada di `apps/web/lib/site.ts`. Tombol Play mengarah ke prototipe di artifact. Link X dan Discord masih `#`.
+- Nama, tagline, token, dan link ada di `apps/web/lib/site.ts`. Tombol Play mengarah ke prototipe di artifact. Link X masih `#`.
 - Contract address $ROYAL diambil dari env `NEXT_PUBLIC_ROYAL_CA`. Sebelum diisi, chip CA menampilkan "posted at launch". Setelah diisi, muncul tombol Copy dan link ke explorer. Variabel ini dibaca saat build, jadi perlu redeploy setelah mengisinya.
 - Warna art ada di `apps/web/lib/palette.ts`, sedangkan token UI ada di `apps/web/app/globals.css`. Nilai keduanya sama.
 - Font yang dipakai adalah Silkscreen, Pixelify Sans, dan Nunito dari Google Fonts (lisensi OFL).

@@ -1,5 +1,5 @@
 // Names, links and addresses in one place. Play points at the current prototype;
-// X and Discord are placeholders until the accounts exist.
+// X is a placeholder until the account exists.
 
 const addr = (v: string | undefined) => (v && /^0x[0-9a-fA-F]{40}$/.test(v) ? v : null);
 
@@ -18,7 +18,6 @@ export const site = {
     litepaper: "/litepaper",
     roadmap: "/roadmap",
     whitelist: "/whitelist",
-    discord: "#",
     x: "#",
   },
   /**

@@ -203,7 +203,7 @@ export default function Docs() {
         <Table
           head={["Tier", "Rank at snapshot", "What you get"]}
           rows={[
-            ["OG Roughneck", "Top 500", "Guaranteed rig mint, closed alpha access, OG role"],
+            ["OG Roughneck", "Top 500", "Guaranteed rig mint, closed alpha access, OG badge in the game"],
             ["Crew", "501 to 2,500", "Whitelist mint window before public, alpha waitlist"],
             ["Deckhand", "Everyone else", "First in line for the public mint"],
           ]}
