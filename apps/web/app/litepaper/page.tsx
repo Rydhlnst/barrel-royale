@@ -243,7 +243,7 @@ export default function Litepaper() {
           rows={[
             ["Browser game: wells, pressure, refinery, market, contracts, storms, rig levels", "Live"],
             [`Export terminal with a preview ${site.reward} balance`, "Live"],
-            ["Vault, rig NFT, class upgrader and fee splitter contracts, with tests", "Built"],
+            ["Reward vault, rig NFT and fee splitter contracts on Robinhood Chain", "Live"],
             ["Whitelist with referral ranks", "Live"],
             [`${site.token}, rig mint and class reveal`, "Launch"],
             ["FeeSplitter, treasury reports and the first vault purchases", "Weeks 1 to 2 after launch"],

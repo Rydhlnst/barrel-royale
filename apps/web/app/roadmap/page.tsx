@@ -26,41 +26,41 @@ const phases: { when: string; status: Status; title: string; icon: readonly stri
     ],
   },
   {
-    when: "Now",
-    status: "now",
+    when: "Phase 1",
+    status: "done",
     title: "Whitelist and community",
     icon: icons.hardHat,
     items: [
-      { text: "Whitelist open, with referral ranks and three tiers" },
+      { text: "Whitelist open, with referral ranks and three tiers", ok: true },
       { text: "Browser game live: pressure and choke, refinery, Dispatch contracts, storm brace", ok: true },
-      { text: `Export terminal for ${site.reward} in the browser game, with a preview balance`, ok: true },
-      { text: "X account open; quests checked by the team" },
-      { text: "Snapshot date announced at least a week ahead" },
+      { text: `Export terminal for ${site.reward} in the browser game`, ok: true },
+      { text: "X account open at @barrelroyale", ok: true },
     ],
-    gate: "snapshot taken and tiers published",
   },
   {
-    when: "Launch day",
-    status: "next",
+    when: "Phase 2",
+    status: "now",
     title: `${site.name} goes live`,
     icon: crownBarrel,
     items: [
+      { text: `${site.reward} vault, rig NFT and fee splitter live on Robinhood Chain, owned by the treasury Safe`, ok: true },
+      { text: `${site.reward} vault running with its ${VAULT.timelockDays}-day timelock and withdrawal limits`, ok: true },
+      { text: "Contract addresses published in the docs", ok: true },
+      { text: "Whitelist snapshot taken and tiers published" },
       { text: `${site.token} live on Robinhood Chain` },
       { text: "Rig mint: OG Roughnecks first, then Crew, then public; class seed hash posted before the first mint" },
-      { text: "Contract addresses and treasury multisig posted on X and in the docs" },
-      { text: "Creator fees start flowing into the treasury" },
     ],
+    gate: "rig mint open and creator fees flowing into the FeeSplitter",
   },
   {
     when: "Weeks 1–2",
-    status: "later",
+    status: "next",
     title: "Treasury on-chain",
     icon: icons.coin,
     items: [
       { text: "Rig class reveal" },
-      { text: "FeeSplitter deployed; fees split by the waterfall automatically" },
+      { text: "Creator fees split by the FeeSplitter waterfall automatically" },
       { text: "First treasury report with links to every fee and transaction" },
-      { text: `${site.reward} vault deployed with its ${VAULT.timelockDays}-day timelock and withdrawal limits` },
       { text: `First ${site.reward} purchases, held in the vault until claims open` },
     ],
     gate: "fees cover running costs and the reserve is filling",
@@ -124,8 +124,8 @@ export default function Roadmap() {
     <DocPage
       current={site.links.roadmap}
       eyebrow="Roadmap"
-      title="Whitelist first, then build in the open"
-      lede={`${site.name} is building its crew with a whitelist first, then launches the token, the rig mint and the game. On-chain gameplay and ${site.reward} claims follow in stages, each behind a public checkpoint. Timing after launch is an estimate.`}
+      title="Launch first, then build in the open"
+      lede={`The whitelist and the browser game are live, and the ${site.name} contracts are on Robinhood Chain. Next come the token and the rig mint, then on-chain gameplay and ${site.reward} claims in stages, each behind a public checkpoint. Timing after launch is an estimate.`}
     >
       <ol className="mx-auto w-full max-w-4xl" style={{ listStyle: "none", paddingLeft: 0, gap: 0 }}>
         {phases.map((p) => (

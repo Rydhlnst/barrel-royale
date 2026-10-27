@@ -74,9 +74,14 @@ const classes: { kind: RigClass; name: string; rarity: string; body: string; mul
 
 const roadmap = [
   { when: "Done", status: "Done", title: "Foundation", items: ["Game loop and XOM reward model", "Website, docs and litepaper", "Playable browser prototype"] },
-  { when: "Now", status: "Now", title: "Whitelist and community", items: ["Whitelist with referral ranks", "Browser game live at /play", `Export terminal for ${site.reward}`] },
-  { when: "Launch day", status: "Launch", title: "Barrel Royale goes live", items: [`${site.token} on Robinhood Chain`, "Rig mint opens, class seed hash posted first", "Contracts and treasury multisig published"] },
-  { when: "Weeks 1–2", status: "Next", title: "Treasury on-chain", items: ["Rig class reveal", "FeeSplitter live, first treasury report", `First ${site.reward} purchases into the vault`] },
+  { when: "Phase 1", status: "Done", title: "Whitelist and community", items: ["Whitelist with referral ranks", "Browser game live at /play", `Export terminal for ${site.reward}`] },
+  {
+    when: "Phase 2",
+    status: "Now",
+    title: "Barrel Royale goes live",
+    items: [{ text: "Contracts live on Robinhood Chain", ok: true }, `${site.token} on Robinhood Chain`, "Rig mint opens, class seed hash posted first"],
+  },
+  { when: "Weeks 1–2", status: "Next", title: "Treasury on-chain", items: ["Rig class reveal", "Fees split automatically, first treasury report", `First ${site.reward} purchases into the vault`] },
   { when: "Weeks 3–6", status: "Planned", title: "On-chain game, testnet", items: ["Your rig NFT becomes your in-game rig", "Pressure, refinery and storm drills", `${site.reward} claims tested end to end`] },
 ];
 
@@ -349,12 +354,15 @@ function Roadmap() {
                 </div>
                 <h3 className="font-display text-2xl font-bold leading-tight">{r.title}</h3>
                 <ul className="flex flex-col gap-2 text-[15px]">
-                  {r.items.map((it) => (
-                    <li key={it} className="flex gap-2">
-                      <span aria-hidden className={`mt-1.5 h-3 w-3 shrink-0 pixel-sm ${done ? "bg-brand-leaf" : "bg-white"}`} />
-                      {it}
-                    </li>
-                  ))}
+                  {r.items.map((item) => {
+                    const it = typeof item === "string" ? { text: item, ok: false } : item;
+                    return (
+                      <li key={it.text} className="flex gap-2">
+                        <span aria-hidden className={`mt-1.5 h-3 w-3 shrink-0 pixel-sm ${done || it.ok ? "bg-brand-leaf" : "bg-white"}`} />
+                        {it.text}
+                      </li>
+                    );
+                  })}
                 </ul>
               </li>
             );

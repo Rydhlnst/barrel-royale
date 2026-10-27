@@ -17,9 +17,15 @@ import {
 } from "@/lib/game/content";
 import { CLASS_COSTS, SPLIT } from "@/lib/tokenomics";
 import { VAULT } from "@/lib/vault";
+import { CONTRACTS } from "@/lib/contracts";
 import { DocPage, Formula, Note, Section, Table } from "@/components/doc/doc";
 
 const fmt = (n: number) => n.toLocaleString("en-US");
+const addr = (a: string) => (
+  <a href={`${site.explorer}/address/${a}`} target="_blank" rel="noopener" className="break-all font-mono text-[13px]">
+    {a}
+  </a>
+);
 
 export const metadata: Metadata = {
   title: `Docs · ${site.name}`,
@@ -77,6 +83,7 @@ export default function Docs() {
             ["Storms and the brace drill", "Live"],
             ["Rig levels 1 to 5", "Live"],
             [`Export terminal and ${site.reward} balance`, `Live, as a preview balance until claims open`],
+            ["Reward vault, rig NFT and fee splitter contracts on Robinhood Chain", "Live"],
             ["Whitelist with referral ranks", "Live"],
             ["Wallet login, rig NFTs and rig classes", "On-chain game"],
             [`Rig class upgrades with ${site.token}`, "On-chain game"],
@@ -497,18 +504,19 @@ export default function Docs() {
               "ERC-721",
               "Set the price, lists and class seed before the first mint; move the mint phase forward; reveal the seed; set the metadata URL; set the upgrader once",
               "Change the price or seed after the first mint, move the phase back, change a class after the reveal, or mint past 3,333",
-              "Published at launch",
+              addr(CONTRACTS.rig),
             ],
             [
               `${site.reward}RewardVault`,
               "Reward vault",
               `Post one weekly round of at most ${VAULT.roundPct}% of the free balance; withdraw up to ${VAULT.withdrawPct}% of the free balance per ${VAULT.withdrawWindowDays} days after a ${VAULT.timelockDays}-day timelock; change the export rate and quota after the same timelock; pause claims up to ${VAULT.pauseDays} days`,
               "Touch rewards owed to players, renounce ownership, or withdraw XOM any other way",
-              "Published at launch",
+              addr(CONTRACTS.vault),
             ],
-            ["RigUpgrader", "Class upgrades", "Nothing: no owner", "Change the costs or lower a class", "Published at launch"],
-            ["FeeSplitter", "Fee waterfall", "Update the payout addresses, the cost cap and the reserve target, behind the timelock", "Change the split shares", "Published at launch"],
-            ["Treasury", "Multisig", "Holds every admin role above", "Act with a single signer", "Published at launch"],
+            ["RigUpgrader", "Class upgrades", "Nothing: no owner", "Change the costs or lower a class", `Deployed when ${site.token} is live`],
+            ["FeeSplitter", "Fee waterfall", "Update the payout addresses, the cost cap and the reserve target, behind the timelock", "Change the split shares", addr(CONTRACTS.splitter)],
+            ["Treasury", "Safe", "Holds every admin role above", "Act without its signers approving", addr(CONTRACTS.safe)],
+            [`${site.reward} token`, "Robinhood Chain stock token", "—", "—", addr(CONTRACTS.xom)],
           ]}
         />
       </Section>
