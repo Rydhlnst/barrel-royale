@@ -8,6 +8,7 @@ import { Button, Dither, Ticker } from "@/components/ui";
 import { Footer, Logo, StickyCta, XButton } from "@/components/chrome";
 import { CopyCa } from "@/components/copy-ca";
 import { tiers } from "@/lib/whitelist-rules";
+import { EXPORT_BBL, EXPORT_DAILY_BBL, EXPORT_USD } from "@/lib/game/content";
 
 const nav = [
   { label: "How it works", href: "#how" },
@@ -23,7 +24,7 @@ const steps = [
   { icon: crownBarrel, title: "Mint a rig", body: "Each rig is an NFT with its own class and production multiplier. Its well slots are where you drill." },
   { icon: icons.derrick, title: "Drill and pump", body: "Strike crude or gas, then ride the pressure. Push a well harder for a bigger haul, if you can keep it from blowing." },
   { icon: barrel, title: "Refine and sell", body: "Turn crude into diesel and jet fuel, then sell at the market index or fill a tanker contract for a premium." },
-  { icon: icons.coin, title: `Claim ${site.reward} weekly`, body: `Rig holders claim their share of the week's ${site.reward} pool, weighted by the barrels their rig produced.` },
+  { icon: icons.coin, title: `Export for ${site.reward}`, body: `Ship barrels through the export terminal and they turn into ${site.reward}, up to a daily quota per rig. Claim every week.` },
 ];
 
 const features = [
@@ -45,12 +46,12 @@ const features = [
     scene: <StormScene />,
     eyebrow: "Incidents",
     title: "Brace for the storm",
-    body: "Storms and sabotage hit on a clock. When the alarm sounds you get a few seconds to shut valves and lash down the cargo. Hold the rig and earn a bonus; miss it and oil goes overboard.",
+    body: "Storms hit on a clock. When the alarm sounds you get a few seconds to close the valves in order. Hold the rig and earn a bonus; miss it and oil goes overboard.",
     hat: [C.white, C.sky],
   },
   {
     scene: <CrewScene />,
-    eyebrow: "Crews",
+    eyebrow: "Crews · Season 1",
     title: "Win the crew war",
     body: "Crews of up to 20 rigs share a leaderboard each season, send saboteurs at their rivals and cover each other's decks. The top three crews split the season's bonus pool.",
     hat: [C.sea, C.foam],
@@ -60,8 +61,8 @@ const features = [
 const flow = [
   { label: "Revenue", body: `Creator fees from ${site.token} and rig trading` },
   { label: "Treasury", body: `Pays running costs, then buys ${site.reward} with 40% of the rest` },
-  { label: `${site.reward} vault`, body: "Holds the week's pool on-chain", key: true },
-  { label: "Rig holders", body: `Claim ${site.reward} by production points` },
+  { label: `${site.reward} vault`, body: `Holds the ${site.reward} players earn from exports`, key: true },
+  { label: "Rig holders", body: `Claim the ${site.reward} their exports earned` },
 ];
 
 const classes: { kind: RigClass; name: string; rarity: string; body: string; mult: string }[] = [
@@ -73,7 +74,7 @@ const classes: { kind: RigClass; name: string; rarity: string; body: string; mul
 
 const roadmap = [
   { when: "Done", status: "Done", title: "Foundation", items: ["Game loop and XOM reward model", "Website, docs and litepaper", "Playable browser prototype"] },
-  { when: "Now", status: "Now", title: "Whitelist and community", items: ["Whitelist with referral ranks", "Browser game live at /play", "X account open"] },
+  { when: "Now", status: "Now", title: "Whitelist and community", items: ["Whitelist with referral ranks", "Browser game live at /play", `Export terminal for ${site.reward}`] },
   { when: "Launch day", status: "Launch", title: "Barrel Royale goes live", items: [`${site.token} on Robinhood Chain`, "Rig mint opens, class seed hash posted first", "Contracts and treasury multisig published"] },
   { when: "Weeks 1–2", status: "Next", title: "Treasury on-chain", items: ["Rig class reveal", "FeeSplitter live, first treasury report", `First ${site.reward} purchases into the vault`] },
   { when: "Weeks 3–6", status: "Planned", title: "On-chain game, testnet", items: ["Your rig NFT becomes your in-game rig", "Pressure, refinery and storm drills", "Audit starts"] },
@@ -240,7 +241,7 @@ function Xom() {
           ))}
         </ol>
         <p className="box mt-10 overflow-x-auto bg-white p-4 font-mono text-sm font-bold sm:text-base">
-          your {site.reward} = weekly pool × your barrels ÷ barrels from all eligible rigs
+          {EXPORT_BBL.toLocaleString("en-US")} bbl exported = ${EXPORT_USD} worth of {site.reward} · up to {EXPORT_DAILY_BBL.toLocaleString("en-US")} bbl per rig per day
         </p>
       </div>
     </section>
@@ -278,8 +279,8 @@ function Fleet() {
         <div className="box mt-10 flex flex-col items-start gap-4 bg-brand-sun-pale p-6 sm:flex-row sm:items-center">
           <PixelIcon rows={roughneck} palette={base} scale={4} />
           <p className="text-lg">
-            <b>No rig? Play free.</b> Free players start on a starter platform with 3 well slots and earn season points. A rig is needed for {site.token} and{" "}
-            {site.reward}.
+            <b>No rig? Play free.</b> The browser game is free for everyone. In the on-chain game free players get a starter platform with 3 well slots,
+            and a rig is needed to export for {site.reward}.
           </p>
         </div>
       </div>

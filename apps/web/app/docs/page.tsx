@@ -1,16 +1,18 @@
 import type { Metadata } from "next";
 import { site } from "@/lib/site";
-import { ROYAL_DAILY_CAP, ROYAL_PER_BARREL } from "@/lib/game/content";
+import { BRACE_SECONDS, CAP_COST, EXPORT_BBL, EXPORT_DAILY_BBL, EXPORT_USD, LEVELS, OFFLINE_CAP, STORM_WARNING } from "@/lib/game/content";
+import { VAULT } from "@/lib/vault";
 import { DocPage, Formula, Note, Section, Table } from "@/components/doc/doc";
 
 const fmt = (n: number) => n.toLocaleString("en-US");
 
 export const metadata: Metadata = {
   title: `Docs · ${site.name}`,
-  description: `How ${site.name} works: rigs, wells and pressure, the refinery, contracts, storms, crews, the whitelist and weekly ${site.reward} rewards.`,
+  description: `How ${site.name} works: rigs, wells and pressure, the refinery, contracts, the ${site.reward} export terminal, storms, the whitelist, the reward vault and its admin rights.`,
 };
 
 const toc = [
+  { id: "status", label: "What's live today" },
   { id: "start", label: "Getting started" },
   { id: "rigs", label: "Rigs" },
   { id: "wells", label: "Wells and pressure" },
@@ -22,9 +24,10 @@ const toc = [
   { id: "free", label: "Playing without a rig" },
   { id: "whitelist", label: "Whitelist" },
   { id: "xom", label: `${site.reward} rewards` },
+  { id: "vault", label: "The reward vault" },
   { id: "fees", label: "Where the money goes" },
   { id: "trust", label: "Safety and transparency" },
-  { id: "contracts", label: "Contracts" },
+  { id: "contracts", label: "Contracts and admin rights" },
   { id: "faq", label: "FAQ" },
 ];
 
@@ -34,7 +37,7 @@ export default function Docs() {
       current={site.links.docs}
       eyebrow="Documentation"
       title="Barrel Royale docs"
-      lede={`Everything a roughneck needs: how rigs work, how to run a well hard without blowing it, what the refinery makes, and how weekly ${site.reward} rewards reach the people pumping.`}
+      lede={`Everything a roughneck needs: how rigs work, how to run a well hard without blowing it, what the refinery makes, and how barrels turn into ${site.reward}.`}
       toc={{ title: "Docs", items: toc }}
     >
       <Note title="Play it today.">
@@ -42,18 +45,47 @@ export default function Docs() {
         <a href={site.links.roadmap}>roadmap</a>, and the numbers below are tuned with every community playtest.
       </Note>
 
+      <Section id="status" title="What's live today">
+        <p>
+          The browser game is the first stage of {site.name}. Everything marked <b>Live</b> can be played right now; the rest arrives with the on-chain
+          game and is listed on the <a href={site.links.roadmap}>roadmap</a>.
+        </p>
+        <Table
+          head={["Feature", "Status"]}
+          rows={[
+            ["Wells, pressure and choke settings", "Live"],
+            ["Blowouts and the capping drill", "Live"],
+            ["Refinery: distillation, cracker and liquefier", "Live"],
+            ["Spot market with six price indexes", "Live"],
+            ["Dispatch board contracts", "Live"],
+            ["Storms and the brace drill", "Live"],
+            ["Rig levels 1 to 5", "Live"],
+            [`Export terminal and ${site.reward} balance`, `Live, as a preview balance until claims open`],
+            ["Whitelist with referral ranks", "Live"],
+            ["Wallet login, rig NFTs and rig classes", "On-chain game"],
+            [`${site.reward} claims from the reward vault`, "On-chain game"],
+            ["Shifts, supply boats, tankers and crew quarters", "On-chain game"],
+            ["Crews, seasons, raids and crew projects", "Season 1"],
+            ["Free players working shifts on other rigs", "Season 1"],
+          ]}
+        />
+      </Section>
+
       <Section id="start" title="Getting started">
         <ol>
           <li>
             Open <a href={site.links.play}>Play</a>. Your rig saves in your browser.
           </li>
-          <li>Tap an empty deck slot and strike light crude, the quickest well to start with.</li>
-          <li>Keep the choke on Normal for your first wells and watch the pressure gauge.</li>
-          <li>Collect your barrels, run some through the refinery, then sell or fill a contract on the Dispatch board.</li>
+          <li>Walk with WASD or the arrow keys (the joystick on a phone). Step up to an empty pad and press E to drill; light crude is the quickest start.</li>
+          <li>Keep the choke on Normal for your first wells and watch the pressure gauge. Press F at a well to change its choke.</li>
+          <li>Collect your barrels, run some through the refinery, then sell at the market kiosk or fill a contract on the Dispatch board.</li>
           <li>When the storm alarm sounds, brace the rig: shut the valves in order before the timer runs out.</li>
-          <li>Reinvest in rig levels, refinery units and a fleet.</li>
+          <li>Reinvest in rig levels and refinery units at the storage tanks, and export barrels for {site.reward} at the market kiosk.</li>
         </ol>
-        <p>On mainnet you connect a wallet on Robinhood Chain (chain ID 4663) and your rig NFT becomes your in-game rig.</p>
+        <p>
+          While the tab is closed your wells keep pumping on Safe for up to {OFFLINE_CAP / 3600} hours. In the on-chain game you connect a wallet on
+          Robinhood Chain (chain ID 4663) and your rig NFT becomes your in-game rig.
+        </p>
       </Section>
 
       <Section id="rigs" title="Rigs">
@@ -70,7 +102,10 @@ export default function Docs() {
             ["Ultra-deepwater", "2%", "2.00×"],
           ]}
         />
-        <p>Every rig starts with 6 deck slots and grows to 12. Wells and refinery units share the deck, so every rig is built a little differently.</p>
+        <p>
+          Every rig starts with {LEVELS[0].slots} deck slots and grows to {LEVELS[LEVELS.length - 1].slots}. Wells and refinery units share the deck, so
+          every rig is built a little differently. In the browser game every rig produces at 1.00×; classes apply once rigs move on-chain.
+        </p>
       </Section>
 
       <Section id="wells" title="Wells and pressure">
@@ -84,8 +119,8 @@ export default function Docs() {
           ]}
         />
         <p>
-          Push past the red line and the well <b>blows out</b>: it stops and loses the barrels still in it until you cap it. Capping costs a few coins, or nothing at all if you close the valves in order during the capping drill. Good roughnecks run Overdrive and back off just in
-          time.
+          Push past the red line and the well <b>blows out</b>: it stops and loses the barrels still in it until you cap it. Capping costs {CAP_COST} coins, or nothing at all if you close the valves in
+          order during the capping drill. Good roughnecks run Overdrive and back off just in time.
         </p>
       </Section>
 
@@ -111,18 +146,19 @@ export default function Docs() {
             <b>Spot market.</b> Sell any time at the product&apos;s index.
           </li>
           <li>
-            <b>Dispatch board.</b> Tanker contracts at a fixed price, 10 to 30% above base, with a deadline, such as 40 bbl of diesel within 2 hours.
+            <b>Dispatch board.</b> Contracts at a fixed price, 10 to 30% above base, with a deadline. In the browser game a new one arrives every 45
+            seconds and lasts a few minutes; on-chain, contracts run for hours.
           </li>
           <li>
-            <b>Export terminal.</b> Ship barrels out for {site.token}: {fmt(10 / ROYAL_PER_BARREL)} bbl of any product earns 10 {site.token}, up to{" "}
-            {ROYAL_DAILY_CAP} {site.token} per rig per day.
+            <b>Export terminal.</b> Ship barrels out for {site.reward}: every {fmt(EXPORT_BBL)} bbl of any product earns ${EXPORT_USD} worth of{" "}
+            {site.reward}, up to {fmt(EXPORT_DAILY_BBL)} bbl per rig per day.
           </li>
         </ul>
         <p>
           The market and contracts pay in-game coins, which buy wells, refinery units and upgrades and never leave the game. Exports are the only way
-          play turns into {site.token}, so every barrel is a choice: grow the rig now, or bank {site.token}.
+          play turns into {site.reward}, so every barrel is a choice: grow the rig now, or bank {site.reward}.
         </p>
-        <Formula>spot sale = base value × index × rig multiplier</Formula>
+        <Formula>spot sale = base value × index × rig class multiplier</Formula>
         <p>
           The index is the benchmark&apos;s price now divided by its price at the start of the season, kept between 0.5× and 2× so the economy stays
           steady. Storage is limited, so timing your sales is part of the game.
@@ -131,25 +167,31 @@ export default function Docs() {
 
       <Section id="incidents" title="Storms and sabotage">
         <p>
-          Storms roll in on a timer. Online, you get a 60-second alarm and then a 10-second <b>brace</b>: shut the valves, lash down the cargo, pull the
-          boats in. Your result is your defense multiplied by how well you braced.
+          Storms roll in on a timer. You get a {STORM_WARNING}-second alarm, then {BRACE_SECONDS} seconds to <b>brace</b>: close the four valves in the
+          order shown. A wrong valve costs a second.
         </p>
         <ul>
-          <li>Hold the rig and you earn a bonus.</li>
-          <li>Miss it and part of your storage goes overboard, and some gear needs repairs.</li>
-          <li>While you are offline your rig is covered by its base defense.</li>
+          <li>Close every valve in time and the rig holds: you earn a coin bonus that grows with your rig level.</li>
+          <li>Miss some and up to 30% of each product in storage washes overboard, less for every valve you closed.</li>
+          <li>Storms never hit while you are offline. Sell often: oil in storage is what a storm can take.</li>
         </ul>
-        <p>Sabotage comes from rival crews, not dice. See crews and seasons.</p>
+        <p>
+          Sabotage arrives with crews in Season 1, as raids between rival rigs. See <a href="#crews">crews and seasons</a>.
+        </p>
       </Section>
 
       <Section id="progress" title="Upgrades, fleet and shifts">
+        <h3>In the browser game</h3>
+        <Table
+          head={["Rig level", "Upgrade cost", "Deck slots", "Storage"]}
+          rows={LEVELS.map((l, i) => [String(i + 1), i === 0 ? "Start" : `${fmt(l.cost)} coins`, String(l.slots), `${fmt(l.storage)} bbl`])}
+        />
+        <p>
+          <b>Refinery units</b> (distillation, cracker and liquefier) each upgrade to level 3. Every level runs a quarter faster, and a level 2
+          distillation unit can make jet fuel.
+        </p>
+        <h3>In the on-chain game</h3>
         <ul>
-          <li>
-            <b>Rig level</b> (1 to 5): more deck slots, dock berths, storage and defense, for 100, 260, 600 and 1,200 {site.token}.
-          </li>
-          <li>
-            <b>Refinery units</b>: distillation, cracker and liquefier, each with 3 levels.
-          </li>
           <li>
             <b>Supply boat</b>: spare parts for cheaper repairs, and extra defense.
           </li>
@@ -159,15 +201,18 @@ export default function Docs() {
           <li>
             <b>Crew quarters</b>: more shifts per day.
           </li>
+          <li>
+            <b>Shifts</b>: each rig has 8 a day for active moves like bracing, capping a blowout and running Overdrive. Base production keeps running
+            without them, so a short session still moves your rig forward.
+          </li>
         </ul>
-        <p>
-          Each rig has 8 <b>shifts</b> a day for active moves like bracing, capping a blowout and running Overdrive. Base production keeps running without
-          them, so a short session still moves your rig forward.
-        </p>
       </Section>
 
       <Section id="crews" title="Crews and seasons">
-        <p>A crew is up to 20 rigs and a season lasts 4 weeks. Crew score comes from contracts filled, production and crew projects.</p>
+        <p>
+          Crews open with Season 1 of the on-chain game. A crew is up to 20 rigs and a season lasts 4 weeks. Crew score comes from contracts filled,
+          production and crew projects.
+        </p>
         <ul>
           <li>
             <b>Crew projects</b>: build something together, like an undersea pipeline, and every member gets a lasting buff.
@@ -183,10 +228,11 @@ export default function Docs() {
       </Section>
 
       <Section id="free" title="Playing without a rig">
+
         <p>
-          Everyone can play. Free players start on a starter platform with 3 slots and earn season points. They can also <b>work shifts on a rig
-          holder&apos;s rig</b>, using its refinery and contracts, and the rig owner keeps 5 to 10% of what they make. Busy rigs grow fastest, so owners
-          recruit.
+          The browser game is free for everyone today. In the on-chain game, free players start on a starter platform with 3 slots and earn season
+          points, while {site.reward} exports need a rig NFT. From Season 1 they can also <b>work shifts on a rig holder&apos;s rig</b>, using its
+          refinery and contracts, and the rig owner keeps 5 to 10% of what they make. Busy rigs grow fastest, so owners recruit.
         </p>
       </Section>
 
@@ -197,7 +243,10 @@ export default function Docs() {
         </p>
         <ul>
           <li>Joining is +10 points. Every friend who joins with your referral link is +5.</li>
-          <li>Quests such as following on X and reaching rig level 3 in the game earn +5 bonus points each, checked before the snapshot.</li>
+          <li>
+            Two quests earn +5 bonus points each: follow <a href={site.links.x}>@barrelroyale</a> on X and post your referral link, and post a screenshot of your rig at level 3. The team
+            checks both before the snapshot.
+          </li>
           <li>One spot per wallet and per X account keeps the list fair. Duplicate and bot entries are removed before the snapshot.</li>
         </ul>
         <Table
@@ -208,20 +257,75 @@ export default function Docs() {
             ["Deckhand", "Everyone else", "First in line for the public mint"],
           ]}
         />
-        <p>The snapshot date is announced on X at least a week ahead.</p>
+        <p>
+          The snapshot date is announced on <a href={site.links.x}>@barrelroyale</a> at least a week ahead.
+        </p>
       </Section>
 
       <Section id="xom" title={`${site.reward} rewards`}>
         <p>
-          Every week the treasury buys {site.reward} stock tokens and deposits them in the reward vault. The pool is shared across eligible rigs by{" "}
-          <b>production points</b>: barrels after the rig multiplier, plus contracts filled, plus storms held.
+          The export terminal turns barrels straight into {site.reward}. Every rig&apos;s exports add up through the week, and the treasury fills the
+          reward vault with {site.reward} bought from revenue.
         </p>
-        <Formula>your {site.reward} = weekly pool × your points ÷ points from all eligible rigs</Formula>
+        <Formula>
+          your {site.reward} = barrels exported ÷ {fmt(EXPORT_BBL)} × ${EXPORT_USD} ÷ {site.reward} price
+        </Formula>
         <ul>
-          <li>Points past a weekly cap per rig count for less, so the pool goes to real players rather than scripts.</li>
-          <li>A rig qualifies with at least 3 active shifts and 1 filled contract in the week.</li>
-          <li>Claim any time after the week closes. Unclaimed rewards roll into the pool after 12 weeks.</li>
+          <li>Each rig can export up to {fmt(EXPORT_DAILY_BBL)} bbl a day. The quota resets at 00:00 UTC.</li>
+          <li>
+            The {site.reward} price comes from the Chainlink feed on Robinhood Chain at the moment of export. The browser game uses a fixed reference
+            price, so its {site.reward} balance is a preview.
+          </li>
+          <li>
+            Claim any time after the week closes. Unclaimed rewards go back to the vault&apos;s free balance after {VAULT.claimWeeks} weeks.
+          </li>
           <li>The vault, every purchase and every claim are public on the Robinhood Chain explorer.</li>
+        </ul>
+      </Section>
+
+      <Section id="vault" title="The reward vault">
+        <p>
+          The {site.name} {site.reward}RewardVault keeps two balances apart, and the rules for each are written into the contract.
+        </p>
+        <Table
+          head={["Balance", "What it is", "Who can move it"]}
+          rows={[
+            [
+              "Owed to players",
+              `${site.reward} from every week whose rewards are posted and not yet claimed`,
+              `Only the players it belongs to, by claiming. The team cannot withdraw it.`,
+            ],
+            [
+              "Free balance",
+              `${site.reward} bought by the treasury that no player has earned yet`,
+              `The treasury multisig, within the limits below`,
+            ],
+          ]}
+        />
+        <h3>Treasury withdrawals from the free balance</h3>
+        <ul>
+          <li>
+            Every withdrawal is scheduled on-chain first and can only be executed {VAULT.timelockDays} days later, so anyone can see it coming.
+          </li>
+          <li>
+            At most {VAULT.withdrawPct}% of the free balance can leave in any {VAULT.withdrawWindowDays} days.
+          </li>
+          <li>
+            Withdrawals cover running costs in quiet months, move funds to a new vault version, or rebalance the treasury. Each one is listed with its
+            reason in the monthly treasury report.
+          </li>
+        </ul>
+        <h3>Other admin actions</h3>
+        <ul>
+          <li>
+            The export rate and the daily quota can change only through the same {VAULT.timelockDays}-day timelock, announced on X and in these docs
+            first.
+          </li>
+          <li>
+            Claims can be paused for at most {VAULT.pauseDays} days to deal with a security issue. Paused time is added to every claim window, so no
+            reward expires because of a pause.
+          </li>
+          <li>Every admin role sits with the treasury multisig. Its address and signers are published at launch.</li>
         </ul>
       </Section>
 
@@ -241,14 +345,14 @@ export default function Docs() {
         <Table
           head={["Use", "Share"]}
           rows={[
-            [`${site.reward} for the weekly pool`, "40%"],
+            [`${site.reward} for the reward vault`, "40%"],
             ["Game development and operations", "35%"],
-            [`${site.token} buybacks for the game rewards pool`, "20%"],
+            [`${site.token} buyback and burn`, "20%"],
             ["Crew war prizes", "5%"],
           ]}
         />
         <p>
-          The {site.reward} pool grows with the game: the more people play and trade, the bigger it gets. Rewards come from real revenue, never from new
+          The {site.reward} vault grows with the game: the more people play and trade, the bigger it gets. Rewards come from real revenue, never from new
           deposits.
         </p>
       </Section>
@@ -268,6 +372,10 @@ export default function Docs() {
             <b>No single key.</b> The treasury and every admin role sit behind a multisig.
           </li>
           <li>
+            <b>Timelocked admin.</b> Vault withdrawals and changes to the export rules wait {VAULT.timelockDays} days on-chain before they apply, and
+            players&apos; earned {site.reward} cannot be withdrawn by anyone but them.
+          </li>
+          <li>
             <b>Open books.</b> A monthly treasury report links every fee, split and {site.reward} purchase.
           </li>
           <li>
@@ -279,25 +387,48 @@ export default function Docs() {
         </ul>
       </Section>
 
-      <Section id="contracts" title="Contracts">
-        <p>Official addresses appear here and on the official X account. Always double-check an address before you use it.</p>
+      <Section id="contracts" title="Contracts and admin rights">
+        <p>
+          Official addresses appear here and on <a href={site.links.x}>@barrelroyale</a> on X. Always double-check an address before you use it. The table also lists what the
+          admin of each contract can and cannot do.
+        </p>
         <Table
-          head={["Contract", "Standard", "Address"]}
+          head={["Contract", "Standard", "Admin can", "Admin cannot", "Address"]}
           rows={[
-            [`RoyalToken (${site.token})`, "ERC-20", site.ca ?? "Published at launch"],
-            ["RigNFT", "ERC-721", "Published at launch"],
-            ["EnergyOracle", "Chainlink adapter", "Published at launch"],
-            ["Platform", "Game logic", "Published at launch"],
-            [`${site.reward}RewardVault`, "Reward vault", "Published at launch"],
-            ["FeeSplitter", "Fee waterfall", "Published at launch"],
-            ["Treasury", "Multisig", "Published at launch"],
+            [`RoyalToken (${site.token})`, "ERC-20", "Nothing: no owner after launch", "Mint more, pause transfers or blacklist", site.ca ?? "Published at launch"],
+            ["RigNFT", "ERC-721", "Post the class seed and reveal it", "Change a class after the reveal or mint past 3,333", "Published at launch"],
+            ["EnergyOracle", "Chainlink adapter", "Add a feed for a new product, behind the timelock", "Move a price past its per-update limit", "Published at launch"],
+            ["Platform", "Game logic", "Change the export rate and quota, behind the timelock", "Change a rig's past exports", "Published at launch"],
+            [
+              `${site.reward}RewardVault`,
+              "Reward vault",
+              `Post weekly roots; withdraw up to ${VAULT.withdrawPct}% of the free balance per ${VAULT.withdrawWindowDays} days after a ${VAULT.timelockDays}-day timelock; pause claims up to ${VAULT.pauseDays} days`,
+              "Touch rewards owed to players",
+              "Published at launch",
+            ],
+            ["FeeSplitter", "Fee waterfall", "Update the payout addresses, behind the timelock", "Change the split shares", "Published at launch"],
+            ["Treasury", "Multisig", "Holds every admin role above", "Act with a single signer", "Published at launch"],
           ]}
         />
       </Section>
 
       <Section id="faq" title="FAQ">
         <h3>Do I need a rig to play?</h3>
-        <p>No. Everyone can play for free, and free players can work shifts on other rigs.</p>
+        <p>
+          No. The browser game is free for everyone. In the on-chain game a rig NFT is needed to export for {site.reward}, and from Season 1 free players
+          can work shifts on other rigs.
+        </p>
+        <h3>Is the {site.reward} in the browser game real?</h3>
+        <p>
+          Not yet. It shows what your exports would earn at a reference price. Real {site.reward} is claimed from the vault once the on-chain game is
+          live.
+        </p>
+        <h3>Can the team take the {site.reward} in the vault?</h3>
+        <p>
+          Not the {site.reward} owed to players. The treasury can withdraw only from the free balance, at most {VAULT.withdrawPct}% per{" "}
+          {VAULT.withdrawWindowDays} days, and every withdrawal waits {VAULT.timelockDays} days on-chain and is listed in the treasury report. See{" "}
+          <a href="#vault">the reward vault</a>.
+        </p>
         <h3>Is {site.reward} a share in Exxon Mobil?</h3>
         <p>It is a token on Robinhood Chain that tracks the Exxon Mobil share price.</p>
         <h3>Is {site.name} affiliated with Exxon Mobil or Robinhood?</h3>

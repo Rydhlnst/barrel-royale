@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { site } from "@/lib/site";
+import { VAULT } from "@/lib/vault";
 import { PixelIcon } from "@/components/pixel/sprite";
 import { barrel, base, crownBarrel, icons } from "@/components/pixel/sprites";
 import { DocPage } from "@/components/doc/doc";
@@ -32,6 +33,7 @@ const phases: { when: string; status: Status; title: string; icon: readonly stri
     items: [
       { text: "Whitelist open, with referral ranks and three tiers" },
       { text: "Browser game live: pressure and choke, refinery, Dispatch contracts, storm brace", ok: true },
+      { text: `Export terminal for ${site.reward} in the browser game, with a preview balance`, ok: true },
       { text: "X account open; quests checked by the team" },
       { text: "Snapshot date announced at least a week ahead" },
     ],
@@ -58,6 +60,7 @@ const phases: { when: string; status: Status; title: string; icon: readonly stri
       { text: "Rig class reveal" },
       { text: "FeeSplitter deployed; fees split by the waterfall automatically" },
       { text: "First treasury report with links to every fee and transaction" },
+      { text: `${site.reward} vault deployed with its ${VAULT.timelockDays}-day timelock and withdrawal limits` },
       { text: `First ${site.reward} purchases, held in the vault until claims open` },
     ],
     gate: "fees cover running costs and the reserve is filling",
@@ -96,7 +99,7 @@ const phases: { when: string; status: Status; title: string; icon: readonly stri
     items: [
       { text: "Crew projects, like the first undersea pipeline" },
       { text: "Cosmetics marketplace and more events" },
-      { text: "Mobile-friendly game client" },
+      { text: "A second rig site with new products" },
       { text: "Community votes on the next season's rules" },
     ],
   },

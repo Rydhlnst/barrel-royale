@@ -31,6 +31,8 @@ export function XButton({ className = "" }: { className?: string }) {
   return (
     <a
       href={site.links.x}
+      target="_blank"
+      rel="noopener noreferrer"
       aria-label={`${site.name} on X`}
       className={`pixel pixel-drop m-1 grid h-[52px] w-[52px] place-items-center bg-white transition-transform hover:-translate-y-0.5 max-sm:h-[46px] max-sm:w-[46px] ${className}`}
     >

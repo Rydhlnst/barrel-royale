@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import { site } from "@/lib/site";
-import { ROYAL_DAILY_CAP, ROYAL_PER_BARREL } from "@/lib/game/content";
+import { EXPORT_BBL, EXPORT_DAILY_BBL, EXPORT_USD } from "@/lib/game/content";
 import { DocPage, Formula, Note, Section, Table } from "@/components/doc/doc";
+import { VAULT } from "@/lib/vault";
 
 const fmt = (n: number) => n.toLocaleString("en-US");
 
 export const metadata: Metadata = {
   title: `Litepaper · ${site.name}`,
-  description: `${site.name} litepaper: the game, the energy price index, the ${site.token} economy, weekly ${site.reward} rewards, fair play, architecture and safety.`,
+  description: `${site.name} litepaper: the game, the energy price index, the ${site.token} economy, ${site.reward} rewards and the reward vault, fair play, architecture and safety.`,
 };
 
 const toc = [
@@ -17,10 +18,12 @@ const toc = [
   { id: "index", label: "4. Energy price index" },
   { id: "economy", label: "5. Economy" },
   { id: "rewards", label: `6. ${site.reward} rewards` },
-  { id: "bots", label: "7. Fair play" },
-  { id: "architecture", label: "8. Architecture" },
-  { id: "security", label: "9. Safety and transparency" },
-  { id: "sources", label: "10. Sources" },
+  { id: "vault", label: "7. The reward vault" },
+  { id: "bots", label: "8. Fair play" },
+  { id: "architecture", label: "9. Architecture" },
+  { id: "security", label: "10. Safety and transparency" },
+  { id: "status", label: "11. Status" },
+  { id: "sources", label: "12. Sources" },
 ];
 
 export default function Litepaper() {
@@ -29,7 +32,7 @@ export default function Litepaper() {
       current={site.links.litepaper}
       eyebrow="Litepaper · v1.0"
       title="Litepaper"
-      lede={`An offshore drilling game on Robinhood Chain where in-game prices follow real energy benchmarks and rig holders share Exxon Mobil stock tokens bought with project revenue.`}
+      lede={`An offshore drilling game on Robinhood Chain where in-game prices follow real energy benchmarks and rig holders export their barrels for Exxon Mobil stock tokens bought with project revenue.`}
       meta={["Litepaper v1.0", "October 2026", "Chain · Robinhood Chain (4663)"]}
       toc={{ title: "Litepaper", items: toc }}
     >
@@ -39,9 +42,9 @@ export default function Litepaper() {
 
       <Section id="summary" title="1. Summary">
         <p>
-          Players own rigs (NFTs), drill wells, manage well pressure, refine crude and gas into six energy products, sell them for in-game coins and export them for {site.token}. Each
+          Players own rigs (NFTs), drill wells, manage well pressure, refine crude and gas into six energy products, sell them for in-game coins and export them for {site.reward}. Each
           product&apos;s price follows a real benchmark through an on-chain oracle. A fixed share of project revenue buys {site.reward}, the Exxon Mobil
-          stock token on Robinhood Chain, which is shared every week by the rigs that produce.
+          stock token on Robinhood Chain, and holds it in a reward vault that pays out what each rig exports.
         </p>
       </Section>
 
@@ -54,7 +57,10 @@ export default function Litepaper() {
       </Section>
 
       <Section id="design" title="3. Game design">
-        <p>The core loop is drill, manage pressure, refine, sell, defend and upgrade. Each shift is 5 to 10 minutes of real decisions.</p>
+        <p>
+          The core loop is drill, manage pressure, refine, sell or export, defend and upgrade. Section 11 lists which parts are live in the browser
+          game today.
+        </p>
         <ul>
           <li>
             <b>Wells and pressure:</b> three raw products; a choke trades output against blowout risk.
@@ -63,7 +69,10 @@ export default function Litepaper() {
             <b>Refinery:</b> distillation, cracker and liquefier turn crude and gas into diesel, jet fuel and LNG.
           </li>
           <li>
-            <b>Selling:</b> the spot market at the index, or Dispatch contracts at a fixed premium price.
+            <b>Selling:</b> the spot market at the index, or Dispatch contracts at a fixed premium price, both paid in in-game coins.
+          </li>
+          <li>
+            <b>Export:</b> barrels shipped through the export terminal turn into {site.reward}, up to a daily quota per rig.
           </li>
           <li>
             <b>Incidents:</b> storms with an active brace phase; sabotage as raids between crews.
@@ -98,11 +107,10 @@ export default function Litepaper() {
       <Section id="economy" title="5. Economy">
         <h3>{site.token}</h3>
         <p>
-          {site.token} is a fixed-supply ERC-20 with a fair launch: no presale and no private round. In-game sales pay coins, which never leave the game. The
-          only way play turns into {site.token} is the export terminal: {fmt(10 / ROYAL_PER_BARREL)} bbl of any product ships out for 10 {site.token},
-          up to {ROYAL_DAILY_CAP} {site.token} per rig per day. Exports are paid from the game rewards pool, which is refilled by buybacks from revenue
-          and by the {site.token} players spend on class upgrades, raids and cosmetics. The rate and the quota are set so the pool pays out no more than
-          flows back in, and both are shown on a public dashboard.
+          {site.token} is a fixed-supply ERC-20 with a fair launch: no presale and no private round. It is spent on rig class upgrades and cosmetics,
+          which burn it, and a share of revenue buys it back and burns it too. In-game sales pay coins, which never leave the game. Barrels become{" "}
+          {site.reward} only through the export terminal: every {fmt(EXPORT_BBL)} bbl earns ${EXPORT_USD} worth of {site.reward}, up to{" "}
+          {fmt(EXPORT_DAILY_BBL)} bbl per rig per day.
         </p>
         <h3>Rig mint</h3>
         <Table
@@ -124,9 +132,9 @@ export default function Litepaper() {
         <Table
           head={["Use", "Share"]}
           rows={[
-            [`${site.reward} for the weekly reward pool`, "40%"],
+            [`${site.reward} for the reward vault`, "40%"],
             ["Game development and operations", "35%"],
-            [`${site.token} buybacks for the game rewards pool`, "20%"],
+            [`${site.token} buyback and burn`, "20%"],
             ["Crew war prizes", "5%"],
           ]}
         />
@@ -142,28 +150,51 @@ export default function Litepaper() {
           <li>a 1% slippage limit on every trade;</li>
           <li>every purchase listed in the public treasury log.</li>
         </ul>
-        <Formula>reward(i, w) = Pool(w) × Points(i, w) ÷ Σ Points(j, w) over eligible rigs j</Formula>
+        <Formula>
+          reward(i, w) = B(i, w) ÷ {fmt(EXPORT_BBL)} × ${EXPORT_USD} ÷ P(w)
+        </Formula>
         <p>
-          Points combine production after the class multiplier, filled contracts and storms held, with gentler returns past a weekly cap per rig. The vault
-          records each week&apos;s pool and a Merkle root of rewards, and holders claim with a proof.
+          B(i, w) is the barrels rig i exported in week w, at most {fmt(EXPORT_DAILY_BBL)} a day, and P(w) is the {site.reward} price from the
+          Chainlink feed. The vault records each week&apos;s Merkle root of rewards and holders claim with a proof. The rate and the daily quota keep
+          weekly exports well inside what the vault receives from revenue, and both can change only through the timelock in section 7.
         </p>
       </Section>
 
-      <Section id="bots" title="7. Fair play">
+      <Section id="vault" title="7. The reward vault">
+        <p>
+          The {site.reward}RewardVault keeps two balances apart. {site.reward} owed to players, from every posted week that is not yet claimed, can only
+          leave through their claims. The free balance, {site.reward} the treasury bought that no player has earned yet, is managed by the treasury
+          multisig under fixed limits:
+        </p>
+        <ul>
+          <li>every withdrawal is scheduled on-chain and executes only after a {VAULT.timelockDays}-day timelock;</li>
+          <li>
+            at most {VAULT.withdrawPct}% of the free balance can leave in any {VAULT.withdrawWindowDays} days;
+          </li>
+          <li>withdrawals cover running costs in quiet months, a move to a new vault version, or a treasury rebalance, each listed in the monthly report;</li>
+          <li>changes to the export rate and quota use the same timelock;</li>
+          <li>
+            claims can be paused for at most {VAULT.pauseDays} days for a security issue, and paused time is added to every claim window;
+          </li>
+          <li>unclaimed rewards return to the free balance after {VAULT.claimWeeks} weeks.</li>
+        </ul>
+      </Section>
+
+      <Section id="bots" title="8. Fair play">
         <p>A reward with real value deserves real players. {site.name} is built for that from day one:</p>
         <ul>
           <li>The game server decides every outcome; the client only sends what the player wants to do.</li>
-          <li>Shifts set a daily budget of active play per rig; points past a weekly cap count for less.</li>
-          <li>Eligibility asks for varied, active play: shifts, contracts and storms.</li>
+          <li>Shifts set a daily budget of active play per rig, and exports stop at a daily quota.</li>
+          <li>Exports count only from rigs that show varied, active play: shifts, contracts and storms.</li>
           <li>Rate limits, one session per account, and a quick check at sign-up and at claim time.</li>
           <li>Rigs flagged for review are held back from that week&apos;s Merkle root until they are cleared.</li>
         </ul>
       </Section>
 
-      <Section id="architecture" title="8. Architecture">
+      <Section id="architecture" title="9. Architecture">
         <ul>
           <li>
-            <b>RoyalToken:</b> ERC-20 with a fixed supply.
+            <b>RoyalToken:</b> ERC-20 with a fixed supply and no owner after launch: no minting, pausing or blacklisting.
           </li>
           <li>
             <b>RigNFT:</b> ERC-721 with commit-reveal class assignment.
@@ -172,24 +203,25 @@ export default function Litepaper() {
             <b>EnergyOracle:</b> one source per product, Chainlink feed or keeper set, with the checks in section 4.
           </li>
           <li>
-            <b>Platform:</b> settles sales and enforces the daily cap.
+            <b>Platform:</b> records exports and enforces the daily quota; the export rate and quota change only through the timelock.
           </li>
           <li>
-            <b>{site.reward}RewardVault:</b> holds {site.reward}, stores weekly Merkle roots and pays claims to eligible wallets.
+            <b>{site.reward}RewardVault:</b> holds {site.reward}, stores weekly Merkle roots, pays claims, and keeps player rewards apart from the timelocked free balance.
           </li>
           <li>
             <b>FeeSplitter:</b> runs the revenue split.
           </li>
           <li>
-            <b>Game server:</b> wells, refinery, contracts, incidents and crews, plus an indexer that scores each rig&apos;s week and builds the Merkle tree.
+            <b>Game server:</b> wells, refinery, contracts, incidents and crews, plus an indexer that tallies each rig&apos;s exports for the week and builds the Merkle tree.
           </li>
         </ul>
       </Section>
 
-      <Section id="security" title="9. Safety and transparency">
+      <Section id="security" title="10. Safety and transparency">
         <ul>
           <li>OpenZeppelin contracts with reentrancy guards and an emergency pause.</li>
           <li>Every admin role and the treasury held by a multisig, so no single key can move funds.</li>
+          <li>A {VAULT.timelockDays}-day timelock on vault withdrawals and on changes to the export rules, so every admin action is public before it applies.</li>
           <li>An external audit published before mainnet, then a public bug bounty.</li>
           <li>Source code verified on the Robinhood Chain explorer for every contract.</li>
           <li>A monthly treasury report linking every fee, split and {site.reward} purchase.</li>
@@ -197,7 +229,22 @@ export default function Litepaper() {
         </ul>
       </Section>
 
-      <Section id="sources" title="10. Sources">
+      <Section id="status" title="11. Status">
+        <Table
+          head={["Part", "Status"]}
+          rows={[
+            ["Browser game: wells, pressure, refinery, market, contracts, storms, rig levels", "Live"],
+            [`Export terminal with a preview ${site.reward} balance`, "Live"],
+            ["Whitelist with referral ranks", "Live"],
+            [`${site.token}, rig mint and class reveal`, "Launch"],
+            ["FeeSplitter, treasury reports and the first vault purchases", "Weeks 1 to 2 after launch"],
+            [`On-chain game and ${site.reward} claims on testnet, external audit`, "Weeks 3 to 6"],
+            [`Mainnet, Season 1, crews and raids, first ${site.reward} claims`, "Weeks 7 to 10"],
+          ]}
+        />
+      </Section>
+
+      <Section id="sources" title="12. Sources">
         <ul>
           <li>
             <a href="https://docs.robinhood.com/chain/oracles-and-price-feeds" target="_blank" rel="noopener">
