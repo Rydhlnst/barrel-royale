@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { site } from "@/lib/site";
+import { royalUrl, site } from "@/lib/site";
 import { ROBINHOOD_CHAIN, connectWallet, disconnectWallet, shortAddress, type WalletState } from "@/lib/wallet";
 import type { HolderState } from "@/lib/holder";
 import { PixelIcon } from "@/components/pixel/sprite";
@@ -111,7 +111,6 @@ export function ConnectGate({ wallet }: { wallet: WalletState }) {
 
 /** Shown to a connected wallet while its $ROYAL balance is read, and when it holds less than the minimum. */
 export function HolderGate({ account, holder, recheck }: { account: string; holder: HolderState; recheck: () => void }) {
-  const getUrl = site.buyUrl ?? (site.ca ? `${site.explorer}/token/${site.ca}` : site.links.docs);
   return (
     <GateFrame title={holder.status === "checking" ? "Checking your rig pass" : `Hold ${site.token} to play`}>
       <p className="text-brand-ink-2">
@@ -129,7 +128,7 @@ export function HolderGate({ account, holder, recheck }: { account: string; hold
         </p>
       )}
       <div className="flex w-full flex-col gap-2">
-        <a href={getUrl} target="_blank" rel="noopener" className="btn btn-red w-full justify-center">
+        <a href={royalUrl} target="_blank" rel="noopener" className="btn btn-red w-full justify-center">
           Get {site.token}
         </a>
         <button type="button" className="btn btn-white w-full justify-center" onClick={recheck} disabled={holder.status === "checking"}>

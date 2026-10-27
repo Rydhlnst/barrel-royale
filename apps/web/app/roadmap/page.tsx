@@ -47,7 +47,8 @@ const phases: { when: string; status: Status; title: string; icon: readonly stri
       { text: `${site.reward} vault running with its ${VAULT.timelockDays}-day timelock and withdrawal limits`, ok: true },
       { text: "Contract addresses published in the docs", ok: true },
       { text: "Whitelist snapshot taken and tiers published" },
-      { text: `${site.token} live on Robinhood Chain` },
+      { text: `${site.token} live on Robinhood Chain`, ok: true },
+      { text: `Browser game open to ${site.token} holders, with a live chart in the game`, ok: true },
       { text: "Rig mint: OG Roughnecks first, then Crew, then public; class seed hash posted before the first mint" },
     ],
     gate: `rig mint open and ${site.token} trading live`,
@@ -124,7 +125,7 @@ export default function Roadmap() {
       current={site.links.roadmap}
       eyebrow="Roadmap"
       title="Launch first, then build in the open"
-      lede={`The whitelist and the browser game are live, and the ${site.name} contracts are on Robinhood Chain. Next come the token and the rig mint, then on-chain gameplay and ${site.reward} claims in stages, each behind a public checkpoint. Timing after launch is an estimate.`}
+      lede={`${site.token} is live, the browser game is open to holders, and the ${site.name} contracts are on Robinhood Chain. Next comes the rig mint, then on-chain gameplay and ${site.reward} claims in stages, each behind a public checkpoint.`}
     >
       <ol className="mx-auto w-full max-w-4xl" style={{ listStyle: "none", paddingLeft: 0, gap: 0 }}>
         {phases.map((p) => (

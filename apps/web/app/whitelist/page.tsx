@@ -43,10 +43,10 @@ export default function Whitelist() {
         <section className="sunburst relative overflow-hidden px-4 pb-16 pt-36 sm:px-8 lg:pt-32">
           <div className="mx-auto grid max-w-7xl items-start gap-10 lg:grid-cols-[1fr_minmax(0,520px)]">
             <div className="flex flex-col gap-5">
-              <span className="pixel-sm self-start bg-white px-3 py-1 font-display text-sm font-bold">Whitelist · pre-launch</span>
+              <span className="pixel-sm self-start bg-white px-3 py-1 font-display text-sm font-bold">Whitelist · rig mint</span>
               <h1 className="outlined font-logo text-4xl font-bold uppercase leading-tight sm:text-6xl">Claim your spot on the rig</h1>
               <p className="pixel max-w-xl bg-white/90 px-4 py-3 text-lg leading-relaxed">
-                {site.name} is building its crew before launch. Join the whitelist, bring your friends, and the top roughnecks get a guaranteed spot in
+                {site.name} is building its crew for the rig mint. Join the whitelist, bring your friends, and the top roughnecks get a guaranteed spot in
                 the rig mint and the first look at the alpha.
               </p>
               <PixelIcon rows={roughneck} palette={base} scale={10} className="mt-2 hidden lg:block" />

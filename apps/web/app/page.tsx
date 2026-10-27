@@ -1,5 +1,5 @@
 import { C } from "@/lib/palette";
-import { site } from "@/lib/site";
+import { royalUrl, site } from "@/lib/site";
 import { PixelIcon, Pixels, Sprite, disc } from "@/components/pixel/sprite";
 import { barrel, base, crownBarrel, hat, icons, roughneck, roughneckHead } from "@/components/pixel/sprites";
 import { HeroScene } from "@/components/scenes/hero-scene";
@@ -78,7 +78,7 @@ const roadmap = [
     when: "Phase 2",
     status: "Now",
     title: "Barrel Royale goes live",
-    items: [{ text: "Contracts live on Robinhood Chain", ok: true }, `${site.token} on Robinhood Chain`, "Rig mint opens, class seed hash posted first"],
+    items: [{ text: "Contracts live on Robinhood Chain", ok: true }, { text: `${site.token} live on Robinhood Chain`, ok: true }, { text: "Browser game open to holders", ok: true }, "Rig mint opens, class seed hash posted first"],
   },
   { when: "Weeks 1–2", status: "Next", title: "Treasury on-chain", items: ["Rig class reveal", "First treasury report", `First ${site.reward} purchases into the vault`] },
   { when: "Weeks 3–6", status: "Planned", title: "On-chain game, testnet", items: ["Your rig NFT becomes your in-game rig", "Pressure, refinery and storm drills", `${site.reward} claims tested end to end`] },
@@ -124,11 +124,11 @@ function Hero() {
           </span>
         </p>
         <div className="flex flex-wrap justify-center gap-3">
-          <Button href={site.links.whitelist} variant="red">
-            Join the whitelist
-          </Button>
-          <Button href={site.links.play} variant="white">
+          <Button href={site.links.play} variant="red">
             Enter the rig
+          </Button>
+          <Button href={royalUrl} variant="white">
+            Get {site.token}
           </Button>
         </div>
         <div className="mt-2 flex max-w-full items-stretch gap-2">
@@ -280,7 +280,7 @@ function Fleet() {
         <div className="box mt-10 flex flex-col items-start gap-4 bg-brand-sun-pale p-6 sm:flex-row sm:items-center">
           <PixelIcon rows={roughneck} palette={base} scale={4} />
           <p className="text-lg">
-            <b>No rig yet?</b> Hold {site.token} and the browser game is yours from launch day. In the on-chain game players without a rig get a starter platform with 3 well slots,
+            <b>No rig yet?</b> Hold {site.token} and the browser game is yours today. In the on-chain game players without a rig get a starter platform with 3 well slots,
             and a rig is needed to export for {site.reward}.
           </p>
         </div>
@@ -294,10 +294,10 @@ function WhitelistBand() {
     <section id="whitelist" className="sunburst relative scroll-mt-4 overflow-hidden px-4 py-20 sm:px-8 sm:py-24">
       <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[1fr_minmax(0,560px)]">
         <div className="flex flex-col gap-5">
-          <span className="pixel-sm self-start bg-white px-3 py-1 font-display text-sm font-bold">Whitelist · pre-launch</span>
+          <span className="pixel-sm self-start bg-white px-3 py-1 font-display text-sm font-bold">Whitelist · rig mint</span>
           <h2 className="outlined font-logo text-4xl font-bold uppercase leading-tight sm:text-6xl">Claim your spot on the rig</h2>
           <p className="pixel max-w-xl bg-white/90 px-4 py-3 text-lg leading-relaxed">
-            We&apos;re building the crew before launch. Join with your wallet and X handle, bring friends with your referral link, and climb the list.
+            We&apos;re building the crew for the rig mint. Join with your wallet and X handle, bring friends with your referral link, and climb the list.
           </p>
           <div className="flex flex-wrap gap-3">
             <Button href={site.links.whitelist} variant="red">
@@ -332,7 +332,7 @@ function Roadmap() {
     <section id="roadmap-preview" className="scroll-mt-4 bg-brand-sun-pale px-4 py-20 sm:px-8 sm:py-24">
       <div className="mx-auto max-w-7xl">
         <SectionHead eyebrow="Roadmap" title="Launch first, then build in the open">
-          On-chain gameplay and {site.reward} claims follow in stages, each behind a public checkpoint. Timing after launch is an estimate.
+          {site.token} is live and the browser game is open. On-chain gameplay and {site.reward} claims follow in stages, each behind a public checkpoint.
         </SectionHead>
         <ol className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-5">
           {roadmap.map((r) => {
@@ -376,16 +376,16 @@ function Roadmap() {
 function PlayCopy() {
   return (
     <div className="mx-auto flex max-w-3xl flex-col items-center gap-5 text-center">
-      <h2 className="outlined font-logo text-4xl font-bold uppercase leading-tight sm:text-6xl">The rig opens at launch</h2>
+      <h2 className="outlined font-logo text-4xl font-bold uppercase leading-tight sm:text-6xl">The rig is open</h2>
       <p className="pixel max-w-xl bg-white/90 px-4 py-3 text-lg">
-        Connect your wallet now and drill your first wells the moment {site.token} goes live, right in your browser.
+        Hold {site.token}, connect your wallet and drill your first wells right in your browser.
       </p>
       <div className="flex flex-wrap justify-center gap-3">
         <Button href={site.links.play} variant="red">
-          Get ready
+          Enter the rig
         </Button>
-        <Button href={site.links.docs} variant="white">
-          Read the docs
+        <Button href={royalUrl} variant="white">
+          Get {site.token}
         </Button>
       </div>
     </div>

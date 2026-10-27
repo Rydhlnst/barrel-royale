@@ -58,9 +58,9 @@ export default function Docs() {
       lede={`Everything a roughneck needs: how rigs work, how to run a well hard without blowing it, what the refinery makes, and how barrels turn into ${site.reward}.`}
       toc={{ title: "Docs", items: toc }}
     >
-      <Note title="Ready for launch.">
-        The browser game opens at <a href={site.links.play}>Play</a> with the {site.token} launch, for wallets holding {fmt(site.minHold)} {site.token} or
-        more. Connect your wallet now and you are ready on day one. On-chain play rolls out in stages along the{" "}
+      <Note title="The rig is open.">
+        The browser game is live at <a href={site.links.play}>Play</a> for wallets holding {fmt(site.minHold)} {site.token} or more. Connect your wallet
+        and start drilling. On-chain play rolls out in stages along the{" "}
         <a href={site.links.roadmap}>roadmap</a>, and the numbers below are tuned with every community playtest.
       </Note>
 
@@ -72,18 +72,18 @@ export default function Docs() {
         <Table
           head={["Feature", "Status"]}
           rows={[
-            ["Wells, pressure and choke settings", "Built, opens at launch"],
-            ["Blowouts and the capping drill", "Built, opens at launch"],
-            ["Refinery: distillation, cracker and liquefier", "Built, opens at launch"],
-            ["Spot market with six price indexes", "Built, opens at launch"],
-            ["Dispatch board delivery contracts", "Built, opens at launch"],
-            ["Storms and the brace drill", "Built, opens at launch"],
-            ["Rig levels 1 to 5", "Built, opens at launch"],
-            [`Export terminal and ${site.reward} balance`, "Built, opens at launch"],
+            ["Wells, pressure and choke settings", "Live"],
+            ["Blowouts and the capping drill", "Live"],
+            ["Refinery: distillation, cracker and liquefier", "Live"],
+            ["Spot market with six price indexes", "Live"],
+            ["Dispatch board delivery contracts", "Live"],
+            ["Storms and the brace drill", "Live"],
+            ["Rig levels 1 to 5", "Live"],
+            [`Export terminal and ${site.reward} balance`, "Live"],
             ["Wallet connect on Robinhood Chain", "Live"],
             ["Reward vault, rig NFT and treasury contracts on Robinhood Chain", "Live"],
             ["Whitelist with referral ranks", "Live"],
-            [`Rig access for ${site.token} holders`, `From the ${site.token} launch`],
+            [`Rig access for ${site.token} holders`, "Live"],
             ["Wallet login, rig NFTs and rig classes", "On-chain game"],
             [`Rig class upgrades with ${site.token}`, "On-chain game"],
             [`${site.reward} claims from the reward vault`, "On-chain game"],
@@ -97,7 +97,7 @@ export default function Docs() {
       <Section id="start" title="Getting started">
         <ol>
           <li>
-            Open <a href={site.links.play}>Play</a> and connect your wallet on Robinhood Chain. From launch, hold {fmt(site.minHold)} {site.token} or more in that wallet to step on deck. Your rig is saved to your address.
+            Open <a href={site.links.play}>Play</a> and connect your wallet on Robinhood Chain. Hold {fmt(site.minHold)} {site.token} or more in that wallet to step on deck. Your rig is saved to your address.
           </li>
           <li>Walk with WASD or the arrow keys (the joystick on a phone). Step up to an empty pad and press E to drill; light crude is the quickest start.</li>
           <li>Keep the choke on Normal for your first wells and watch the pressure gauge. Press F at a well to change its choke.</li>
@@ -275,7 +275,7 @@ export default function Docs() {
       <Section id="free" title="Playing without a rig">
 
         <p>
-          The browser game opens for {site.token} holders at launch. In the on-chain game, players without a rig start on a starter platform with 3 slots and earn season
+          The browser game is open to {site.token} holders. In the on-chain game, players without a rig start on a starter platform with 3 slots and earn season
           points, while {site.reward} exports need a rig NFT. From Season 1 they can also <b>work shifts on a rig holder&apos;s rig</b>, using its
           refinery and contracts, and the rig owner keeps 5 to 10% of what they make. Busy rigs grow fastest, so owners recruit.
         </p>
@@ -283,7 +283,7 @@ export default function Docs() {
 
       <Section id="whitelist" title="Whitelist">
         <p>
-          Before launch, {site.name} is building its crew with a whitelist. Join on the <a href={site.links.whitelist}>whitelist page</a> with a wallet
+          {site.name} is building its crew for the rig mint with a whitelist. Join on the <a href={site.links.whitelist}>whitelist page</a> with a wallet
           and an X handle. It is free and needs no transaction.
         </p>
         <ul>
@@ -425,7 +425,7 @@ export default function Docs() {
             Claims can be paused for at most {VAULT.pauseDays} days to deal with a security issue. Paused time is added to every claim window, so no
             reward expires because of a pause.
           </li>
-          <li>Every admin role sits with the treasury multisig. Its address and signers are published at launch.</li>
+          <li>Every admin role sits with the treasury multisig. Its address is listed in the contracts table below.</li>
         </ul>
       </Section>
 
@@ -493,7 +493,7 @@ export default function Docs() {
       <Section id="faq" title="FAQ">
         <h3>What do I need to play?</h3>
         <p>
-          A wallet on Robinhood Chain and, from the {site.token} launch, {fmt(site.minHold)} {site.token} or more in it. In the on-chain game a rig NFT is needed to export for{" "}
+          A wallet on Robinhood Chain with {fmt(site.minHold)} {site.token} or more in it. In the on-chain game a rig NFT is needed to export for{" "}
           {site.reward}, and from Season 1 players without a rig can work shifts on other rigs.
         </p>
         <h3>What is the {site.reward} balance in the browser game?</h3>

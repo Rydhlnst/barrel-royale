@@ -30,3 +30,6 @@ export const site = {
   buyUrl: process.env.NEXT_PUBLIC_ROYAL_BUY_URL || null,
   explorer: "https://robinhoodchain.blockscout.com",
 } as const;
+
+/** Where the "Get $ROYAL" buttons go: the launchpad page when set, otherwise the token on GMGN. */
+export const royalUrl = site.buyUrl ?? (site.ca ? `https://gmgn.ai/robinhood/token/${site.ca}` : site.links.docs);

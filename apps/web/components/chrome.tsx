@@ -41,14 +41,13 @@ export function XButton({ className = "" }: { className?: string }) {
   );
 }
 
-/** X and the whitelist, pinned top right on every page. On phones the X button moves into the page so it doesn't cover the logo. */
+/** X and the way into the rig, pinned top right on every page. On phones the X button moves into the page so it doesn't cover the logo. */
 export function StickyCta() {
   return (
     <div className="fixed right-3 top-3 z-40 flex gap-2 sm:right-6 sm:top-4 sm:gap-3">
       <XButton className="max-sm:hidden" />
-      <Button href={site.links.whitelist} variant="red">
-        <span className="sm:hidden">Join</span>
-        <span className="hidden sm:inline">Whitelist</span>
+      <Button href={site.links.play} variant="red">
+        Play
       </Button>
     </div>
   );

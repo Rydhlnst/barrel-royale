@@ -4,7 +4,7 @@ import { PlayClient } from "@/components/game/play-client";
 
 export const metadata: Metadata = {
   title: `Play · ${site.name}`,
-  description: `Your own offshore rig, opening with the ${site.token} launch: drill wells, ride the pressure, refine, fill contracts and brace for storms.`,
+  description: `Your own offshore rig, open to ${site.token} holders: drill wells, ride the pressure, refine, fill contracts and brace for storms.`,
 };
 
 export default function PlayPage() {
