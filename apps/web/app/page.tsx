@@ -8,7 +8,6 @@ import { Button, Dither, Ticker } from "@/components/ui";
 import { Footer, Logo, StickyCta, XButton } from "@/components/chrome";
 import { CopyCa } from "@/components/copy-ca";
 import { tiers } from "@/lib/whitelist-rules";
-import { EXPORT_BBL, EXPORT_DAILY_BBL, EXPORT_USD } from "@/lib/game/content";
 
 const nav = [
   { label: "How it works", href: "#how" },
@@ -60,7 +59,7 @@ const features = [
 
 const flow = [
   { label: "Revenue", body: `From ${site.token} and rig trading` },
-  { label: "Treasury", body: `Buys ${site.reward} for the reward vault` },
+  { label: "Treasury", body: `Uses revenue to buy ${site.reward} and fills the vault` },
   { label: `${site.reward} vault`, body: `Holds the ${site.reward} players earn from exports`, key: true },
   { label: "Rig holders", body: `Claim the ${site.reward} their exports earned` },
 ];
@@ -245,9 +244,6 @@ function Xom() {
             </li>
           ))}
         </ol>
-        <p className="box mt-10 overflow-x-auto bg-white p-4 font-mono text-sm font-bold sm:text-base">
-          {EXPORT_BBL.toLocaleString("en-US")} bbl exported = ${EXPORT_USD} worth of {site.reward} · up to {EXPORT_DAILY_BBL.toLocaleString("en-US")} bbl per rig per day
-        </p>
       </div>
     </section>
   );
