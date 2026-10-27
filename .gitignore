@@ -20,3 +20,9 @@ Thumbs.db
 
 # internal notes (research, design, legal risks) stay on this machine only
 docs/
+
+# Foundry build output and installed libraries
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+contracts/lib/
