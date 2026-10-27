@@ -86,7 +86,7 @@ const phases: { when: string; status: Status; title: string; icon: readonly stri
       { text: "Treasury report for the first full month" },
       { text: `${site.reward} claim page in the app` },
       { text: "On-chain game on mainnet; Season 1 and crew wars start" },
-      { text: `First weekly ${site.reward} claim, including ${site.reward} bought since launch` },
+      { text: `First ${site.reward} claims, including ${site.reward} bought since launch` },
     ],
     gate: "the first round checked against the published export ledger",
   },

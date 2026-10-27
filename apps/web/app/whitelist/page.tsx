@@ -10,7 +10,7 @@ import { WhitelistForm } from "@/components/whitelist-form";
 
 export const metadata: Metadata = {
   title: `Whitelist · ${site.name}`,
-  description: `Join the ${site.name} whitelist: a guaranteed rig mint for the top roughnecks, early alpha access, and +${POINTS_REFERRAL} points for every friend you bring.`,
+  description: `Join the ${site.name} whitelist: a guaranteed spot in the rig mint for the top roughnecks, early alpha access, and +${POINTS_REFERRAL} points for every friend you bring.`,
 };
 
 const quests = [
@@ -46,8 +46,8 @@ export default function Whitelist() {
               <span className="pixel-sm self-start bg-white px-3 py-1 font-display text-sm font-bold">Whitelist · pre-launch</span>
               <h1 className="outlined font-logo text-4xl font-bold uppercase leading-tight sm:text-6xl">Claim your spot on the rig</h1>
               <p className="pixel max-w-xl bg-white/90 px-4 py-3 text-lg leading-relaxed">
-                {site.name} is building its crew before launch. Join the whitelist, bring your friends, and the top roughnecks get a guaranteed rig mint
-                and the first look at the alpha.
+                {site.name} is building its crew before launch. Join the whitelist, bring your friends, and the top roughnecks get a guaranteed spot in
+                the rig mint and the first look at the alpha.
               </p>
               <PixelIcon rows={roughneck} palette={base} scale={10} className="mt-2 hidden lg:block" />
             </div>

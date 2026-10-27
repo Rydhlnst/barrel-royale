@@ -78,7 +78,7 @@ export default function Docs() {
             ["Blowouts and the capping drill", "Live"],
             ["Refinery: distillation, cracker and liquefier", "Live"],
             ["Spot market with six price indexes", "Live"],
-            ["Dispatch board contracts", "Live"],
+            ["Dispatch board delivery contracts", "Live"],
             ["Storms and the brace drill", "Live"],
             ["Rig levels 1 to 5", "Live"],
             [`Export terminal and ${site.reward} balance`, `Live, as a preview balance until claims open`],
@@ -192,8 +192,8 @@ export default function Docs() {
             <b>Spot market.</b> Sell any time at the product&apos;s index.
           </li>
           <li>
-            <b>Dispatch board.</b> Contracts at a fixed price, 10 to 30% above base, with a deadline. In the browser game a new one arrives every 45
-            seconds and lasts a few minutes; on-chain, contracts run for hours.
+            <b>Dispatch board.</b> Delivery contracts at a fixed price, 10 to 30% above base, with a deadline. In the browser game a new one arrives every 45
+            seconds and lasts a few minutes; on-chain, delivery contracts run for hours.
           </li>
           <li>
             <b>Export terminal.</b> Ship barrels out for {site.reward}: every {fmt(EXPORT_BBL)} bbl of any product earns ${EXPORT_USD} worth of{" "}
@@ -298,7 +298,7 @@ export default function Docs() {
         <Table
           head={["Tier", "Rank at snapshot", "What you get"]}
           rows={[
-            ["OG Roughneck", "Top 500", "Guaranteed rig mint, closed alpha access, OG badge in the game"],
+            ["OG Roughneck", "Top 500", "A guaranteed spot in the rig mint, closed alpha access, OG badge in the game"],
             ["Crew", "501 to 2,500", "Whitelist mint window before public, alpha waitlist"],
             ["Deckhand", "Everyone else", "First in line for the public mint"],
           ]}
@@ -320,7 +320,7 @@ export default function Docs() {
               "Trading on the launchpad",
               "Rig class upgrades and cosmetics, both burned",
             ],
-            [site.reward, `${site.reward}RewardVault`, "Exporting barrels", "The reward, claimed to your wallet every week"],
+            [site.reward, `${site.reward}RewardVault`, "Exporting barrels", "The reward: new XOM every week, claimed to your wallet any time"],
           ]}
         />
         <h3>{site.token}</h3>
@@ -347,7 +347,7 @@ export default function Docs() {
           <li>
             The treasury buys {site.reward} for the reward vault and buys back and burns {site.token}.
           </li>
-          <li>Players pump, refine and export barrels, and claim the {site.reward} their exports earned every week.</li>
+          <li>Players pump, refine and export barrels. New {site.reward} lands every week, and they claim it whenever they like.</li>
           <li>Holders burn {site.token} to raise their rig&apos;s class, which lifts every barrel the rig produces.</li>
         </ol>
       </Section>
@@ -367,7 +367,7 @@ export default function Docs() {
             price, so its {site.reward} balance is a preview.
           </li>
           <li>
-            Claim any time after the week closes. Unclaimed rewards go back to the vault&apos;s free balance after {VAULT.claimWeeks} weeks.
+            Claim whenever you like: each week&apos;s rewards stay open for {VAULT.claimWeeks} weeks, so you can let a few weeks build up and claim them together.
           </li>
           <li>The vault, every purchase and every claim are public on the Robinhood Chain explorer.</li>
         </ul>
@@ -497,10 +497,9 @@ export default function Docs() {
           No. The browser game is free for everyone. In the on-chain game a rig NFT is needed to export for {site.reward}, and from Season 1 free players
           can work shifts on other rigs.
         </p>
-        <h3>Is the {site.reward} in the browser game real?</h3>
+        <h3>What is the {site.reward} balance in the browser game?</h3>
         <p>
-          Not yet. It shows what your exports would earn at a reference price. Real {site.reward} is claimed from the vault once the on-chain game is
-          live.
+          A preview of what your exports earn, at a reference {site.reward} price. Claims of {site.reward} to your wallet open with the on-chain game.
         </p>
         <h3>Can the team take the {site.reward} in the vault?</h3>
         <p>

@@ -24,7 +24,7 @@ const steps = [
   { icon: crownBarrel, title: "Mint a rig", body: "Each rig is an NFT with its own class and production multiplier. Its well slots are where you drill." },
   { icon: icons.derrick, title: "Drill and pump", body: "Strike crude or gas, then ride the pressure. Push a well harder for a bigger haul, if you can keep it from blowing." },
   { icon: barrel, title: "Refine and sell", body: "Turn crude into diesel and jet fuel, then sell at the market index or fill a tanker contract for a premium." },
-  { icon: icons.coin, title: `Export for ${site.reward}`, body: `Ship barrels through the export terminal and they turn into ${site.reward}, up to a daily quota per rig. Claim every week.` },
+  { icon: icons.coin, title: `Export for ${site.reward}`, body: `Ship barrels through the export terminal and they turn into ${site.reward}, up to a daily quota per rig. New ${site.reward} lands every week, and you claim it whenever you like.` },
 ];
 
 const features = [
@@ -66,10 +66,10 @@ const flow = [
 ];
 
 const classes: { kind: RigClass; name: string; rarity: string; body: string; mult: string }[] = [
-  { kind: "jackup", name: "Jack-up", rarity: "Common · 60%", body: "Shallow-water workhorse. 6 well slots at launch.", mult: "1.00×" },
-  { kind: "semisub", name: "Semi-sub", rarity: "Uncommon · 28%", body: "Floats over deeper fields. Produces a quarter more.", mult: "1.25×" },
-  { kind: "drillship", name: "Drillship", rarity: "Rare · 10%", body: "Moves between fields. Half again the output.", mult: "1.50×" },
-  { kind: "ultra", name: "Ultra-deepwater", rarity: "Legendary · 2%", body: "Reaches the richest reserves. Double output.", mult: "2.00×" },
+  { kind: "jackup", name: "Jack-up", rarity: "Common · 60%", body: "Shallow-water workhorse. The base class.", mult: "1.00×" },
+  { kind: "semisub", name: "Semi-sub", rarity: "Uncommon · 28%", body: "Floats over deeper fields. Produces 25% more.", mult: "1.25×" },
+  { kind: "drillship", name: "Drillship", rarity: "Rare · 10%", body: "Moves between fields. Produces 50% more.", mult: "1.50×" },
+  { kind: "ultra", name: "Ultra-deepwater", rarity: "Legendary · 2%", body: "Reaches the richest reserves. Produces twice as much.", mult: "2.00×" },
 ];
 
 const roadmap = [
@@ -118,10 +118,10 @@ function Hero() {
         <h1 className="outlined font-logo text-[44px] font-bold uppercase leading-[1.05] sm:text-7xl lg:text-[96px]">Barrel Royale</h1>
         <p className="outlined-sm font-logo text-xl font-bold uppercase sm:text-3xl">{site.tagline}</p>
         <p className="max-w-2xl pixel bg-white/90 px-4 py-3 text-base leading-relaxed sm:text-lg">
-          <span className="sm:hidden">Run an offshore rig, sell barrels at market prices and claim {site.reward} every week.</span>
+          <span className="sm:hidden">Run an offshore rig, sell barrels at market prices and export them for {site.reward} you can claim any time.</span>
           <span className="hidden sm:inline">
-            Run an offshore rig, drill wells, refine what comes up and sell it at prices that track the energy market. Every week, part of the
-            project&apos;s revenue buys {site.reward} stock tokens for rig holders, split by how much oil each rig produced.
+            Run an offshore rig, drill wells, refine what comes up and sell it at prices that track the energy market. Export your barrels for{" "}
+            {site.reward} stock tokens: new rewards land every week, and you claim them whenever you like.
           </span>
         </p>
         <div className="flex flex-wrap justify-center gap-3">

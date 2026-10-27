@@ -59,7 +59,7 @@ export function SeaStrip() {
 }
 
 const tickerItems = [
-  "Weekly XOM pool for rig holders",
+  "New XOM every week, claim any time",
   "Season 1 crew wars",
   "Storm warning on the Gulf shelf",
   "Six products, six markets",
