@@ -1,0 +1,16 @@
+{
+  "version": "1.0",
+  "chainId": "4663",
+  "createdAt": 1793088016223,
+  "meta": {
+    "name": "Barrel Royale: rig mint setup",
+    "description": "Commit the class seed hash."
+  },
+  "transactions": [
+    {
+      "to": "0xD0E8418e44fD597f3fAbf246cA75Aa0551AC5f7f",
+      "value": "0",
+      "data": "0x3ffc6f9c389b8e37be6eb6e4672363c6885627b9db0d66183454567791532fc9db39e0c4"
+    }
+  ]
+}
