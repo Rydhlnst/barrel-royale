@@ -73,7 +73,7 @@ const classes: { kind: RigClass; name: string; rarity: string; body: string; mul
 
 const roadmap = [
   { when: "Done", status: "Done", title: "Foundation", items: ["Game loop and XOM reward model", "Website, docs and litepaper", "Playable browser prototype"] },
-  { when: "Phase 1", status: "Done", title: "Whitelist and community", items: ["Whitelist with referral ranks", "Browser game live at /play", `Export terminal for ${site.reward}`] },
+  { when: "Phase 1", status: "Done", title: "Whitelist and community", items: ["Whitelist with referral ranks", "Browser game built", `Export terminal for ${site.reward}`] },
   {
     when: "Phase 2",
     status: "Now",
@@ -128,7 +128,7 @@ function Hero() {
             Join the whitelist
           </Button>
           <Button href={site.links.play} variant="white">
-            Play the game
+            Enter the rig
           </Button>
         </div>
         <div className="mt-2 flex max-w-full items-stretch gap-2">
@@ -280,7 +280,7 @@ function Fleet() {
         <div className="box mt-10 flex flex-col items-start gap-4 bg-brand-sun-pale p-6 sm:flex-row sm:items-center">
           <PixelIcon rows={roughneck} palette={base} scale={4} />
           <p className="text-lg">
-            <b>No rig? Play free.</b> The browser game is free for everyone. In the on-chain game free players get a starter platform with 3 well slots,
+            <b>No rig yet?</b> Hold {site.token} and the browser game is yours from launch day. In the on-chain game players without a rig get a starter platform with 3 well slots,
             and a rig is needed to export for {site.reward}.
           </p>
         </div>
@@ -376,13 +376,13 @@ function Roadmap() {
 function PlayCopy() {
   return (
     <div className="mx-auto flex max-w-3xl flex-col items-center gap-5 text-center">
-      <h2 className="outlined font-logo text-4xl font-bold uppercase leading-tight sm:text-6xl">The rig is open</h2>
+      <h2 className="outlined font-logo text-4xl font-bold uppercase leading-tight sm:text-6xl">The rig opens at launch</h2>
       <p className="pixel max-w-xl bg-white/90 px-4 py-3 text-lg">
-        Connect your wallet, drill your first wells, ride the pressure and fill a contract in a few minutes, right in your browser.
+        Connect your wallet now and drill your first wells the moment {site.token} goes live, right in your browser.
       </p>
       <div className="flex flex-wrap justify-center gap-3">
         <Button href={site.links.play} variant="red">
-          Play now
+          Get ready
         </Button>
         <Button href={site.links.docs} variant="white">
           Read the docs

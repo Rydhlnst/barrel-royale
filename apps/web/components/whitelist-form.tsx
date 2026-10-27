@@ -80,7 +80,7 @@ export function WhitelistForm() {
               Share on X
             </a>
             <a className="btn btn-white" href={site.links.play}>
-              Play the game
+              Enter the rig
             </a>
           </div>
         </div>

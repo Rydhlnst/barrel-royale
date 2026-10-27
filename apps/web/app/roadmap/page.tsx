@@ -32,7 +32,7 @@ const phases: { when: string; status: Status; title: string; icon: readonly stri
     icon: icons.hardHat,
     items: [
       { text: "Whitelist open, with referral ranks and three tiers", ok: true },
-      { text: "Browser game live: pressure and choke, refinery, Dispatch contracts, storm brace", ok: true },
+      { text: "Browser game built: pressure and choke, refinery, Dispatch contracts, storm brace", ok: true },
       { text: `Export terminal for ${site.reward} in the browser game`, ok: true },
       { text: "X account open at @barrelroyale", ok: true },
     ],

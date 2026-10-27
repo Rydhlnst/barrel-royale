@@ -142,3 +142,30 @@ export function HolderGate({ account, holder, recheck }: { account: string; hold
     </GateFrame>
   );
 }
+
+/** Shown to a connected wallet before $ROYAL launches: the rig opens with the token. */
+export function LaunchGate({ account }: { account: string }) {
+  return (
+    <GateFrame title="Your rig is almost ready">
+      <p className="text-brand-ink-2">
+        The rig opens with the {site.token} launch. Your wallet is connected and your spot on deck is saved, so you are ready to drill the moment it
+        goes live.
+      </p>
+      <PixelIcon rows={roughneck} palette={base} scale={4} />
+      <p className="pixel-sm w-full bg-brand-sun-pale px-3 py-2 text-sm">
+        <span className="font-mono font-bold">{shortAddress(account)}</span> · ready for launch
+      </p>
+      <div className="flex w-full flex-col gap-2">
+        <a href={site.links.whitelist} className="btn btn-red w-full justify-center">
+          Join the whitelist
+        </a>
+        <a href={site.links.x} target="_blank" rel="noopener" className="btn btn-white w-full justify-center">
+          Follow @barrelroyale
+        </a>
+        <button type="button" className="text-sm font-bold text-brand-sea-deep underline" onClick={disconnectWallet}>
+          Use another wallet
+        </button>
+      </div>
+    </GateFrame>
+  );
+}

@@ -17,7 +17,7 @@ const quests = [
   { icon: crownBarrel, title: "Join the list", points: `+${POINTS_JOIN}`, body: "Your wallet and X handle. One spot per wallet and per X account." },
   { icon: icons.hardHat, title: "Bring your crew", points: `+${POINTS_REFERRAL} each`, body: "Share your referral link. Every friend who joins with it moves you up." },
   { icon: xMark, title: "Follow and post", points: "+5", body: "Follow the X account and post your link. Checked by the team before the snapshot." },
-  { icon: icons.derrick, title: "Play the game", points: "+5", body: "Post a screenshot of your rig at level 3 on X. Checked by the team before the snapshot." },
+  { icon: icons.derrick, title: "Spread the word", points: "+5", body: "Repost the launch post from @barrelroyale. Checked by the team before the snapshot." },
 ];
 
 const steps = [

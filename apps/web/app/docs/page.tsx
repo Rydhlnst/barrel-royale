@@ -58,8 +58,9 @@ export default function Docs() {
       lede={`Everything a roughneck needs: how rigs work, how to run a well hard without blowing it, what the refinery makes, and how barrels turn into ${site.reward}.`}
       toc={{ title: "Docs", items: toc }}
     >
-      <Note title="Play it today.">
-        The browser game is live at <a href={site.links.play}>Play</a>: connect your wallet and start drilling. From the {site.token} launch, the rig opens for wallets holding {fmt(site.minHold)} {site.token} or more. On-chain play rolls out in stages along the{" "}
+      <Note title="Ready for launch.">
+        The browser game opens at <a href={site.links.play}>Play</a> with the {site.token} launch, for wallets holding {fmt(site.minHold)} {site.token} or
+        more. Connect your wallet now and you are ready on day one. On-chain play rolls out in stages along the{" "}
         <a href={site.links.roadmap}>roadmap</a>, and the numbers below are tuned with every community playtest.
       </Note>
 
@@ -71,14 +72,15 @@ export default function Docs() {
         <Table
           head={["Feature", "Status"]}
           rows={[
-            ["Wells, pressure and choke settings", "Live"],
-            ["Blowouts and the capping drill", "Live"],
-            ["Refinery: distillation, cracker and liquefier", "Live"],
-            ["Spot market with six price indexes", "Live"],
-            ["Dispatch board delivery contracts", "Live"],
-            ["Storms and the brace drill", "Live"],
-            ["Rig levels 1 to 5", "Live"],
-            [`Export terminal and ${site.reward} balance`, `Live, as a preview balance until claims open`],
+            ["Wells, pressure and choke settings", "Built, opens at launch"],
+            ["Blowouts and the capping drill", "Built, opens at launch"],
+            ["Refinery: distillation, cracker and liquefier", "Built, opens at launch"],
+            ["Spot market with six price indexes", "Built, opens at launch"],
+            ["Dispatch board delivery contracts", "Built, opens at launch"],
+            ["Storms and the brace drill", "Built, opens at launch"],
+            ["Rig levels 1 to 5", "Built, opens at launch"],
+            [`Export terminal and ${site.reward} balance`, "Built, opens at launch"],
+            ["Wallet connect on Robinhood Chain", "Live"],
             ["Reward vault, rig NFT and treasury contracts on Robinhood Chain", "Live"],
             ["Whitelist with referral ranks", "Live"],
             [`Rig access for ${site.token} holders`, `From the ${site.token} launch`],
@@ -273,7 +275,7 @@ export default function Docs() {
       <Section id="free" title="Playing without a rig">
 
         <p>
-          The browser game is free for everyone today. In the on-chain game, free players start on a starter platform with 3 slots and earn season
+          The browser game opens for {site.token} holders at launch. In the on-chain game, players without a rig start on a starter platform with 3 slots and earn season
           points, while {site.reward} exports need a rig NFT. From Season 1 they can also <b>work shifts on a rig holder&apos;s rig</b>, using its
           refinery and contracts, and the rig owner keeps 5 to 10% of what they make. Busy rigs grow fastest, so owners recruit.
         </p>
@@ -287,7 +289,7 @@ export default function Docs() {
         <ul>
           <li>Joining is +10 points. Every friend who joins with your referral link is +5.</li>
           <li>
-            Two quests earn +5 bonus points each: follow <a href={site.links.x}>@barrelroyale</a> on X and post your referral link, and post a screenshot of your rig at level 3. The team
+            Two quests earn +5 bonus points each: follow <a href={site.links.x}>@barrelroyale</a> on X and post your referral link, and repost the launch post from @barrelroyale. The team
             checks both before the snapshot.
           </li>
           <li>One spot per wallet and per X account keeps the list fair. Duplicate and bot entries are removed before the snapshot.</li>
