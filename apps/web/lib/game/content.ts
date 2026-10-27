@@ -19,9 +19,9 @@ export const RAWS: Raw[] = ["light", "heavy", "gas"];
 
 /** Drilling cost, barrels per second at Normal, and how many barrels the wellhead holds. */
 export const WELLS: Record<Raw, { cost: number; rate: number; holds: number }> = {
-  light: { cost: 5, rate: 0.35, holds: 15 },
-  gas: { cost: 8, rate: 0.28, holds: 15 },
-  heavy: { cost: 12, rate: 0.22, holds: 15 },
+  light: { cost: 5, rate: 0.175, holds: 15 },
+  gas: { cost: 8, rate: 0.14, holds: 15 },
+  heavy: { cost: 12, rate: 0.11, holds: 15 },
 };
 
 export type Choke = "safe" | "normal" | "overdrive";
@@ -75,9 +75,13 @@ export const OFFLINE_CAP = 2 * 60 * 60;
 export const POINTS = { barrel: 1, contract: 5, storm: 5 };
 
 /**
- * The export terminal is the only way barrels become $ROYAL: 1,000 bbl of any
- * product ships out for 10 $ROYAL, up to a daily quota per rig. Selling on the
- * market pays in-game coins instead, which never leave the game.
+ * The export terminal turns barrels straight into XOM: every 300 bbl of any
+ * product earns $0.001 worth of XOM at the current XOM price, up to a daily
+ * quota of barrels per rig. Selling on the market pays in-game coins instead.
  */
-export const ROYAL_PER_BARREL = 0.01;
-export const ROYAL_DAILY_CAP = 50;
+export const EXPORT_BBL = 300;
+export const EXPORT_USD = 0.001;
+export const EXPORT_DAILY_BBL = 5_000;
+
+/** Reference XOM price for the browser game; the on-chain game reads the Chainlink feed. */
+export const XOM_USD = 115;

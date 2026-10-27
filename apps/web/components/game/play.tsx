@@ -117,7 +117,7 @@ export default function Play() {
   const nearSlot = nearPad >= 0 ? game.slots[nearPad] : null;
 
   const stats = [
-    { label: site.token, value: game.royal.toFixed(2), tone: "bg-brand-sun" },
+    { label: site.reward, value: game.xom.toFixed(8), tone: "bg-brand-sun" },
     { label: "Coins", value: fmt(game.coins), tone: "bg-white" },
     { label: "Storage", value: `${used}/${info.storage}`, tone: used >= info.storage ? "bg-[#ffd9d4]" : "bg-white" },
     { label: "Rig", value: `Lv ${game.level}`, tone: "bg-white" },

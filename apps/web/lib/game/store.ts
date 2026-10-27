@@ -17,9 +17,11 @@ function load(now: number): E.Game {
     if (raw) {
       const g = JSON.parse(raw) as E.Game;
       if (g.version === 1 && Array.isArray(g.slots)) {
-        // saves from before the export terminal only had coins
-        g.royal ??= 0;
-        g.exported ??= { day: 0, royal: 0 };
+        // saves from before the export terminal paid out in XOM
+        const old = g as E.Game & { royal?: number };
+        delete old.royal;
+        g.xom ??= 0;
+        if (typeof g.exported?.bbl !== "number") g.exported = { day: 0, bbl: 0 };
         return E.tick(g, now);
       }
     }

@@ -5,20 +5,22 @@ import {
   CHOKES,
   CONTRACT_EVERY,
   CONTRACT_SLOTS,
+  EXPORT_BBL,
+  EXPORT_DAILY_BBL,
+  EXPORT_USD,
   LEVELS,
   MARKET_EVERY,
   OFFLINE_CAP,
   POINTS,
   PRODUCTS,
   PRODUCT_ORDER,
-  ROYAL_DAILY_CAP,
-  ROYAL_PER_BARREL,
   START_COINS,
   STORM_EVERY,
   STORM_WARNING,
   UNITS,
   UNIT_UPGRADE_COST,
   WELLS,
+  XOM_USD,
   type Choke,
   type Product,
   type Raw,
@@ -44,9 +46,9 @@ export type Game = {
   savedAt: number;
   /** In-game money for drilling, units and upgrades. It never leaves the game. */
   coins: number;
-  /** $ROYAL earned by exporting barrels, and how much of the daily quota is used today. */
-  royal: number;
-  exported: { day: number; royal: number };
+  /** XOM earned by exporting barrels, and how many barrels of today's quota are used. */
+  xom: number;
+  exported: { day: number; bbl: number };
   level: number;
   slots: Slot[];
   storage: Record<Product, number>;
@@ -87,8 +89,8 @@ export function newGame(now: number): Game {
     version: 1,
     savedAt: now,
     coins: START_COINS,
-    royal: 0,
-    exported: { day: dayOf(now), royal: 0 },
+    xom: 0,
+    exported: { day: dayOf(now), bbl: 0 },
     level: 1,
     slots,
     storage: zeroes(),
@@ -398,24 +400,27 @@ export function sell(prev: Game, now: number, p: Product): Result {
   });
 }
 
-/** $ROYAL left in today's export quota (UTC day). */
-export const exportLeft = (g: Game, now: number) => (g.exported.day === dayOf(now) ? round(ROYAL_DAILY_CAP - g.exported.royal) : ROYAL_DAILY_CAP);
+/** Barrels left in today's export quota (UTC day). */
+export const exportLeft = (g: Game, now: number) => (g.exported.day === dayOf(now) ? Math.max(0, EXPORT_DAILY_BBL - g.exported.bbl) : EXPORT_DAILY_BBL);
 
-/** Ship barrels out through the export terminal for $ROYAL, up to the daily quota. */
+/** XOM paid for a number of exported barrels, at the reference XOM price. */
+export const xomFor = (bbl: number) => ((bbl / EXPORT_BBL) * EXPORT_USD) / XOM_USD;
+
+/** Ship barrels out through the export terminal for XOM, up to the daily quota. */
 export function exportBarrels(prev: Game, now: number, p: Product): Result {
   return act(prev, now, (g) => {
     const have = g.storage[p];
     if (!have) return "!Nothing to export.";
     const left = exportLeft(g, now);
-    if (left <= 0) return `!Today's export quota of ${ROYAL_DAILY_CAP} $ROYAL is full. It resets at 00:00 UTC.`;
-    const qty = Math.min(have, Math.floor(left / ROYAL_PER_BARREL + 1e-9));
-    const earned = round(qty * ROYAL_PER_BARREL);
-    if (g.exported.day !== dayOf(now)) g.exported = { day: dayOf(now), royal: 0 };
+    if (left <= 0) return `!Today's export quota of ${EXPORT_DAILY_BBL.toLocaleString("en-US")} bbl is full. It resets at 00:00 UTC.`;
+    const qty = Math.min(have, left);
+    const earned = xomFor(qty);
+    if (g.exported.day !== dayOf(now)) g.exported = { day: dayOf(now), bbl: 0 };
     g.storage[p] -= qty;
-    g.royal = round(g.royal + earned);
-    g.exported.royal = round(g.exported.royal + earned);
-    log(g, now, `Exported ${qty} bbl ${PRODUCTS[p].name.toLowerCase()}: +${earned.toFixed(2)} $ROYAL.`);
-    return `Exported ${qty} bbl for +${earned.toFixed(2)} $ROYAL`;
+    g.xom += earned;
+    g.exported.bbl += qty;
+    log(g, now, `Exported ${qty} bbl ${PRODUCTS[p].name.toLowerCase()}: +${earned.toFixed(8)} XOM.`);
+    return `Exported ${qty} bbl for +${earned.toFixed(8)} XOM`;
   });
 }
 

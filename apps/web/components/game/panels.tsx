@@ -10,9 +10,10 @@ import {
   LEVELS,
   PRODUCTS,
   PRODUCT_ORDER,
+  EXPORT_BBL,
+  EXPORT_DAILY_BBL,
+  EXPORT_USD,
   RAWS,
-  ROYAL_DAILY_CAP,
-  ROYAL_PER_BARREL,
   UNITS,
   UNIT_UPGRADE_COST,
   WARN_AT,
@@ -257,13 +258,13 @@ export function MarketPanel({ store, game, now }: { store: GameStore; game: E.Ga
   return (
     <>
       <p className="text-sm text-brand-ink-2">
-        Sell for coins at each product&apos;s index, between 0.5× and 2×; prices move every few seconds. Or export through the terminal:{" "}
-        {fmt(10 / ROYAL_PER_BARREL)} bbl ships out for 10 {site.token}, up to {ROYAL_DAILY_CAP} {site.token} a day.
+        Sell for coins at each product&apos;s index, between 0.5× and 2×; prices move every few seconds. Or export for {site.reward}: every{" "}
+        {fmt(EXPORT_BBL)} bbl earns ${EXPORT_USD} worth of {site.reward}, up to {fmt(EXPORT_DAILY_BBL)} bbl a day.
       </p>
       <p className="pixel-sm flex items-center justify-between bg-brand-sun px-3 py-2 text-sm font-bold">
         <span>Export quota left today</span>
         <span className="font-display tabular-nums">
-          {E.exportLeft(game, now).toFixed(2)} / {ROYAL_DAILY_CAP} {site.token}
+          {fmt(E.exportLeft(game, now))} / {fmt(EXPORT_DAILY_BBL)} bbl
         </span>
       </p>
       <ul className="flex flex-col gap-2">
@@ -368,7 +369,7 @@ export function StoragePanel({ store, game }: { store: GameStore; game: E.Game }
           </div>
         ))}
       </dl>
-      <p className="text-sm text-brand-ink-2">Points come from barrels, contracts and storms held. On mainnet they set your share of the weekly {site.reward} pool.</p>
+      <p className="text-sm text-brand-ink-2">Points come from barrels, contracts and storms held. From Season 1 they count toward your crew score.</p>
     </>
   );
 }
