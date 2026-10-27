@@ -43,7 +43,7 @@ export default function Litepaper() {
       <Section id="summary" title="1. Summary">
         <p>
           Players own rigs (NFTs), drill wells, manage well pressure, refine crude and gas into six energy products, sell them for in-game coins and export them for {site.reward}. Each
-          product&apos;s price follows a real benchmark through an on-chain oracle. A fixed share of project revenue buys {site.reward}, the Exxon Mobil
+          product&apos;s price follows a real benchmark through Chainlink price feeds. A fixed share of project revenue buys {site.reward}, the Exxon Mobil
           stock token on Robinhood Chain, and holds it in a reward vault that pays out what each rig exports.
         </p>
       </Section>
@@ -93,8 +93,8 @@ export default function Litepaper() {
         <p>For each product, the index is the benchmark price now divided by its reference at the start of the season, held within a steady band.</p>
         <Formula>index(p) = clamp( P_now(p) ÷ P_season_start(p), 0.5, 2.0 )</Formula>
         <p>
-          The oracle reads Chainlink feeds on Robinhood Chain through the standard <code>AggregatorV3Interface</code>; benchmarks without a feed are
-          published by a set of keepers with multiple signers and a limit on each move. Following Robinhood&apos;s guidance, the oracle:
+          The game server reads Chainlink feeds on Robinhood Chain through the standard <code>AggregatorV3Interface</code>; benchmarks without a feed
+          follow a simulated index until one is available. Following Robinhood&apos;s guidance, the server:
         </p>
         <ul>
           <li>checks the L2 sequencer uptime feed and waits out a grace period after any outage;</li>
@@ -121,12 +121,12 @@ export default function Litepaper() {
             ["Max per transaction", "5"],
             ["Mint order", "OG Roughnecks, then Crew (24 hours), then public"],
             ["Class reveal", "Commit-reveal seed, hash published before the first mint"],
-            ["Mint proceeds", "Audit, art and the first season's prizes"],
+            ["Mint proceeds", "Art, the game server and the first season's prizes"],
           ]}
         />
         <h3>Revenue split</h3>
         <p>
-          Creator fees on {site.token} trading and rig sales cover running costs first (up to $500 a month), then fill a 3-month reserve. Everything after
+          Creator fees on {site.token} trading and rig sales cover running costs first (up to an ETH cap set to about $500 a month), then fill a 3-month reserve. Everything after
           that is split by the FeeSplitter contract:
         </p>
         <Table
@@ -176,6 +176,7 @@ export default function Litepaper() {
           <li>
             claims can be paused for at most {VAULT.pauseDays} days for a security issue, and paused time is added to every claim window;
           </li>
+          <li>one round per week, at least {VAULT.roundSpacingDays} days apart and at most {VAULT.roundPct}% of the free balance, with claims opening {VAULT.claimDelayDays} days after posting;</li>
           <li>unclaimed rewards return to the free balance after {VAULT.claimWeeks} weeks.</li>
         </ul>
       </Section>
@@ -200,13 +201,7 @@ export default function Litepaper() {
             <b>RigNFT:</b> ERC-721 with commit-reveal class assignment.
           </li>
           <li>
-            <b>EnergyOracle:</b> one source per product, Chainlink feed or keeper set, with the checks in section 4.
-          </li>
-          <li>
-            <b>Platform:</b> records exports and enforces the daily quota; the export rate and quota change only through the timelock.
-          </li>
-          <li>
-            <b>{site.reward}RewardVault:</b> holds {site.reward}, stores weekly Merkle roots, pays claims, and keeps player rewards apart from the timelocked free balance.
+            <b>{site.reward}RewardVault:</b> holds {site.reward}, stores weekly Merkle roots, pays claims, keeps player rewards apart from the timelocked free balance, and stores the export rate and quota.
           </li>
           <li>
             <b>FeeSplitter:</b> runs the revenue split.
@@ -222,7 +217,7 @@ export default function Litepaper() {
           <li>OpenZeppelin contracts with reentrancy guards and an emergency pause.</li>
           <li>Every admin role and the treasury held by a multisig, so no single key can move funds.</li>
           <li>A {VAULT.timelockDays}-day timelock on vault withdrawals and on changes to the export rules, so every admin action is public before it applies.</li>
-          <li>An external audit published before mainnet, then a public bug bounty.</li>
+          <li>Automated tests for every vault limit, published with the contract source.</li>
           <li>Source code verified on the Robinhood Chain explorer for every contract.</li>
           <li>A monthly treasury report linking every fee, split and {site.reward} purchase.</li>
           <li>No fixed returns, ever: rewards follow revenue and play, and the numbers are public.</li>
@@ -238,7 +233,7 @@ export default function Litepaper() {
             ["Whitelist with referral ranks", "Live"],
             [`${site.token}, rig mint and class reveal`, "Launch"],
             ["FeeSplitter, treasury reports and the first vault purchases", "Weeks 1 to 2 after launch"],
-            [`On-chain game and ${site.reward} claims on testnet, external audit`, "Weeks 3 to 6"],
+            [`On-chain game and ${site.reward} claims on testnet`, "Weeks 3 to 6"],
             [`Mainnet, Season 1, crews and raids, first ${site.reward} claims`, "Weeks 7 to 10"],
           ]}
         />

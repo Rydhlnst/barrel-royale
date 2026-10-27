@@ -74,7 +74,7 @@ const phases: { when: string; status: Status; title: string; icon: readonly stri
       { text: "Wallet connect; your rig NFT becomes your in-game rig" },
       { text: "Game server with shifts, crews and raids" },
       { text: `${site.reward} vault and weekly Merkle claims on testnet` },
-      { text: "External smart contract audit starts" },
+      { text: "Contract source published with its test suite" },
     ],
     gate: `a full test week runs from drilling to ${site.reward} claim with no critical bugs`,
   },
@@ -84,12 +84,12 @@ const phases: { when: string; status: Status; title: string; icon: readonly stri
     title: `Season 1 and first ${site.reward} claims`,
     icon: barrel,
     items: [
-      { text: "Audit report published" },
+      { text: "Treasury report for the first full month" },
       { text: `${site.reward} claim page in the app` },
       { text: "On-chain game on mainnet; Season 1 and crew wars start" },
       { text: `First weekly ${site.reward} claim, including ${site.reward} bought since launch` },
     ],
-    gate: "no open critical audit findings",
+    gate: "the first round checked against the published export ledger",
   },
   {
     when: "After Season 1",

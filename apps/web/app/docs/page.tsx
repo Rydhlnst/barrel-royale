@@ -315,6 +315,17 @@ export default function Docs() {
             reason in the monthly treasury report.
           </li>
         </ul>
+        <h3>Weekly rounds</h3>
+        <ul>
+          <li>
+            The multisig posts one Merkle root per week, at least {VAULT.roundSpacingDays} days apart, built from the game&apos;s export ledger. The
+            full list of wallets and amounts is published with it.
+          </li>
+          <li>
+            Claims open {VAULT.claimDelayDays} days after posting, so anyone can check the list against the ledger first. A round can never take more
+            than {VAULT.roundPct}% of the free balance.
+          </li>
+        </ul>
         <h3>Other admin actions</h3>
         <ul>
           <li>
@@ -337,7 +348,7 @@ export default function Docs() {
         <Table
           head={["Step", "Where it goes", "Rule"]}
           rows={[
-            ["1", "Running costs: servers, RPC, oracle keeper, gas", "Filled first, up to $500 a month"],
+            ["1", "Running costs: servers, RPC, gas", "Filled first, up to an ETH cap set to about $500 a month"],
             ["2", "Reserve for quiet months", "Filled until it holds 3 months of costs"],
             ["3", "Everything after that", "Split as below"],
           ]}
@@ -366,7 +377,7 @@ export default function Docs() {
             <b>Verified contracts.</b> Every contract is published with its source verified on the Robinhood Chain explorer.
           </li>
           <li>
-            <b>Audited.</b> An external audit is completed and published before the game goes on-chain, followed by a public bug bounty.
+            <b>Tested rules.</b> Every limit on this page, from the timelock to the 20% cap and the round limits, is covered by the contracts&apos; automated tests, published with their source.
           </li>
           <li>
             <b>No single key.</b> The treasury and every admin role sit behind a multisig.
@@ -396,17 +407,21 @@ export default function Docs() {
           head={["Contract", "Standard", "Admin can", "Admin cannot", "Address"]}
           rows={[
             [`RoyalToken (${site.token})`, "ERC-20", "Nothing: no owner after launch", "Mint more, pause transfers or blacklist", site.ca ?? "Published at launch"],
-            ["RigNFT", "ERC-721", "Post the class seed and reveal it", "Change a class after the reveal or mint past 3,333", "Published at launch"],
-            ["EnergyOracle", "Chainlink adapter", "Add a feed for a new product, behind the timelock", "Move a price past its per-update limit", "Published at launch"],
-            ["Platform", "Game logic", "Change the export rate and quota, behind the timelock", "Change a rig's past exports", "Published at launch"],
+            [
+              "RigNFT",
+              "ERC-721",
+              "Set the price, lists and class seed before the first mint; move the mint phase forward; reveal the seed; set the metadata URL",
+              "Change the price or seed after the first mint, move the phase back, change a class after the reveal, or mint past 3,333",
+              "Published at launch",
+            ],
             [
               `${site.reward}RewardVault`,
               "Reward vault",
-              `Post weekly roots; withdraw up to ${VAULT.withdrawPct}% of the free balance per ${VAULT.withdrawWindowDays} days after a ${VAULT.timelockDays}-day timelock; pause claims up to ${VAULT.pauseDays} days`,
-              "Touch rewards owed to players",
+              `Post one weekly round of at most ${VAULT.roundPct}% of the free balance; withdraw up to ${VAULT.withdrawPct}% of the free balance per ${VAULT.withdrawWindowDays} days after a ${VAULT.timelockDays}-day timelock; change the export rate and quota after the same timelock; pause claims up to ${VAULT.pauseDays} days`,
+              "Touch rewards owed to players, renounce ownership, or withdraw XOM any other way",
               "Published at launch",
             ],
-            ["FeeSplitter", "Fee waterfall", "Update the payout addresses, behind the timelock", "Change the split shares", "Published at launch"],
+            ["FeeSplitter", "Fee waterfall", "Update the payout addresses, the cost cap and the reserve target, behind the timelock", "Change the split shares", "Published at launch"],
             ["Treasury", "Multisig", "Holds every admin role above", "Act with a single signer", "Published at launch"],
           ]}
         />
