@@ -216,7 +216,7 @@ export default function Litepaper() {
           <li>Automated tests for every vault limit, published with the contract source.</li>
           <li>Source code verified on the Robinhood Chain explorer for every contract.</li>
           <li>A monthly treasury report linking every {site.reward} purchase and every {site.token} burn.</li>
-          <li>No fixed returns, ever: rewards follow revenue and play, and the numbers are public.</li>
+          <li>Rewards follow revenue and play, and every number is public.</li>
         </ul>
       </Section>
 

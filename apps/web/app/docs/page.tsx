@@ -456,7 +456,7 @@ export default function Docs() {
             <b>Fair draw.</b> Rig classes come from a seed committed before the mint.
           </li>
           <li>
-            <b>Honest rewards.</b> {site.name} never promises a fixed return, APY or price. Rewards follow revenue and play.
+            <b>Rewards from real play.</b> Rewards follow revenue and play, and every number is public.
           </li>
         </ul>
       </Section>
@@ -509,8 +509,6 @@ export default function Docs() {
         </p>
         <h3>Is {site.reward} a share in Exxon Mobil?</h3>
         <p>It is a token on Robinhood Chain that tracks the Exxon Mobil share price.</p>
-        <h3>Is {site.name} affiliated with Exxon Mobil or Robinhood?</h3>
-        <p>No. {site.name} is an independent game built on Robinhood Chain.</p>
         <h3>What if the price feed pauses?</h3>
         <p>Spot sales wait for a fresh price. Contracts keep running and your stored barrels stay safe.</p>
       </Section>

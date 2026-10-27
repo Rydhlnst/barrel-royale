@@ -114,7 +114,7 @@ export function Footer({ children }: { children?: React.ReactNode }) {
             </nav>
           </div>
           <p className="text-xs opacity-70">
-            © {site.name} · An independent game, not affiliated with Exxon Mobil or Robinhood · Not financial advice
+            © 2026 {site.name}
           </p>
         </div>
       </footer>
