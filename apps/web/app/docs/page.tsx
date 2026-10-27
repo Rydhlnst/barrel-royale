@@ -15,7 +15,7 @@ import {
   UNITS,
   WELLS,
 } from "@/lib/game/content";
-import { CLASS_COSTS, SPLIT } from "@/lib/tokenomics";
+import { CLASS_COSTS } from "@/lib/tokenomics";
 import { VAULT } from "@/lib/vault";
 import { CONTRACTS } from "@/lib/contracts";
 import { DocPage, Formula, Note, Section, Table } from "@/components/doc/doc";
@@ -47,7 +47,6 @@ const toc = [
   { id: "tokenomics", label: "Tokenomics" },
   { id: "xom", label: `${site.reward} rewards` },
   { id: "vault", label: "The reward vault" },
-  { id: "fees", label: "Where the money goes" },
   { id: "trust", label: "Safety and transparency" },
   { id: "contracts", label: "Contracts and admin rights" },
   { id: "faq", label: "FAQ" },
@@ -83,7 +82,7 @@ export default function Docs() {
             ["Storms and the brace drill", "Live"],
             ["Rig levels 1 to 5", "Live"],
             [`Export terminal and ${site.reward} balance`, `Live, as a preview balance until claims open`],
-            ["Reward vault, rig NFT and fee splitter contracts on Robinhood Chain", "Live"],
+            ["Reward vault, rig NFT and treasury contracts on Robinhood Chain", "Live"],
             ["Whitelist with referral ranks", "Live"],
             ["Wallet login, rig NFTs and rig classes", "On-chain game"],
             [`Rig class upgrades with ${site.token}`, "On-chain game"],
@@ -332,7 +331,7 @@ export default function Docs() {
             next class.
           </li>
           <li>
-            <b>Buyback and burn</b>: {SPLIT.burn}% of revenue after running costs buys {site.token} on the market and burns it.
+            <b>Buyback and burn</b>: the treasury buys {site.token} back on the market and burns it.
           </li>
           <li>
             <b>Cosmetics</b> arrive with Season 1 and are paid in {site.token}, which is burned too.
@@ -344,10 +343,9 @@ export default function Docs() {
         />
         <h3>How value flows</h3>
         <ol>
-          <li>Players trade {site.token} and mint rigs, which pays creator fees and mint proceeds into the treasury.</li>
+          <li>Players trade {site.token} and mint rigs, which funds the treasury.</li>
           <li>
-            The FeeSplitter covers running costs, fills the reserve, then sends {SPLIT.xom}% to buy {site.reward} for the vault, {SPLIT.dev}% to development,{" "}
-            {SPLIT.burn}% to buy back and burn {site.token} and {SPLIT.prizes}% to crew prizes.
+            The treasury buys {site.reward} for the reward vault and buys back and burns {site.token}.
           </li>
           <li>Players pump, refine and export barrels, and claim the {site.reward} their exports earned every week.</li>
           <li>Holders burn {site.token} to raise their rig&apos;s class, which lifts every barrel the rig produces.</li>
@@ -403,7 +401,7 @@ export default function Docs() {
             At most {VAULT.withdrawPct}% of the free balance can leave in any {VAULT.withdrawWindowDays} days.
           </li>
           <li>
-            Withdrawals cover running costs in quiet months, move funds to a new vault version, or rebalance the treasury. Each one is listed with its
+            Withdrawals move funds to a new vault version or rebalance the treasury. Each one is listed with its
             reason in the monthly treasury report.
           </li>
         </ul>
@@ -432,33 +430,6 @@ export default function Docs() {
         </ul>
       </Section>
 
-      <Section id="fees" title="Where the money goes">
-        <p>
-          {site.name} runs on creator fees from {site.token} trading and rig sales. Every fee follows the same three steps, enforced by the FeeSplitter
-          contract.
-        </p>
-        <Table
-          head={["Step", "Where it goes", "Rule"]}
-          rows={[
-            ["1", "Running costs: servers, RPC, gas", "Filled first, up to an ETH cap set to about $500 a month"],
-            ["2", "Reserve for quiet months", "Filled until it holds 3 months of costs"],
-            ["3", "Everything after that", "Split as below"],
-          ]}
-        />
-        <Table
-          head={["Use", "Share"]}
-          rows={[
-            [`${site.reward} for the reward vault`, "40%"],
-            ["Game development and operations", "35%"],
-            [`${site.token} buyback and burn`, "20%"],
-            ["Crew war prizes", "5%"],
-          ]}
-        />
-        <p>
-          The {site.reward} vault grows with the game: the more people play and trade, the bigger it gets. Rewards come from real revenue, never from new
-          deposits.
-        </p>
-      </Section>
 
       <Section id="trust" title="Safety and transparency">
         <ul>
@@ -479,7 +450,7 @@ export default function Docs() {
             players&apos; earned {site.reward} cannot be withdrawn by anyone but them.
           </li>
           <li>
-            <b>Open books.</b> A monthly treasury report links every fee, split and {site.reward} purchase.
+            <b>Open books.</b> A monthly treasury report links every {site.reward} purchase and every {site.token} burn.
           </li>
           <li>
             <b>Fair draw.</b> Rig classes come from a seed committed before the mint.
@@ -514,7 +485,6 @@ export default function Docs() {
               addr(CONTRACTS.vault),
             ],
             ["RigUpgrader", "Class upgrades", "Nothing: no owner", "Change the costs or lower a class", `Deployed when ${site.token} is live`],
-            ["FeeSplitter", "Fee waterfall", "Update the payout addresses, the cost cap and the reserve target, behind the timelock", "Change the split shares", addr(CONTRACTS.splitter)],
             ["Treasury", "Safe", "Holds every admin role above", "Act without its signers approving", addr(CONTRACTS.safe)],
             [`${site.reward} token`, "Robinhood Chain stock token", "—", "—", addr(CONTRACTS.xom)],
           ]}

@@ -59,8 +59,8 @@ const features = [
 ];
 
 const flow = [
-  { label: "Revenue", body: `Creator fees from ${site.token} and rig trading` },
-  { label: "Treasury", body: `Pays running costs, then buys ${site.reward} with 40% of the rest` },
+  { label: "Revenue", body: `From ${site.token} and rig trading` },
+  { label: "Treasury", body: `Buys ${site.reward} for the reward vault` },
   { label: `${site.reward} vault`, body: `Holds the ${site.reward} players earn from exports`, key: true },
   { label: "Rig holders", body: `Claim the ${site.reward} their exports earned` },
 ];
@@ -81,7 +81,7 @@ const roadmap = [
     title: "Barrel Royale goes live",
     items: [{ text: "Contracts live on Robinhood Chain", ok: true }, `${site.token} on Robinhood Chain`, "Rig mint opens, class seed hash posted first"],
   },
-  { when: "Weeks 1–2", status: "Next", title: "Treasury on-chain", items: ["Rig class reveal", "Fees split automatically, first treasury report", `First ${site.reward} purchases into the vault`] },
+  { when: "Weeks 1–2", status: "Next", title: "Treasury on-chain", items: ["Rig class reveal", "First treasury report", `First ${site.reward} purchases into the vault`] },
   { when: "Weeks 3–6", status: "Planned", title: "On-chain game, testnet", items: ["Your rig NFT becomes your in-game rig", "Pressure, refinery and storm drills", `${site.reward} claims tested end to end`] },
 ];
 

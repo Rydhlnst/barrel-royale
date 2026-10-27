@@ -22,7 +22,7 @@ const phases: { when: string; status: Status; title: string; icon: readonly stri
       { text: `Game loop and ${site.reward} reward model`, ok: true },
       { text: "Website, docs and litepaper", ok: true },
       { text: "Playable browser prototype", ok: true },
-      { text: "Fee waterfall and treasury rules published", ok: true },
+      { text: "Treasury and reward vault rules published", ok: true },
     ],
   },
   {
@@ -43,14 +43,14 @@ const phases: { when: string; status: Status; title: string; icon: readonly stri
     title: `${site.name} goes live`,
     icon: crownBarrel,
     items: [
-      { text: `${site.reward} vault, rig NFT and fee splitter live on Robinhood Chain, owned by the treasury Safe`, ok: true },
+      { text: `${site.reward} vault, rig NFT and treasury contracts live on Robinhood Chain, owned by the treasury Safe`, ok: true },
       { text: `${site.reward} vault running with its ${VAULT.timelockDays}-day timelock and withdrawal limits`, ok: true },
       { text: "Contract addresses published in the docs", ok: true },
       { text: "Whitelist snapshot taken and tiers published" },
       { text: `${site.token} live on Robinhood Chain` },
       { text: "Rig mint: OG Roughnecks first, then Crew, then public; class seed hash posted before the first mint" },
     ],
-    gate: "rig mint open and creator fees flowing into the FeeSplitter",
+    gate: `rig mint open and ${site.token} trading live`,
   },
   {
     when: "Weeks 1–2",
@@ -59,11 +59,10 @@ const phases: { when: string; status: Status; title: string; icon: readonly stri
     icon: icons.coin,
     items: [
       { text: "Rig class reveal" },
-      { text: "Creator fees split by the FeeSplitter waterfall automatically" },
-      { text: "First treasury report with links to every fee and transaction" },
+      { text: "First treasury report with links to every transaction" },
       { text: `First ${site.reward} purchases, held in the vault until claims open` },
     ],
-    gate: "fees cover running costs and the reserve is filling",
+    gate: `the first ${site.reward} purchases land in the vault`,
   },
   {
     when: "Weeks 3–6",

@@ -1,5 +1,4 @@
-// The on-chain numbers the docs and litepaper quote, matching the contracts in
-// contracts/src: RigUpgrader's class costs and FeeSplitter's fixed shares.
+// RigUpgrader's class costs, as the docs and litepaper quote them.
 
 /** Cumulative $ROYAL cost of each class from Jack-up; holders pay only the difference. */
 export const CLASS_COSTS = [
@@ -9,5 +8,3 @@ export const CLASS_COSTS = [
   { name: "Ultra-deepwater", mult: "2.00×", cost: 12_000 },
 ] as const;
 
-/** How revenue after running costs and the reserve is split by FeeSplitter. */
-export const SPLIT = { xom: 40, dev: 35, burn: 20, prizes: 5 } as const;

@@ -19,7 +19,7 @@ research/pixels-site/
 Thumbs.db
 
 # internal notes (research, design, legal risks) stay on this machine only
-docs/
+/docs/
 
 # Foundry build output and installed libraries
 contracts/out/

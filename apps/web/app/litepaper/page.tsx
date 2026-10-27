@@ -134,20 +134,6 @@ export default function Litepaper() {
             ["Mint proceeds", "Art, the game server and the first season's prizes"],
           ]}
         />
-        <h3>Revenue split</h3>
-        <p>
-          Creator fees on {site.token} trading and rig sales cover running costs first (up to an ETH cap set to about $500 a month), then fill a 3-month reserve. Everything after
-          that is split by the FeeSplitter contract:
-        </p>
-        <Table
-          head={["Use", "Share"]}
-          rows={[
-            [`${site.reward} for the reward vault`, "40%"],
-            ["Game development and operations", "35%"],
-            [`${site.token} buyback and burn`, "20%"],
-            ["Crew war prizes", "5%"],
-          ]}
-        />
       </Section>
 
       <Section id="rewards" title={`6. ${site.reward} rewards`}>
@@ -181,7 +167,7 @@ export default function Litepaper() {
           <li>
             at most {VAULT.withdrawPct}% of the free balance can leave in any {VAULT.withdrawWindowDays} days;
           </li>
-          <li>withdrawals cover running costs in quiet months, a move to a new vault version, or a treasury rebalance, each listed in the monthly report;</li>
+          <li>withdrawals move funds to a new vault version or rebalance the treasury, each listed in the monthly report;</li>
           <li>changes to the export rate and quota use the same timelock;</li>
           <li>
             claims can be paused for at most {VAULT.pauseDays} days for a security issue, and paused time is added to every claim window;
@@ -217,9 +203,6 @@ export default function Litepaper() {
             <b>{site.reward}RewardVault:</b> holds {site.reward}, stores weekly Merkle roots, pays claims, keeps player rewards apart from the timelocked free balance, and stores the export rate and quota.
           </li>
           <li>
-            <b>FeeSplitter:</b> runs the revenue split.
-          </li>
-          <li>
             <b>Game server:</b> wells, refinery, contracts, incidents and crews, plus an indexer that tallies each rig&apos;s exports for the week and builds the Merkle tree.
           </li>
         </ul>
@@ -232,7 +215,7 @@ export default function Litepaper() {
           <li>A {VAULT.timelockDays}-day timelock on vault withdrawals and on changes to the export rules, so every admin action is public before it applies.</li>
           <li>Automated tests for every vault limit, published with the contract source.</li>
           <li>Source code verified on the Robinhood Chain explorer for every contract.</li>
-          <li>A monthly treasury report linking every fee, split and {site.reward} purchase.</li>
+          <li>A monthly treasury report linking every {site.reward} purchase and every {site.token} burn.</li>
           <li>No fixed returns, ever: rewards follow revenue and play, and the numbers are public.</li>
         </ul>
       </Section>
@@ -243,10 +226,10 @@ export default function Litepaper() {
           rows={[
             ["Browser game: wells, pressure, refinery, market, contracts, storms, rig levels", "Live"],
             [`Export terminal with a preview ${site.reward} balance`, "Live"],
-            ["Reward vault, rig NFT and fee splitter contracts on Robinhood Chain", "Live"],
+            ["Reward vault, rig NFT and treasury contracts on Robinhood Chain", "Live"],
             ["Whitelist with referral ranks", "Live"],
             [`${site.token}, rig mint and class reveal`, "Launch"],
-            ["FeeSplitter, treasury reports and the first vault purchases", "Weeks 1 to 2 after launch"],
+            ["Treasury reports and the first vault purchases", "Weeks 1 to 2 after launch"],
             [`On-chain game and ${site.reward} claims on testnet`, "Weeks 3 to 6"],
             [`Mainnet, Season 1, crews and raids, first ${site.reward} claims`, "Weeks 7 to 10"],
           ]}
