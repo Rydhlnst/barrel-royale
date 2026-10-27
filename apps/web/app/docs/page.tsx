@@ -1,6 +1,21 @@
 import type { Metadata } from "next";
 import { site } from "@/lib/site";
-import { BRACE_SECONDS, CAP_COST, EXPORT_BBL, EXPORT_DAILY_BBL, EXPORT_USD, LEVELS, OFFLINE_CAP, STORM_WARNING } from "@/lib/game/content";
+import {
+  BRACE_SECONDS,
+  CAP_COST,
+  EXPORT_BBL,
+  EXPORT_DAILY_BBL,
+  EXPORT_USD,
+  LEVELS,
+  OFFLINE_CAP,
+  PRODUCTS,
+  RAWS,
+  STORM_WARNING,
+  UNIT_UPGRADE_COST,
+  UNITS,
+  WELLS,
+} from "@/lib/game/content";
+import { CLASS_COSTS, SPLIT } from "@/lib/tokenomics";
 import { VAULT } from "@/lib/vault";
 import { DocPage, Formula, Note, Section, Table } from "@/components/doc/doc";
 
@@ -23,6 +38,7 @@ const toc = [
   { id: "crews", label: "Crews and seasons" },
   { id: "free", label: "Playing without a rig" },
   { id: "whitelist", label: "Whitelist" },
+  { id: "tokenomics", label: "Tokenomics" },
   { id: "xom", label: `${site.reward} rewards` },
   { id: "vault", label: "The reward vault" },
   { id: "fees", label: "Where the money goes" },
@@ -63,6 +79,7 @@ export default function Docs() {
             [`Export terminal and ${site.reward} balance`, `Live, as a preview balance until claims open`],
             ["Whitelist with referral ranks", "Live"],
             ["Wallet login, rig NFTs and rig classes", "On-chain game"],
+            [`Rig class upgrades with ${site.token}`, "On-chain game"],
             [`${site.reward} claims from the reward vault`, "On-chain game"],
             ["Shifts, supply boats, tankers and crew quarters", "On-chain game"],
             ["Crews, seasons, raids and crew projects", "Season 1"],
@@ -110,6 +127,20 @@ export default function Docs() {
 
       <Section id="wells" title="Wells and pressure">
         <p>Wells bring up three raw products: light crude, heavy crude and natural gas. Each well has a pressure gauge and a choke with three settings.</p>
+        <h3>What a well needs</h3>
+        <p>
+          An empty pad on your deck and a few coins. Every rig starts with {LEVELS[0].slots} pads, and each rig level adds more. Walk up to an empty pad,
+          press E and pick a product.
+        </p>
+        <Table
+          head={["Well", "Drill cost", "Pumps at Normal", "Wellhead holds"]}
+          rows={RAWS.map((p) => [
+            PRODUCTS[p].name,
+            `${WELLS[p].cost} coins`,
+            `${Math.round(WELLS[p].rate * 60 * 10) / 10} bbl a minute`,
+            `${WELLS[p].holds} bbl`,
+          ])}
+        />
         <Table
           head={["Choke", "Output", "Pressure"]}
           rows={[
@@ -126,6 +157,15 @@ export default function Docs() {
 
       <Section id="refinery" title="Refinery and products">
         <p>Refinery units turn raw products into refined ones worth several times more. Each product follows its own price index.</p>
+        <Table
+          head={["Unit", "Build cost", "Makes", "Upgrades"]}
+          rows={(Object.keys(UNITS) as (keyof typeof UNITS)[]).map((u) => [
+            UNITS[u].name,
+            `${UNITS[u].cost} coins`,
+            UNITS[u].recipes.map((r) => `${r.inQty} ${PRODUCTS[r.input].name.toLowerCase()} → 1 ${PRODUCTS[r.output].name.toLowerCase()}`).join("; "),
+            `Level 2 for ${UNIT_UPGRADE_COST[2]}, level 3 for ${UNIT_UPGRADE_COST[3]} coins`,
+          ])}
+        />
         <Table
           head={["Product", "Comes from", "Benchmark", "Base value per bbl"]}
           rows={[
@@ -260,6 +300,51 @@ export default function Docs() {
         <p>
           The snapshot date is announced on <a href={site.links.x}>@barrelroyale</a> at least a week ahead.
         </p>
+      </Section>
+
+      <Section id="tokenomics" title="Tokenomics">
+        <p>{site.name} runs on three assets, and each one has a single job.</p>
+        <Table
+          head={["Asset", "Where it lives", "How you get it", "What it does"]}
+          rows={[
+            ["Coins", "In the game", "Selling barrels, Dispatch contracts, storm bonuses", "Drilling, capping, refinery units and rig levels"],
+            [
+              site.token,
+              "Robinhood Chain, ERC-20",
+              "Trading on the launchpad",
+              "Rig class upgrades and cosmetics, both burned",
+            ],
+            [site.reward, `${site.reward}RewardVault`, "Exporting barrels", "The reward, claimed to your wallet every week"],
+          ]}
+        />
+        <h3>{site.token}</h3>
+        <ul>
+          <li>Fixed supply, minted once at launch. Fair launch: no presale and no private round.</li>
+          <li>
+            <b>Class upgrades</b> burn {site.token} through the RigUpgrader contract. Costs count from Jack-up, so a holder only pays the difference to the
+            next class.
+          </li>
+          <li>
+            <b>Buyback and burn</b>: {SPLIT.burn}% of revenue after running costs buys {site.token} on the market and burns it.
+          </li>
+          <li>
+            <b>Cosmetics</b> arrive with Season 1 and are paid in {site.token}, which is burned too.
+          </li>
+        </ul>
+        <Table
+          head={["Class", "Production", `Total ${site.token} from Jack-up`]}
+          rows={CLASS_COSTS.map((c) => [c.name, c.mult, c.cost ? `${fmt(c.cost)} ${site.token}` : "Starting class"])}
+        />
+        <h3>How value flows</h3>
+        <ol>
+          <li>Players trade {site.token} and mint rigs, which pays creator fees and mint proceeds into the treasury.</li>
+          <li>
+            The FeeSplitter covers running costs, fills the reserve, then sends {SPLIT.xom}% to buy {site.reward} for the vault, {SPLIT.dev}% to development,{" "}
+            {SPLIT.burn}% to buy back and burn {site.token} and {SPLIT.prizes}% to crew prizes.
+          </li>
+          <li>Players pump, refine and export barrels, and claim the {site.reward} their exports earned every week.</li>
+          <li>Holders burn {site.token} to raise their rig&apos;s class, which lifts every barrel the rig produces.</li>
+        </ol>
       </Section>
 
       <Section id="xom" title={`${site.reward} rewards`}>
@@ -410,7 +495,7 @@ export default function Docs() {
             [
               "RigNFT",
               "ERC-721",
-              "Set the price, lists and class seed before the first mint; move the mint phase forward; reveal the seed; set the metadata URL",
+              "Set the price, lists and class seed before the first mint; move the mint phase forward; reveal the seed; set the metadata URL; set the upgrader once",
               "Change the price or seed after the first mint, move the phase back, change a class after the reveal, or mint past 3,333",
               "Published at launch",
             ],
@@ -421,6 +506,7 @@ export default function Docs() {
               "Touch rewards owed to players, renounce ownership, or withdraw XOM any other way",
               "Published at launch",
             ],
+            ["RigUpgrader", "Class upgrades", "Nothing: no owner", "Change the costs or lower a class", "Published at launch"],
             ["FeeSplitter", "Fee waterfall", "Update the payout addresses, the cost cap and the reserve target, behind the timelock", "Change the split shares", "Published at launch"],
             ["Treasury", "Multisig", "Holds every admin role above", "Act with a single signer", "Published at launch"],
           ]}

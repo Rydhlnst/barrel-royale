@@ -3,6 +3,7 @@ import { site } from "@/lib/site";
 import { EXPORT_BBL, EXPORT_DAILY_BBL, EXPORT_USD } from "@/lib/game/content";
 import { DocPage, Formula, Note, Section, Table } from "@/components/doc/doc";
 import { VAULT } from "@/lib/vault";
+import { CLASS_COSTS } from "@/lib/tokenomics";
 
 const fmt = (n: number) => n.toLocaleString("en-US");
 
@@ -112,6 +113,15 @@ export default function Litepaper() {
           {site.reward} only through the export terminal: every {fmt(EXPORT_BBL)} bbl earns ${EXPORT_USD} worth of {site.reward}, up to{" "}
           {fmt(EXPORT_DAILY_BBL)} bbl per rig per day.
         </p>
+        <h3>Rig class upgrades</h3>
+        <p>
+          The RigUpgrader contract raises a rig&apos;s class by burning {site.token}. Costs count from Jack-up, so a holder pays only the difference, and
+          the contract has no owner.
+        </p>
+        <Table
+          head={["Class", "Production", `Total ${site.token} from Jack-up`]}
+          rows={CLASS_COSTS.map((c) => [c.name, c.mult, c.cost ? `${fmt(c.cost)} ${site.token}` : "Starting class"])}
+        />
         <h3>Rig mint</h3>
         <Table
           head={["Item", "Plan"]}
@@ -201,6 +211,9 @@ export default function Litepaper() {
             <b>RigNFT:</b> ERC-721 with commit-reveal class assignment.
           </li>
           <li>
+            <b>RigUpgrader:</b> burns {site.token} to raise a rig&apos;s class, with fixed costs and no owner.
+          </li>
+          <li>
             <b>{site.reward}RewardVault:</b> holds {site.reward}, stores weekly Merkle roots, pays claims, keeps player rewards apart from the timelocked free balance, and stores the export rate and quota.
           </li>
           <li>
@@ -230,6 +243,7 @@ export default function Litepaper() {
           rows={[
             ["Browser game: wells, pressure, refinery, market, contracts, storms, rig levels", "Live"],
             [`Export terminal with a preview ${site.reward} balance`, "Live"],
+            ["Vault, rig NFT, class upgrader and fee splitter contracts, with tests", "Built"],
             ["Whitelist with referral ranks", "Live"],
             [`${site.token}, rig mint and class reveal`, "Launch"],
             ["FeeSplitter, treasury reports and the first vault purchases", "Weeks 1 to 2 after launch"],
