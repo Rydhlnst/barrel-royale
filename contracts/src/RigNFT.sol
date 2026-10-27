@@ -47,6 +47,11 @@ contract RigNFT is ERC721, Ownable2Step, ReentrancyGuard {
     bool public revealed;
     uint256 public offset;
 
+    /// @notice The contract allowed to raise rig classes (RigUpgrader). Set once, then fixed forever.
+    address public upgrader;
+    /// @notice Classes raised by burning $ROYAL, stored as class + 1 so zero means "not raised".
+    mapping(uint256 tokenId => uint8) private raisedPlusOne;
+
     string private baseURI_;
 
     event PhaseChanged(Phase phase);
@@ -54,6 +59,8 @@ contract RigNFT is ERC721, Ownable2Step, ReentrancyGuard {
     event ListsSet(bytes32 ogRoot, bytes32 crewRoot);
     event SeedCommitted(bytes32 seedHash);
     event Revealed(uint256 offset);
+    event UpgraderSet(address upgrader);
+    event ClassRaised(uint256 indexed tokenId, Class to);
 
     error MintClosed();
     error NotOnList();
@@ -68,6 +75,9 @@ contract RigNFT is ERC721, Ownable2Step, ReentrancyGuard {
     error NotRevealed();
     error TransferFailed();
     error RenounceDisabled();
+    error UpgraderLocked();
+    error NotUpgrader();
+    error NotHigher();
 
     constructor(address owner_, address payable treasury_, string memory baseURI) ERC721("Barrel Royale Rig", "RIG") Ownable(owner_) {
         treasury = treasury_;
@@ -143,14 +153,39 @@ contract RigNFT is ERC721, Ownable2Step, ReentrancyGuard {
         emit Revealed(offset);
     }
 
-    function classOf(uint256 tokenId) external view returns (Class) {
+    /// @notice A rig's class: the higher of the class it drew at reveal and any class raised with $ROYAL.
+    function classOf(uint256 tokenId) public view returns (Class) {
         if (!revealed) revert NotRevealed();
         _requireOwned(tokenId);
+        Class drawn = drawnClassOf(tokenId);
+        uint8 raised = raisedPlusOne[tokenId];
+        if (raised != 0 && Class(raised - 1) > drawn) return Class(raised - 1);
+        return drawn;
+    }
+
+    /// @notice The class a rig drew at reveal, before any upgrade.
+    function drawnClassOf(uint256 tokenId) public view returns (Class) {
+        if (!revealed) revert NotRevealed();
         uint256 slot = (tokenId - 1 + offset) % MAX_SUPPLY;
         if (slot < JACKUP_END) return Class.JackUp;
         if (slot < SEMISUB_END) return Class.SemiSub;
         if (slot < DRILLSHIP_END) return Class.Drillship;
         return Class.UltraDeepwater;
+    }
+
+    /// @notice Set the upgrader once. After that it can never change.
+    function setUpgrader(address upgrader_) external onlyOwner {
+        if (upgrader != address(0) || upgrader_ == address(0)) revert UpgraderLocked();
+        upgrader = upgrader_;
+        emit UpgraderSet(upgrader_);
+    }
+
+    /// @notice Raise a rig's class. Only the upgrader can call it, and only upwards.
+    function raiseClass(uint256 tokenId, Class to) external {
+        if (msg.sender != upgrader) revert NotUpgrader();
+        if (to <= classOf(tokenId)) revert NotHigher();
+        raisedPlusOne[tokenId] = uint8(to) + 1;
+        emit ClassRaised(tokenId, to);
     }
 
     /* ---------------- metadata ---------------- */

@@ -6,6 +6,7 @@ Solidity 0.8.26, Foundry, OpenZeppelin 5.1. Every contract is owned by the treas
 | --- | --- |
 | `XOMRewardVault` | Holds XOM. Keeps rewards owed to players apart from the free balance. Players claim weekly Merkle rounds; the owner withdraws from the free balance only after a 7-day timelock and at most 20% per 30 days. Stores the export rate and daily quota, which change through the same timelock. |
 | `RigNFT` | The 3,333 rigs. Phased mint (OG, Crew, public) with Merkle lists, at most 5 per transaction. The class seed hash is committed before the first mint and revealed after the mint ends. |
+| `RigUpgrader` | Raises a rig's class by burning $ROYAL: 2,000 for Semi-sub, 5,000 for Drillship, 12,000 for Ultra-deepwater, counted from Jack-up, so holders pay only the difference. No owner; costs are fixed at deploy. |
 | `FeeSplitter` | Pays creator fees out in three steps: running costs up to a cap per 30 days, the reserve up to a target, then 40% XOM, 35% development, 20% $ROYAL buyback and burn, 5% prizes. Shares are fixed; payees and caps change through a 7-day timelock. |
 
 $ROYAL itself is created by the launchpad.
@@ -36,6 +37,14 @@ forge test
    ```
 
 The whole deploy uses about 7.7M gas.
+
+## Once $ROYAL is live
+
+```bash
+forge script script/DeployUpgrader.s.sol --rpc-url robinhood --account barrel-deployer --broadcast
+```
+
+Then the multisig calls `RigNFT.setUpgrader(<RigUpgrader address>)`. It can be set only once.
 
 ## After deploying
 
