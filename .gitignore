@@ -32,3 +32,4 @@ contracts/launcher.html
 contracts/*.cmd
 # the reveal batch carries the secret class seed
 contracts/deployments/safe-reveal*.json
+contracts/deployments/verify/

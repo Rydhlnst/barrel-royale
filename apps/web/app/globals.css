@@ -19,7 +19,9 @@
   --font-body: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
 }
 
+/* Light only: the pixel palette is drawn for a light page, so browsers must not darken it or its controls. */
 html {
+  color-scheme: only light;
   background: var(--color-brand-ink);
   scroll-behavior: smooth;
 }
