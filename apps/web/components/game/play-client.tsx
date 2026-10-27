@@ -1,8 +1,9 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useHolder } from "@/lib/holder";
 import { disconnectWallet, useWallet } from "@/lib/wallet";
-import { ConnectGate } from "./connect-gate";
+import { ConnectGate, HolderGate } from "./connect-gate";
 
 // The game reads the browser's save and runs Phaser, so it renders only on the client.
 const Play = dynamic(() => import("./play"), {
@@ -14,9 +15,12 @@ const Play = dynamic(() => import("./play"), {
   ),
 });
 
-/** /play opens once a wallet is connected; each wallet keeps its own rig. */
+/** /play opens once a wallet is connected and, once $ROYAL is live, holds enough $ROYAL. Each wallet keeps its own rig. */
 export function PlayClient() {
   const wallet = useWallet();
-  if (wallet.status !== "connected" || !wallet.account) return <ConnectGate wallet={wallet} />;
-  return <Play key={wallet.account.toLowerCase()} account={wallet.account} onDisconnect={disconnectWallet} />;
+  const account = wallet.status === "connected" ? wallet.account : null;
+  const { holder, recheck } = useHolder(account);
+  if (!account) return <ConnectGate wallet={wallet} />;
+  if (holder.status !== "off" && holder.status !== "holder") return <HolderGate account={account} holder={holder} recheck={recheck} />;
+  return <Play key={account.toLowerCase()} account={account} onDisconnect={disconnectWallet} />;
 }

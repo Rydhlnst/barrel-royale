@@ -3,9 +3,6 @@ import { site } from "@/lib/site";
 import {
   BRACE_SECONDS,
   CAP_COST,
-  EXPORT_BBL,
-  EXPORT_DAILY_BBL,
-  EXPORT_USD,
   LEVELS,
   OFFLINE_CAP,
   PRODUCTS,
@@ -62,7 +59,7 @@ export default function Docs() {
       toc={{ title: "Docs", items: toc }}
     >
       <Note title="Play it today.">
-        The browser game is live at <a href={site.links.play}>Play</a>: connect your wallet and start drilling. On-chain play rolls out in stages along the{" "}
+        The browser game is live at <a href={site.links.play}>Play</a>: connect your wallet and start drilling. From the {site.token} launch, the rig opens for wallets holding {fmt(site.minHold)} {site.token} or more. On-chain play rolls out in stages along the{" "}
         <a href={site.links.roadmap}>roadmap</a>, and the numbers below are tuned with every community playtest.
       </Note>
 
@@ -84,6 +81,7 @@ export default function Docs() {
             [`Export terminal and ${site.reward} balance`, `Live, as a preview balance until claims open`],
             ["Reward vault, rig NFT and treasury contracts on Robinhood Chain", "Live"],
             ["Whitelist with referral ranks", "Live"],
+            [`Rig access for ${site.token} holders`, `From the ${site.token} launch`],
             ["Wallet login, rig NFTs and rig classes", "On-chain game"],
             [`Rig class upgrades with ${site.token}`, "On-chain game"],
             [`${site.reward} claims from the reward vault`, "On-chain game"],
@@ -97,7 +95,7 @@ export default function Docs() {
       <Section id="start" title="Getting started">
         <ol>
           <li>
-            Open <a href={site.links.play}>Play</a> and connect your wallet on Robinhood Chain. Your rig is saved to your address.
+            Open <a href={site.links.play}>Play</a> and connect your wallet on Robinhood Chain. From launch, hold {fmt(site.minHold)} {site.token} or more in that wallet to step on deck. Your rig is saved to your address.
           </li>
           <li>Walk with WASD or the arrow keys (the joystick on a phone). Step up to an empty pad and press E to drill; light crude is the quickest start.</li>
           <li>Keep the choke on Normal for your first wells and watch the pressure gauge. Press F at a well to change its choke.</li>
@@ -196,8 +194,7 @@ export default function Docs() {
             seconds and lasts a few minutes; on-chain, delivery contracts run for hours.
           </li>
           <li>
-            <b>Export terminal.</b> Ship barrels out for {site.reward}: every {fmt(EXPORT_BBL)} bbl of any product earns ${EXPORT_USD} worth of{" "}
-            {site.reward}, up to {fmt(EXPORT_DAILY_BBL)} bbl per rig per day.
+            <b>Export terminal.</b> Ship barrels of any product out for {site.reward}, up to a daily export quota per rig.
           </li>
         </ul>
         <p>
@@ -334,6 +331,9 @@ export default function Docs() {
             <b>Buyback and burn</b>: the treasury buys {site.token} back on the market and burns it.
           </li>
           <li>
+            <b>Rig access</b>: holding {fmt(site.minHold)} {site.token} or more opens the game at <a href={site.links.play}>Play</a>.
+          </li>
+          <li>
             <b>Cosmetics</b> arrive with Season 1 and are paid in {site.token}, which is burned too.
           </li>
         </ul>
@@ -357,11 +357,8 @@ export default function Docs() {
           The export terminal turns barrels straight into {site.reward}. Every rig&apos;s exports add up through the week, and the treasury fills the
           reward vault with {site.reward} bought from revenue.
         </p>
-        <Formula>
-          your {site.reward} = barrels exported ÷ {fmt(EXPORT_BBL)} × ${EXPORT_USD} ÷ {site.reward} price
-        </Formula>
         <ul>
-          <li>Each rig can export up to {fmt(EXPORT_DAILY_BBL)} bbl a day. The quota resets at 00:00 UTC.</li>
+          <li>Each rig has a daily export quota. It resets at 00:00 UTC.</li>
           <li>
             The {site.reward} price comes from the Chainlink feed on Robinhood Chain at the moment of export. The browser game uses a fixed reference
             price, so its {site.reward} balance is a preview.
@@ -492,10 +489,10 @@ export default function Docs() {
       </Section>
 
       <Section id="faq" title="FAQ">
-        <h3>Do I need a rig to play?</h3>
+        <h3>What do I need to play?</h3>
         <p>
-          No. The browser game is free for everyone. In the on-chain game a rig NFT is needed to export for {site.reward}, and from Season 1 free players
-          can work shifts on other rigs.
+          A wallet on Robinhood Chain and, from the {site.token} launch, {fmt(site.minHold)} {site.token} or more in it. In the on-chain game a rig NFT is needed to export for{" "}
+          {site.reward}, and from Season 1 players without a rig can work shifts on other rigs.
         </p>
         <h3>What is the {site.reward} balance in the browser game?</h3>
         <p>

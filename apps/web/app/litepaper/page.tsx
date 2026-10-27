@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { site } from "@/lib/site";
-import { EXPORT_BBL, EXPORT_DAILY_BBL, EXPORT_USD } from "@/lib/game/content";
 import { DocPage, Formula, Note, Section, Table } from "@/components/doc/doc";
 import { VAULT } from "@/lib/vault";
 import { CLASS_COSTS } from "@/lib/tokenomics";
@@ -110,8 +109,7 @@ export default function Litepaper() {
         <p>
           {site.token} is a fixed-supply ERC-20 with a fair launch: no presale and no private round. It is spent on rig class upgrades and cosmetics,
           which burn it, and a share of revenue buys it back and burns it too. In-game sales pay coins, which never leave the game. Barrels become{" "}
-          {site.reward} only through the export terminal: every {fmt(EXPORT_BBL)} bbl earns ${EXPORT_USD} worth of {site.reward}, up to{" "}
-          {fmt(EXPORT_DAILY_BBL)} bbl per rig per day.
+          {site.reward} only through the export terminal, up to a daily quota per rig.
         </p>
         <h3>Rig class upgrades</h3>
         <p>
@@ -146,12 +144,8 @@ export default function Litepaper() {
           <li>a 1% slippage limit on every trade;</li>
           <li>every purchase listed in the public treasury log.</li>
         </ul>
-        <Formula>
-          reward(i, w) = B(i, w) ÷ {fmt(EXPORT_BBL)} × ${EXPORT_USD} ÷ P(w)
-        </Formula>
         <p>
-          B(i, w) is the barrels rig i exported in week w, at most {fmt(EXPORT_DAILY_BBL)} a day, and P(w) is the {site.reward} price from the
-          Chainlink feed. The vault records each week&apos;s Merkle root of rewards and holders claim with a proof. The rate and the daily quota keep
+          Each rig&apos;s exports are tallied every week and priced in {site.reward} through the Chainlink feed. The vault records each week&apos;s Merkle root of rewards and holders claim with a proof. The rate and the daily quota keep
           weekly exports well inside what the vault receives from revenue, and both can change only through the timelock in section 7.
         </p>
       </Section>
