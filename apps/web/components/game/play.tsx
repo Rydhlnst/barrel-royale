@@ -12,6 +12,7 @@ import { logo, logoPalette } from "@/components/pixel/sprites";
 import { shortAddress } from "@/lib/wallet";
 import { Bar, DispatchPanel, MarketPanel, QuartersPanel, SlotPanel, StoragePanel, ValveDrill, fmt, mmss, secs } from "./panels";
 import { World } from "./world/world";
+import { RoyalChart } from "./royal-chart";
 import { SPOTS } from "./world/map";
 
 // The play screen: the walkable rig fills the window, and the HUD, the prompt
@@ -182,7 +183,7 @@ export default function Play({ account, onDisconnect }: { account: string; onDis
       )}
 
       {!nearby && !shown && (
-        <p className="pixel-sm absolute bottom-8 left-1/2 z-10 hidden -translate-x-1/2 bg-white/90 px-3 py-1 text-sm font-bold lg:block">
+        <p className="pixel-sm absolute bottom-8 left-6 z-10 hidden max-w-[calc(100%-470px)] bg-white/90 px-3 py-1 text-sm font-bold lg:block">
           WASD or arrows to walk · E to use · F to manage · walk up to a pad, the kiosk, the board or the tanks
         </p>
       )}
@@ -191,6 +192,9 @@ export default function Play({ account, onDisconnect }: { account: string; onDis
       <div className="absolute bottom-6 left-6 z-10 lg:hidden">
         <Stick store={store} />
       </div>
+
+      {/* live $ROYAL chart, tucked away while a panel or a storm takes the screen */}
+      <RoyalChart hidden={Boolean(shown) || Boolean(game.storm)} />
 
       {/* panel for what you're using */}
       {shown && (
