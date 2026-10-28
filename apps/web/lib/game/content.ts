@@ -54,13 +54,16 @@ export const UNITS: Record<UnitKind, { name: string; cost: number; recipes: { in
 
 export const UNIT_UPGRADE_COST = [0, 0, 90, 180];
 
-/** Rig levels 1–5: upgrade cost, deck slots, storage. */
+/** Rig levels 1–8: upgrade cost, deck slots, storage. Past level 4 the deck is full, so levels add storage. */
 export const LEVELS = [
   { cost: 0, slots: 6, storage: 60 },
   { cost: 100, slots: 8, storage: 100 },
   { cost: 260, slots: 10, storage: 140 },
   { cost: 600, slots: 12, storage: 180 },
   { cost: 1200, slots: 12, storage: 240 },
+  { cost: 2000, slots: 12, storage: 320 },
+  { cost: 3200, slots: 12, storage: 420 },
+  { cost: 5000, slots: 12, storage: 540 },
 ];
 
 export const START_COINS = 60;

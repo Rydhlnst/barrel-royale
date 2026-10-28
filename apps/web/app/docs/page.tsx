@@ -78,7 +78,7 @@ export default function Docs() {
             ["Spot market with six price indexes", "Live"],
             ["Dispatch board delivery contracts", "Live"],
             ["Storms and the brace drill", "Live"],
-            ["Rig levels 1 to 5", "Live"],
+            [`Rig levels 1 to ${LEVELS.length}`, "Live"],
             [`Export terminal and ${site.reward} balance`, "Live"],
             ["Wallet connect on Robinhood Chain", "Live"],
             ["Reward vault, rig NFT and treasury contracts on Robinhood Chain", "Live"],
