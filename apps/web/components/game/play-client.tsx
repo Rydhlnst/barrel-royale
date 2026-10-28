@@ -22,7 +22,7 @@ export function PlayClient() {
   const account = wallet.status === "connected" ? wallet.account : null;
   const { holder, recheck } = useHolder(account);
   if (!account) return <ConnectGate wallet={wallet} />;
-  if (!site.ca) return <LaunchGate account={account} />;
+  if (!site.ca && !site.devOpenPlay) return <LaunchGate account={account} />;
   if (holder.status !== "off" && holder.status !== "holder") return <HolderGate account={account} holder={holder} recheck={recheck} />;
   return <Play key={account.toLowerCase()} account={account} onDisconnect={disconnectWallet} />;
 }

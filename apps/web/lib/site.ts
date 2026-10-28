@@ -26,6 +26,11 @@ export const site = {
   ca: addr(process.env.NEXT_PUBLIC_ROYAL_CA),
   /** Once the CA is set, /play opens for wallets holding at least this much $ROYAL (NEXT_PUBLIC_ROYAL_MIN_HOLD). */
   minHold: Number(process.env.NEXT_PUBLIC_ROYAL_MIN_HOLD) > 0 ? Number(process.env.NEXT_PUBLIC_ROYAL_MIN_HOLD) : 1_000_000,
+  /**
+   * Local development only: NEXT_PUBLIC_DEV_OPEN_PLAY=1 opens /play to any connected wallet, skipping the
+   * launch wait and the $ROYAL hold. `next build` sets NODE_ENV to production, so a deployed site never skips them.
+   */
+  devOpenPlay: process.env.NODE_ENV !== "production" && process.env.NEXT_PUBLIC_DEV_OPEN_PLAY === "1",
   /** Where players get $ROYAL, such as the launchpad page (NEXT_PUBLIC_ROYAL_BUY_URL). Falls back to the token on the explorer. */
   buyUrl: process.env.NEXT_PUBLIC_ROYAL_BUY_URL || null,
   explorer: "https://robinhoodchain.blockscout.com",

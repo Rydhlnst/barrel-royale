@@ -5,8 +5,8 @@ import { site } from "@/lib/site";
 import { ROBINHOOD_CHAIN } from "@/lib/wallet";
 
 // The $ROYAL holder check for /play. It reads the token balance straight from Robinhood Chain's public
-// RPC, so it does not depend on which network the player's wallet is set to. Until the CA is set the
-// check is off and every connected wallet plays.
+// RPC, so it does not depend on which network the player's wallet is set to. Until the CA is set, or
+// with site.devOpenPlay in local development, the check is off and every connected wallet plays.
 
 export type HolderState =
   | { status: "off" }
@@ -39,10 +39,11 @@ export async function royalBalance(token: string, account: string) {
 }
 
 export function useHolder(account: string | null) {
-  const [state, setState] = useState<HolderState>(() => (site.ca ? { status: "checking" } : { status: "off" }));
+  const on = Boolean(site.ca) && !site.devOpenPlay;
+  const [state, setState] = useState<HolderState>(() => (on ? { status: "checking" } : { status: "off" }));
 
   const check = useCallback(async () => {
-    if (!site.ca || !account) return;
+    if (!on || !site.ca || !account) return;
     setState({ status: "checking" });
     try {
       const balance = await royalBalance(site.ca, account);
@@ -50,7 +51,7 @@ export function useHolder(account: string | null) {
     } catch {
       setState({ status: "error", message: `Could not read your ${site.token} balance. Check your connection and try again.` });
     }
-  }, [account]);
+  }, [on, account]);
 
   useEffect(() => {
     // read the balance from the chain whenever the connected wallet changes
