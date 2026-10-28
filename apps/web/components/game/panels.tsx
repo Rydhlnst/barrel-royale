@@ -7,6 +7,10 @@ import {
   BLOWOUT_AT,
   CAP_COST,
   CHOKES,
+  FOREMAN_AWAY_CAP,
+  FOREMAN_FREE_LEVEL,
+  FOREMAN_ROUND,
+  FOREMAN_ROUND_AWAY,
   LEVELS,
   PRODUCTS,
   PRODUCT_ORDER,
@@ -481,6 +485,108 @@ export function ShiftPanel({ store, game, now }: { store: GameStore; game: E.Gam
       )}
       <p className="text-xs text-brand-ink-2">
         {s.swaps > 0 ? "You can swap one unfinished task today. " : ""}Finish every task on consecutive days to grow your streak: +10% on the bonus per day, up to +100%.
+      </p>
+    </>
+  );
+}
+
+const FOREMAN_JOBS: { job: E.ForemanJob; label: string }[] = [
+  { job: "collect", label: "Collect from every well" },
+  { job: "sell", label: "Sell when storage fills up" },
+  { job: "contracts", label: "Fill Dispatch contracts he has barrels for" },
+  { job: "cap", label: "Cap blowouts with the capping drill" },
+  { job: "brace", label: "Brace the rig in storms" },
+];
+
+export function ForemanPanel({ store, game, now }: { store: GameStore; game: E.Game; now: number }) {
+  const free = E.foremanFree(game);
+  const on = E.foremanOn(game, now);
+  const f = game.foreman;
+  const price = E.foremanPrice(game);
+  const jobs = f?.jobs ?? { collect: true, sell: true, contracts: true, cap: true, brace: true };
+  const sellAt = f?.sellAt ?? 0.8;
+  const r = f?.report;
+  const news = r && (r.bbl || r.coins || r.contracts || r.storms || r.capped);
+  return (
+    <>
+      <div className={`pixel-sm flex items-center gap-3 px-3 py-2 ${on ? "bg-[#d8f3e6]" : "bg-brand-sun-pale"}`}>
+        <span className={`inline-block h-3 w-3 ${on ? "bg-brand-leaf" : "bg-brand-ink-2"}`} />
+        <p className="text-sm font-bold">
+          {free
+            ? `On duty for free: your rig is level ${game.level}.`
+            : on
+              ? `On duty for another ${hhmm(((f?.until ?? now) - now) / 1000)}.`
+              : `Not on the rig. He works for free from rig level ${FOREMAN_FREE_LEVEL}.`}
+        </p>
+      </div>
+      <p className="text-sm text-brand-ink-2">
+        He runs your rig on rounds: every {FOREMAN_ROUND / 60} minutes while you play, and every {FOREMAN_ROUND_AWAY / 60} minutes while the game is
+        closed, for up to {FOREMAN_AWAY_CAP / 3600} hours with the wells on Safe.
+      </p>
+      {!free && (
+        <div className="flex flex-wrap gap-2">
+          <button type="button" className="btn btn-red" onClick={() => store.run((g, n) => E.hireForeman(g, n, 1))}>
+            {on ? "Add a day" : "Hire for a day"} · {fmt(price.day)}
+          </button>
+          <button type="button" className="btn btn-white" onClick={() => store.run((g, n) => E.hireForeman(g, n, 3))}>
+            {on ? "Add 3 days" : "3 days"} · {fmt(price.three)}
+          </button>
+        </div>
+      )}
+
+      {news ? (
+        <div className="pixel-sm flex flex-col gap-2 bg-white p-3">
+          <p className="font-display text-lg font-bold">{r.away ? "While you were away" : "His latest rounds"}</p>
+          <dl className="grid grid-cols-2 gap-2 text-center sm:grid-cols-3">
+            {[
+              ["Barrels collected", fmt(r.bbl)],
+              ["Coins earned", `+${fmt(r.coins)}`],
+              ["Contracts filled", fmt(r.contracts)],
+              ["Storms held", fmt(r.storms)],
+              ["Wells capped", fmt(r.capped)],
+            ].map(([k, v]) => (
+              <div key={k} className="pixel-sm bg-brand-sun-pale p-2">
+                <dt className="text-[10px] font-extrabold uppercase text-brand-ink-2">{k}</dt>
+                <dd className="font-display text-lg font-bold tabular-nums">{v}</dd>
+              </div>
+            ))}
+          </dl>
+          <button type="button" className="btn btn-white self-start" onClick={() => store.run((g, n) => E.readForemanReport(g, n))}>
+            Got it
+          </button>
+        </div>
+      ) : null}
+
+      <div className="flex flex-col gap-2">
+        <p className="text-xs font-extrabold uppercase tracking-wide text-brand-ink-2">His jobs</p>
+        {FOREMAN_JOBS.map(({ job, label }) => (
+          <label key={job} className="pixel-sm flex items-center gap-3 bg-white px-3 py-2 text-sm font-bold">
+            <input type="checkbox" className="h-4 w-4 accent-[#15905f]" checked={jobs[job]} onChange={(e) => store.run((g, n) => E.setForeman(g, n, { jobs: { [job]: e.target.checked } }))} />
+            <span className="flex-1">{label}</span>
+            {job === "sell" && (
+              <select
+                aria-label="Sell when storage is this full"
+                className="pixel-sm bg-brand-sun-pale px-1 py-0.5 text-sm"
+                value={sellAt}
+                onChange={(e) => store.run((g, n) => E.setForeman(g, n, { sellAt: Number(e.target.value) }))}
+              >
+                {[0.5, 0.8, 1].map((v) => (
+                  <option key={v} value={v}>
+                    at {Math.round(v * 100)}%
+                  </option>
+                ))}
+              </select>
+            )}
+          </label>
+        ))}
+        <label className="flex items-center gap-3 px-1 text-sm">
+          <input type="checkbox" className="h-4 w-4 accent-[#15905f]" checked={f?.keepForUnits ?? true} onChange={(e) => store.run((g, n) => E.setForeman(g, n, { keepForUnits: e.target.checked }))} />
+          Keep enough crude for the refinery units when he sells
+        </label>
+      </div>
+      <p className="text-xs text-brand-ink-2">
+        He plays by your rules: the same storage, prices and contracts, and he misses a valve now and then like anyone. His work earns no points and
+        doesn&apos;t count toward your Daily Shift.
       </p>
     </>
   );

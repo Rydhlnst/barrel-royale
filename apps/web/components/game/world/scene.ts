@@ -31,6 +31,8 @@ export function rigScene(Phaser: Phaser, store: GameStore) {
     private rain!: PhaserNS.GameObjects.TileSprite;
     private dim!: PhaserNS.GameObjects.Rectangle;
     private ring!: PhaserNS.GameObjects.Graphics;
+    private boss!: Sprite;
+    private bossTag!: PhaserNS.GameObjects.Text;
     private pads: PadView[] = [];
     private facing: "down" | "up" | "side" = "down";
     private font = "monospace";
@@ -87,6 +89,15 @@ export function rigScene(Phaser: Phaser, store: GameStore) {
         this.tweens.add({ targets: npc, y: npc.y - 1, duration: 600, yoyo: true, repeat: -1, ease: "Stepped" });
       }
 
+      // the foreman walks the lane between the first two rows of pads while he's on duty
+      this.boss = this.add.sprite(11 * TILE, 17 * TILE + 10, "foreman", 6).setOrigin(0.5, 1).setVisible(false);
+      this.bossTag = this.add
+        .text(0, 0, "FOREMAN", { fontFamily: this.font, fontSize: "8px", color: "#7dffb0", stroke: "#1e2a4a", strokeThickness: 3 })
+        .setOrigin(0.5, 1)
+        .setResolution(4)
+        .setDepth(9050)
+        .setVisible(false);
+
       // the roughneck, with a shadow at his feet and a name tag so he never gets lost on a busy deck
       this.feet = this.add.ellipse(SPAWN.x, SPAWN.y, 14, 5, 0x10162c, 0.45);
       this.player = this.add.sprite(SPAWN.x, SPAWN.y, "player", 0).setOrigin(0.5, 1);
@@ -126,6 +137,7 @@ export function rigScene(Phaser: Phaser, store: GameStore) {
       this.animateSea(time);
 
       this.move(time, delta);
+      this.walkForeman(game, now, time);
       this.drawPads(game, time);
       this.findNearby(time);
 
@@ -163,6 +175,28 @@ export function rigScene(Phaser: Phaser, store: GameStore) {
       p.setDepth(p.y);
       this.feet.setPosition(Math.round(p.x), Math.round(p.y) - 1).setDepth(p.y - 0.5);
       this.tag.setPosition(Math.round(p.x), Math.round(p.y) - 21 - (Math.floor(time / 500) % 2));
+    }
+
+    /** Back and forth between the rows of pads, stopping at each well like he's checking it. */
+    private walkForeman(game: E.Game, now: number, time: number) {
+      const on = E.foremanOn(game, now);
+      this.boss.setVisible(on);
+      this.bossTag.setVisible(on);
+      if (!on) return;
+      const x0 = 10 * TILE;
+      const x1 = 28 * TILE;
+      const span = x1 - x0;
+      // 9 s each way, with a short stop every 5 tiles
+      const t = (time / 1000) % 18;
+      const leg = t < 9 ? t / 9 : 2 - t / 9;
+      const raw = x0 + leg * span;
+      const stop = Math.round(raw / (5 * TILE)) * 5 * TILE;
+      const x = Math.abs(raw - stop) < 10 ? stop : raw;
+      const walking = x !== stop;
+      this.boss.setX(Math.round(x)).setFlipX(t >= 9);
+      this.boss.setFrame(walking ? 6 + 1 + (Math.floor(time / 140) % 2) : 0);
+      this.boss.setDepth(this.boss.y);
+      this.bossTag.setPosition(Math.round(x), this.boss.y - 21);
     }
 
     /** Does the roughneck's footprint at (x, y) touch a blocked tile? */

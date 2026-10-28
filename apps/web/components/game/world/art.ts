@@ -103,6 +103,7 @@ export const palettes = {
   player: base,
   dispatcher: hat(C.white, C.sky),
   trader: hat(C.red, C.redLight),
+  foreman: hat(C.leaf, "#4fd08f"),
 };
 
 /* ---------------- sea, rain ---------------- */

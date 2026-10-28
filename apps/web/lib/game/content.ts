@@ -116,6 +116,23 @@ export const SHIFT_STREAK_CAP = 10;
 export const SHIFT_REWARD = [25, 40, 80, 150, 300, 500, 800, 1_200];
 export const SHIFT_BONUS = 3;
 
+/**
+ * Rig Foreman: a crew boss who runs the rig on rounds, online and while the game is closed. Free from
+ * FOREMAN_FREE_LEVEL; below it he's hired for coins by the day. He works by the same rules as you: the
+ * same storage, the same prices, the same contracts. His work earns no points and moves no Daily Shift
+ * task, so the shift and the crew scores stay yours.
+ */
+export const FOREMAN_FREE_LEVEL = 6;
+/** Coins for one day of the foreman, by rig level 1–5. Three days cost 2.5 days. */
+export const FOREMAN_DAY = [150, 300, 600, 1_200, 2_500];
+/** Seconds between rounds while you're playing, and while the game is closed. */
+export const FOREMAN_ROUND = 180;
+export const FOREMAN_ROUND_AWAY = 600;
+/** While the game is closed he keeps the rig running this long, at Safe, without storms or blowouts. */
+export const FOREMAN_AWAY_CAP = 6 * 60 * 60;
+/** Chance he closes every valve in a storm; otherwise he gets two or three of four, like anyone. */
+export const FOREMAN_BRACE = 0.85;
+
 export const TASKS: Record<TaskKind, { target: (level: number) => number; label: (n: number, product?: Raw) => string; min?: number; max?: number }> = {
   drill: { target: (l) => 2 + Math.floor(l / 3), label: (n) => `Strike ${n} new wells`, max: 3 },
   collect: { target: (l) => 20 + 30 * l, label: (n) => `Collect ${n} bbl from your wells` },

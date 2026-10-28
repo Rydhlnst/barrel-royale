@@ -3,6 +3,11 @@ import { site } from "@/lib/site";
 import {
   BRACE_SECONDS,
   CAP_COST,
+  FOREMAN_AWAY_CAP,
+  FOREMAN_DAY,
+  FOREMAN_FREE_LEVEL,
+  FOREMAN_ROUND,
+  FOREMAN_ROUND_AWAY,
   LEVELS,
   OFFLINE_CAP,
   PRODUCTS,
@@ -39,6 +44,7 @@ const toc = [
   { id: "incidents", label: "Storms and sabotage" },
   { id: "progress", label: "Upgrades, fleet and shifts" },
   { id: "daily", label: "Daily Shift" },
+  { id: "foreman", label: "Rig Foreman" },
   { id: "village", label: "Royal Harbor" },
   { id: "crews", label: "Crews and seasons" },
   { id: "free", label: "Playing without a rig" },
@@ -88,6 +94,7 @@ export default function Docs() {
             [`Rig access for ${site.token} holders`, "Live"],
             ["Royal Harbor: the shared village with live chat", "Live"],
             ["Daily Shift: five random tasks a day with a streak bonus", "Live"],
+            ["Rig Foreman: runs your rig on rounds, even while the game is closed", "Live"],
             ["Wallet login, rig NFTs and rig classes", "On-chain game"],
             [`Rig class upgrades with ${site.token}`, "On-chain game"],
             [`${site.reward} claims from the reward vault`, "On-chain game"],
@@ -271,6 +278,35 @@ export default function Docs() {
           <li>Full shifts on consecutive days build a streak: +10% on the bonus for every day, up to +100%. Miss a day and it starts again.</li>
           <li>Not feeling a task? Swap one unfinished task a day for another.</li>
         </ul>
+      </Section>
+
+      <Section id="foreman" title="Rig Foreman">
+        <p>
+          The foreman runs your rig on rounds so it keeps earning when you can&apos;t be on deck. Open him with the Foreman button at the top of the
+          screen; while he&apos;s on duty you&apos;ll see him walking the deck in a green hard hat.
+        </p>
+        <ul>
+          <li>
+            He makes a round every {FOREMAN_ROUND / 60} minutes while you play, and every {FOREMAN_ROUND_AWAY / 60} minutes while the game is closed, for up
+            to {FOREMAN_AWAY_CAP / 3600} hours with the wells on Safe.
+          </li>
+          <li>
+            You pick his jobs: collect from every well, sell when storage fills up (at 50%, 80% or 100%), fill Dispatch contracts he has barrels for, cap
+            blowouts with the capping drill and brace the rig in storms. He can keep enough crude back for your refinery units.
+          </li>
+          <li>
+            He plays by your rules: the same storage, prices and contracts, and like anyone he misses a valve in a storm now and then. His work earns no
+            points and doesn&apos;t count toward your Daily Shift.
+          </li>
+          <li>When you come back he leaves a report of what he did while you were away.</li>
+        </ul>
+        <Table
+          head={["Rig level", "Foreman"]}
+          rows={[
+            ...FOREMAN_DAY.map((c, i) => [String(i + 1), `${fmt(c)} coins a day, or ${fmt(Math.round(c * 2.5))} for 3 days`]),
+            [`${FOREMAN_FREE_LEVEL} and up`, "Free"],
+          ]}
+        />
       </Section>
 
       <Section id="village" title="Royal Harbor">

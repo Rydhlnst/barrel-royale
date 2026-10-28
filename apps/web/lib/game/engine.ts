@@ -8,6 +8,12 @@ import {
   EXPORT_BBL,
   EXPORT_DAILY_BBL,
   EXPORT_USD,
+  FOREMAN_AWAY_CAP,
+  FOREMAN_BRACE,
+  FOREMAN_DAY,
+  FOREMAN_FREE_LEVEL,
+  FOREMAN_ROUND,
+  FOREMAN_ROUND_AWAY,
   LEVELS,
   MARKET_EVERY,
   OFFLINE_CAP,
@@ -54,6 +60,25 @@ export type Shift = { day: number; tasks: Task[]; swaps: number; bonusClaimed: b
 
 export type Storm = { phase: "brace"; endsAt: number; order: number[]; step: number } | null;
 
+export type ForemanJob = "collect" | "sell" | "contracts" | "cap" | "brace";
+
+/** What the foreman did since you last read his report. */
+export type ForemanReport = { since: number; bbl: number; coins: number; contracts: number; storms: number; capped: number; away: boolean };
+
+export type Foreman = {
+  /** Hired until this time (ms); free rigs ignore it. */
+  until: number;
+  jobs: Record<ForemanJob, boolean>;
+  /** Sells once storage is this full, 0 to 1. */
+  sellAt: number;
+  /** Leaves enough crude in storage for the refinery units to keep cooking. */
+  keepForUnits: boolean;
+  nextAt: number;
+  report: ForemanReport;
+  /** The report has news you haven't opened yet. */
+  unseen: boolean;
+};
+
 export type Game = {
   version: 1;
   savedAt: number;
@@ -79,6 +104,8 @@ export type Game = {
   log: { at: number; text: string }[];
   /** Missing on saves from before Daily Shift; the next tick deals one. */
   shift?: Shift;
+  /** Missing until the rig first meets its foreman. */
+  foreman?: Foreman;
 };
 
 type Rng = () => number;
@@ -96,6 +123,122 @@ export const price = (g: Game, p: Product) => round(PRODUCTS[p].base * g.index[p
 export const barrelsWaiting = (g: Game) => g.slots.reduce((n, s) => (s.kind === "well" ? n + Math.floor(s.held) : n), 0);
 /** What selling everything in storage pays right now. */
 export const storageValue = (g: Game) => PRODUCT_ORDER.reduce((sum, p) => sum + Math.round(g.storage[p] * price(g, p)), 0);
+
+/* ---------------- rig foreman ---------------- */
+
+const FOREMAN_JOBS: ForemanJob[] = ["collect", "sell", "contracts", "cap", "brace"];
+const emptyReport = (since: number): ForemanReport => ({ since, bbl: 0, coins: 0, contracts: 0, storms: 0, capped: 0, away: false });
+
+function foremanOf(g: Game, now: number): Foreman {
+  g.foreman ??= {
+    until: 0,
+    jobs: Object.fromEntries(FOREMAN_JOBS.map((j) => [j, true])) as Record<ForemanJob, boolean>,
+    sellAt: 0.8,
+    keepForUnits: true,
+    nextAt: now + FOREMAN_ROUND * 1000,
+    report: emptyReport(now),
+    unseen: false,
+  };
+  return g.foreman;
+}
+
+export const foremanFree = (g: Game) => g.level >= FOREMAN_FREE_LEVEL;
+/** Is the foreman on the rig at `at`? */
+export const foremanOn = (g: Game, at: number) => foremanFree(g) || (g.foreman?.until ?? 0) > at;
+/** One day of the foreman for this rig, and three. */
+export const foremanPrice = (g: Game) => {
+  const day = FOREMAN_DAY[Math.min(g.level, FOREMAN_DAY.length) - 1];
+  return { day, three: Math.round(day * 2.5) };
+};
+
+/** Crude the refinery units need on hand to keep cooking for a while. */
+function unitReserve(g: Game) {
+  const keep = zeroes();
+  g.slots.forEach((s, i) => {
+    if (i >= levelInfo(g).slots || s.kind !== "unit") return;
+    const r = UNITS[s.unit].recipes[s.recipe];
+    keep[r.input] += r.inQty * 4;
+  });
+  return keep;
+}
+
+/** One round: cap blown wells, collect, fill contracts and sell, by the same rules a player plays by. */
+function foremanRound(g: Game, now: number, away: boolean) {
+  const f = foremanOf(g, now);
+  const rep = f.report;
+  if (f.jobs.cap)
+    g.slots.forEach((s, i) => {
+      if (i >= levelInfo(g).slots || s.kind !== "well" || !s.blown) return;
+      s.blown = false;
+      s.pressure = 20;
+      s.choke = "normal";
+      rep.capped++;
+    });
+  if (f.jobs.collect)
+    for (const s of g.slots) {
+      if (s.kind !== "well") continue;
+      const take = Math.min(Math.floor(s.held), storageFree(g));
+      if (take < 1) continue;
+      s.held -= take;
+      g.storage[s.product] += take;
+      rep.bbl += take;
+    }
+  if (f.jobs.contracts)
+    for (const c of [...g.contracts]) {
+      if (c.expiresAt <= now || g.storage[c.product] < c.qty) continue;
+      g.storage[c.product] -= c.qty;
+      g.coins += c.reward;
+      g.contractsFilled++;
+      g.contracts = g.contracts.filter((x) => x.id !== c.id);
+      rep.contracts++;
+      rep.coins += c.reward;
+    }
+  if (f.jobs.sell && storageUsed(g) >= levelInfo(g).storage * f.sellAt) {
+    const keep = f.keepForUnits ? unitReserve(g) : zeroes();
+    for (const p of PRODUCT_ORDER) {
+      const qty = Math.max(0, g.storage[p] - keep[p]);
+      if (!qty) continue;
+      const value = Math.round(qty * price(g, p));
+      g.storage[p] -= qty;
+      g.coins += value;
+      rep.coins += value;
+    }
+  }
+  if (away) rep.away = true;
+  if (rep.bbl || rep.coins || rep.contracts || rep.capped) f.unseen = true;
+}
+
+/**
+ * While the game was closed (or the tab sat in the background): the deck runs at Safe up to each of his
+ * rounds, on his own clock, for as long as he's hired. Returns the seconds he covered.
+ */
+function foremanAway(g: Game, from: number, seconds: number) {
+  const f = foremanOf(g, from);
+  const end = from + seconds * 1000;
+  let at = from;
+  while (at < end && foremanOn(g, at)) {
+    const round = Math.max(f.nextAt, at);
+    const stop = Math.min(round, end);
+    runDeck(g, (stop - at) / 1000, stop, false);
+    at = stop;
+    if (at >= round) {
+      foremanRound(g, at, true);
+      f.nextAt = at + FOREMAN_ROUND_AWAY * 1000;
+    }
+  }
+  return (at - from) / 1000;
+}
+
+/** In a storm he gets to the valves after a couple of seconds and, like anyone, sometimes misses one. */
+function foremanBrace(g: Game, now: number, rng: Rng) {
+  const s = g.storm;
+  if (!s || now < s.endsAt - (BRACE_SECONDS - 2.5) * 1000) return;
+  const held = rng() < FOREMAN_BRACE ? s.order.length : 2 + Math.floor(rng() * 2);
+  s.step = held;
+  const wasHeld = g.stormsHeld;
+  endStorm(g, now, false);
+  if (g.stormsHeld > wasHeld) foremanOf(g, now).report.storms++;
+}
 
 /* ---------------- daily shift ---------------- */
 
@@ -280,16 +423,19 @@ function startStorm(g: Game, now: number, rng: Rng) {
   log(g, now, "Storm's here! Close the valves in order.");
 }
 
-function endStorm(g: Game, now: number) {
+/** `byYou` is false when the foreman braced: the bonus is paid, but no points and no shift progress. */
+function endStorm(g: Game, now: number, byYou = true) {
   if (!g.storm) return;
   const held = g.storm.step / g.storm.order.length;
   if (held === 1) {
     const bonus = 10 + 10 * g.level;
     g.coins += bonus;
-    g.points += POINTS.storm;
     g.stormsHeld++;
-    bump(g, "storm", 1);
-    log(g, now, `Rig held through the storm. Bonus +${bonus} coins.`);
+    if (byYou) {
+      g.points += POINTS.storm;
+      bump(g, "storm", 1);
+    }
+    log(g, now, `${byYou ? "Rig held" : "Your foreman held the rig"} through the storm. Bonus +${bonus} coins.`);
   } else {
     const share = 0.3 * (1 - held);
     let lost = 0;
@@ -312,22 +458,31 @@ export function tick(prev: Game, now: number, rng: Rng = Math.random): Game {
   if (g.shift?.day !== dayOf(now)) dealShift(g, dayOf(now), rng);
 
   if (dt > 30) {
-    // offline: production at Safe, capped, then pick up the clocks from now
-    runDeck(g, Math.min(dt, OFFLINE_CAP), now, false);
+    // offline: production at Safe, capped, then pick up the clocks from now. A foreman on the rig keeps
+    // it going for longer, on rounds; once he's off, the rest runs like any closed tab.
+    const worked = foremanOn(g, g.savedAt) ? foremanAway(g, g.savedAt, Math.min(dt, FOREMAN_AWAY_CAP)) : 0;
+    if (worked < OFFLINE_CAP) runDeck(g, Math.min(dt, OFFLINE_CAP) - worked, now, false);
+    if (g.foreman) g.foreman.nextAt = Math.min(g.foreman.nextAt, now + FOREMAN_ROUND * 1000);
     g.nextMarketAt = Math.max(g.nextMarketAt, now);
     g.nextContractAt = Math.max(g.nextContractAt, now);
     g.nextStormAt = Math.max(g.nextStormAt, now + 60_000);
     g.contracts = g.contracts.filter((c) => c.expiresAt > now);
     g.storm = null;
-    log(g, now, "Welcome back. Your wells kept pumping on Safe while you were away.");
+    log(g, now, worked ? "Welcome back. Your foreman kept the rig running while you were away." : "Welcome back. Your wells kept pumping on Safe while you were away.");
     dt = 0;
   }
 
   if (dt > 0) runDeck(g, dt, now, true);
   runMarket(g, now, rng);
   runContracts(g, now, rng);
+  const foreman = foremanOn(g, now) ? foremanOf(g, now) : null;
+  if (foreman?.jobs.brace) foremanBrace(g, now, rng);
   if (g.storm && now >= g.storm.endsAt) endStorm(g, now);
   if (!g.storm && now >= g.nextStormAt) startStorm(g, now, rng);
+  if (foreman && now >= foreman.nextAt) {
+    foremanRound(g, now, false);
+    foreman.nextAt = now + FOREMAN_ROUND * 1000;
+  }
   g.savedAt = now;
   return g;
 }
@@ -617,5 +772,41 @@ export function swapTask(prev: Game, now: number, i: number, rng: Rng = Math.ran
     s.tasks[i] = dealTask(g.level, pool[Math.floor(rng() * pool.length)], rng);
     s.swaps--;
     return "Task swapped";
+  });
+}
+
+/* ---------------- rig foreman actions ---------------- */
+
+/** Hires the foreman for one or three days, adding to any time left. Free rigs don't need to. */
+export function hireForeman(prev: Game, now: number, days: 1 | 3): Result {
+  return act(prev, now, (g) => {
+    if (foremanFree(g)) return "!Your foreman works for free from rig level " + FOREMAN_FREE_LEVEL + ".";
+    const cost = days === 3 ? foremanPrice(g).three : foremanPrice(g).day;
+    if (g.coins < cost) return `!Hiring him for ${days === 3 ? "3 days" : "a day"} costs ${cost.toLocaleString("en-US")} coins.`;
+    const f = foremanOf(g, now);
+    g.coins -= cost;
+    f.until = Math.max(f.until, now) + days * 86_400_000;
+    f.nextAt = now + 5_000;
+    log(g, now, `Foreman hired for ${days === 3 ? "3 days" : "a day"}.`);
+    return "Your foreman is on the rig";
+  });
+}
+
+/** Changes his jobs or how full storage gets before he sells. */
+export function setForeman(prev: Game, now: number, patch: { jobs?: Partial<Record<ForemanJob, boolean>>; sellAt?: number; keepForUnits?: boolean }): Result {
+  return act(prev, now, (g) => {
+    const f = foremanOf(g, now);
+    if (patch.jobs) f.jobs = { ...f.jobs, ...patch.jobs };
+    if (patch.sellAt !== undefined) f.sellAt = clamp(patch.sellAt, 0.2, 1);
+    if (patch.keepForUnits !== undefined) f.keepForUnits = patch.keepForUnits;
+  });
+}
+
+/** You've read his report: start a fresh one. */
+export function readForemanReport(prev: Game, now: number): Result {
+  return act(prev, now, (g) => {
+    const f = foremanOf(g, now);
+    f.report = emptyReport(now);
+    f.unseen = false;
   });
 }
