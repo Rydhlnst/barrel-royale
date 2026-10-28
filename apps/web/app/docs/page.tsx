@@ -101,7 +101,10 @@ export default function Docs() {
           </li>
           <li>Walk with WASD or the arrow keys (the joystick on a phone). Step up to an empty pad and press E to drill; light crude is the quickest start.</li>
           <li>Keep the choke on Normal for your first wells and watch the pressure gauge. Press F at a well to change its choke.</li>
-          <li>Collect your barrels, run some through the refinery, then sell at the market kiosk or fill a contract on the Dispatch board.</li>
+          <li>
+            Collect your barrels at each well, or from every well at once at the storage tanks. Run some through the refinery, then sell at the market
+            kiosk (one product at a time, or everything at once) or fill a contract on the Dispatch board.
+          </li>
           <li>When the storm alarm sounds, brace the rig: shut the valves in order before the timer runs out.</li>
           <li>Reinvest in rig levels and refinery units at the storage tanks, and export barrels for {site.reward} at the market kiosk.</li>
         </ol>

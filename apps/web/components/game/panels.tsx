@@ -266,6 +266,9 @@ export function MarketPanel({ store, game, now }: { store: GameStore; game: E.Ga
         </div>
         <Bar value={E.exportLeft(game, now)} max={EXPORT_DAILY_BBL} color={C.leaf} />
       </div>
+      <button type="button" className="btn btn-red self-start" disabled={!E.storageUsed(game)} onClick={() => store.run((g, t) => E.sellAll(g, t))}>
+        Sell everything · {E.storageValue(game)}
+      </button>
       <ul className="flex flex-col gap-2">
         {PRODUCT_ORDER.map((p) => {
           const h = game.history[p];
@@ -349,6 +352,9 @@ export function StoragePanel({ store, game }: { store: GameStore; game: E.Game }
           </li>
         ))}
       </ul>
+      <button type="button" className="btn btn-red self-start" disabled={E.barrelsWaiting(game) < 1} onClick={() => store.run((g, t) => E.collectAll(g, t))}>
+        Collect from every well · {E.barrelsWaiting(game)} bbl
+      </button>
       {game.level < LEVELS.length ? (
         <button type="button" className="btn btn-sun self-start" onClick={() => store.run((g, t) => E.upgradeRig(g, t))}>
           Upgrade rig to level {game.level + 1} · {LEVELS[game.level].cost}

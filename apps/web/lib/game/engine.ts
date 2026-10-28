@@ -77,6 +77,10 @@ export const levelInfo = (g: Game) => LEVELS[g.level - 1];
 export const storageUsed = (g: Game) => PRODUCT_ORDER.reduce((sum, p) => sum + g.storage[p], 0);
 export const storageFree = (g: Game) => levelInfo(g).storage - storageUsed(g);
 export const price = (g: Game, p: Product) => round(PRODUCTS[p].base * g.index[p]);
+/** Whole barrels waiting in every wellhead, ready to collect. */
+export const barrelsWaiting = (g: Game) => g.slots.reduce((n, s) => (s.kind === "well" ? n + Math.floor(s.held) : n), 0);
+/** What selling everything in storage pays right now. */
+export const storageValue = (g: Game) => PRODUCT_ORDER.reduce((sum, p) => sum + Math.round(g.storage[p] * price(g, p)), 0);
 
 function log(g: Game, now: number, text: string) {
   g.log.unshift({ at: now, text });
@@ -396,6 +400,19 @@ export function sell(prev: Game, now: number, p: Product): Result {
     g.storage[p] = 0;
     g.coins += value;
     log(g, now, `Sold ${qty} bbl ${PRODUCTS[p].name.toLowerCase()} at ${g.index[p].toFixed(2)}×: +${value} coins.`);
+    return `Sold ${qty} bbl for +${value} coins`;
+  });
+}
+
+/** Sells every product in storage at its current price. */
+export function sellAll(prev: Game, now: number): Result {
+  return act(prev, now, (g) => {
+    const qty = storageUsed(g);
+    if (!qty) return "!Nothing to sell.";
+    const value = storageValue(g);
+    for (const p of PRODUCT_ORDER) g.storage[p] = 0;
+    g.coins += value;
+    log(g, now, `Sold all storage, ${qty} bbl: +${value} coins.`);
     return `Sold ${qty} bbl for +${value} coins`;
   });
 }
