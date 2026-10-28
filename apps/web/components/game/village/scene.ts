@@ -31,7 +31,7 @@ const HATS: [string, string][] = [
   ["#d64f9a", "#f7a6d3"],
 ];
 const hatFor = (wallet: string) => parseInt(wallet.slice(-4), 16) % HATS.length;
-const shortName = (w: string) => `${w.slice(0, 6)}…${w.slice(-4)}`;
+const shortName = (w: string) => w.slice(0, 6);
 
 type View = { sprite: Sprite; feet: PhaserNS.GameObjects.Ellipse; tag: Text; bubble: Text; x: number; y: number };
 
@@ -134,7 +134,27 @@ export function villageScene(Phaser: Phaser, store: GameStore, net: VillageNet) 
       this.drawFire(time);
       this.move(time, delta);
       this.drawOthers(time, delta);
+      this.unstackTags();
       this.findBoat(time);
+    }
+
+    /** Name tags of players standing side by side would overlap; lift each one above any it touches, and its bubble with it. */
+    private unstackTags() {
+      const pairs = [{ t: this.tag, b: this.bubble }, ...[...this.views.values()].map((v) => ({ t: v.tag, b: v.bubble }))].sort((a, b) => b.t.y - a.t.y || a.t.x - b.t.x);
+      const placed: { x0: number; x1: number; y0: number; y1: number }[] = [];
+      for (const { t, b } of pairs) {
+        const w = t.displayWidth;
+        const h = t.displayHeight;
+        let y = t.y;
+        for (let tries = 0; tries < 6; tries++) {
+          const hit = placed.some((p) => t.x - w / 2 < p.x1 && t.x + w / 2 > p.x0 && y - h < p.y1 && y > p.y0);
+          if (!hit) break;
+          y -= h - 1;
+        }
+        t.setY(y);
+        b.setY(y - h - 1);
+        placed.push({ x0: t.x - w / 2, x1: t.x + w / 2, y0: y - h, y1: y });
+      }
     }
 
     private typing() {
