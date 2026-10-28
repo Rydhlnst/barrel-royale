@@ -10,7 +10,7 @@ import { GameStore, type Target } from "@/lib/game/store";
 import { PixelIcon } from "@/components/pixel/sprite";
 import { logo, logoPalette } from "@/components/pixel/sprites";
 import { shortAddress } from "@/lib/wallet";
-import { Bar, DispatchPanel, MarketPanel, QuartersPanel, SlotPanel, StoragePanel, ValveDrill, fmt, mmss, secs } from "./panels";
+import { Bar, DispatchPanel, MarketPanel, QuartersPanel, ShiftPanel, SlotPanel, StoragePanel, ValveDrill, fmt, mmss, secs } from "./panels";
 import { World } from "./world/world";
 import { RoyalChart } from "./royal-chart";
 import { Stick } from "./stick";
@@ -43,12 +43,13 @@ export default function Play({ account, onDisconnect }: { account: string; onDis
   const [panel, setPanel] = useState<Target | null>(null);
   // the rig, or Royal Harbor, the village every rig shares; the rig keeps running while you're away
   const [place, setPlace] = useState<"rig" | "village">("rig");
+  const [shiftOpen, setShiftOpen] = useState(false);
   const { game, now, nearby, toast } = snap;
 
   useEffect(() => store.start(), [store]);
   useEffect(() => {
-    store.setPaused(panel !== null || game.storm !== null);
-  }, [store, panel, game.storm]);
+    store.setPaused(panel !== null || shiftOpen || game.storm !== null);
+  }, [store, panel, shiftOpen, game.storm]);
 
   // walking away closes the panel for what you were standing at
   const shown = panel && nearby === panel ? panel : null;
@@ -61,6 +62,7 @@ export default function Play({ account, onDisconnect }: { account: string; onDis
         setPlace("village");
         return;
       }
+      setShiftOpen(false);
       const p = primaryFor(t, store.game);
       if (!manage && p.quick) p.quick(store);
       else setPanel(t);
@@ -71,7 +73,10 @@ export default function Play({ account, onDisconnect }: { account: string; onDis
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.repeat || place !== "rig") return;
-      if (e.key === "Escape") setPanel(null);
+      if (e.key === "Escape") {
+        setPanel(null);
+        setShiftOpen(false);
+      }
       if (store.game.storm) return;
       if (e.key === "e" || e.key === "E" || e.key === "Enter") interact(store.get().nearby);
       if (e.key === "f" || e.key === "F") interact(store.get().nearby, true);
@@ -85,6 +90,8 @@ export default function Play({ account, onDisconnect }: { account: string; onDis
   const stormIn = E.stormIn(game, now);
   const warning = E.stormWarning(game, now);
   const prompt = nearby ? primaryFor(nearby, game) : null;
+  const ready = E.shiftReady(game);
+  const tasksDone = game.shift?.tasks.filter((t) => t.claimed).length ?? 0;
   const nearPad = nearby ? padIndex(nearby) : -1;
   const nearSlot = nearPad >= 0 ? game.slots[nearPad] : null;
 
@@ -118,6 +125,18 @@ export default function Play({ account, onDisconnect }: { account: string; onDis
             </button>
             <button
               type="button"
+              onClick={() => {
+                setPanel(null);
+                setShiftOpen((o) => !o);
+              }}
+              className={`btn ${ready ? "btn-red" : "btn-white"} pointer-events-auto relative min-h-9! self-center px-3! text-sm!`}
+              aria-label={`Daily shift, ${tasksDone} of 5 tasks done${ready ? `, ${ready} ready to claim` : ""}`}
+            >
+              Shift {tasksDone}/5
+              {ready > 0 && <span className="pixel-sm absolute -right-2 -top-2 grid h-6 min-w-6 place-items-center bg-brand-sun px-1 text-xs font-extrabold text-brand-ink">{ready}</span>}
+            </button>
+            <button
+              type="button"
               onClick={onDisconnect}
               title="Disconnect this wallet"
               className="pointer-events-auto pixel-sm mr-auto self-center bg-white px-2 py-0.5 font-mono text-xs font-bold sm:text-sm"
@@ -141,7 +160,7 @@ export default function Play({ account, onDisconnect }: { account: string; onDis
           )}
 
           {/* what you're standing at */}
-          {nearby && !shown && !game.storm && (
+          {nearby && !shown && !shiftOpen && !game.storm && (
             <div className="absolute bottom-40 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2 lg:bottom-8">
               <span className="pixel-sm bg-white px-3 py-1 font-display text-sm font-bold">{labelFor(nearby)}</span>
               <div className="flex gap-2">
@@ -171,7 +190,24 @@ export default function Play({ account, onDisconnect }: { account: string; onDis
           </div>
 
           {/* live $ROYAL chart, tucked away while a panel or a storm takes the screen */}
-          <RoyalChart hidden={Boolean(shown) || Boolean(game.storm)} />
+          <RoyalChart hidden={Boolean(shown) || shiftOpen || Boolean(game.storm)} />
+
+          {shiftOpen && !shown && (
+            <section
+              aria-label="Daily shift"
+              className="box absolute inset-x-3 bottom-3 z-20 flex max-h-[68vh] flex-col overflow-hidden lg:inset-x-auto lg:bottom-auto lg:right-4 lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:w-[440px]"
+            >
+              <header className="flex items-center justify-between gap-3 border-b-[3px] border-brand-ink bg-brand-sun px-4 py-2">
+                <h2 className="font-display text-xl font-bold">Daily shift</h2>
+                <button type="button" className="btn btn-white min-h-9! px-3! text-base!" onClick={() => setShiftOpen(false)} aria-label="Close">
+                  ✕
+                </button>
+              </header>
+              <div className="flex flex-col gap-4 overflow-y-auto p-4">
+                <ShiftPanel store={store} game={game} now={now} />
+              </div>
+            </section>
+          )}
 
           {/* panel for what you're using */}
           {shown && (

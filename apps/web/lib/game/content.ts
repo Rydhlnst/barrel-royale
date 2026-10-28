@@ -88,3 +88,45 @@ export const EXPORT_DAILY_BBL = 5_000;
 
 /** Reference XOM price for the browser game; the on-chain game reads the Chainlink feed. */
 export const XOM_USD = 115;
+
+/**
+ * Daily Shift: every UTC day a rig gets SHIFT_SIZE tasks drawn at random from
+ * this pool, with targets that grow with the rig level. Each task pays coins
+ * when claimed; finishing the whole shift pays a bonus that grows with the
+ * streak of full shifts on consecutive days.
+ */
+export type TaskKind =
+  | "drill"
+  | "collect"
+  | "sell"
+  | "sellRaw"
+  | "earn"
+  | "contract"
+  | "storm"
+  | "refine"
+  | "overdrive"
+  | "capHand"
+  | "export"
+  | "build";
+
+export const SHIFT_SIZE = 5;
+export const SHIFT_SWAPS = 1;
+export const SHIFT_STREAK_CAP = 10;
+/** Coins per task by rig level; the full-shift bonus is SHIFT_BONUS times this, plus 10% per streak day. */
+export const SHIFT_REWARD = [25, 40, 80, 150, 300, 500, 800, 1_200];
+export const SHIFT_BONUS = 3;
+
+export const TASKS: Record<TaskKind, { target: (level: number) => number; label: (n: number, product?: Raw) => string; min?: number; max?: number }> = {
+  drill: { target: (l) => 2 + Math.floor(l / 3), label: (n) => `Strike ${n} new wells`, max: 3 },
+  collect: { target: (l) => 20 + 30 * l, label: (n) => `Collect ${n} bbl from your wells` },
+  sell: { target: (l) => 20 + 30 * l, label: (n) => `Sell ${n} bbl on the market` },
+  sellRaw: { target: (l) => 10 + 15 * l, label: (n, p) => `Sell ${n} bbl of ${PRODUCTS[p ?? "light"].name.toLowerCase()}` },
+  earn: { target: (l) => [50, 120, 300, 700, 1_500, 2_500, 4_000, 6_000][l - 1], label: (n) => `Earn ${n.toLocaleString("en-US")} coins from sales and contracts` },
+  contract: { target: (l) => (l < 4 ? 2 : 3), label: (n) => `Fill ${n} Dispatch contracts` },
+  storm: { target: (l) => (l < 4 ? 1 : 2), label: (n) => (n === 1 ? "Hold the rig through a storm" : `Hold the rig through ${n} storms`) },
+  refine: { target: (l) => 4 + 3 * l, label: (n) => `Refine ${n} bbl of diesel, jet fuel or LNG`, min: 2 },
+  overdrive: { target: (l) => 60 + 15 * l, label: (n) => `Pump on Overdrive for ${n} seconds` },
+  capHand: { target: () => 1, label: () => "Cap a blowout with the capping drill", min: 2 },
+  export: { target: (l) => 20 + 20 * l, label: (n) => `Export ${n} bbl for XOM` },
+  build: { target: () => 1, label: () => "Build or upgrade a refinery unit, or the rig", max: 5 },
+};

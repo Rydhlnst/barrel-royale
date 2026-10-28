@@ -13,6 +13,13 @@ import {
   OFFLINE_CAP,
   POINTS,
   PRODUCTS,
+  RAWS,
+  SHIFT_BONUS,
+  SHIFT_REWARD,
+  SHIFT_SIZE,
+  SHIFT_STREAK_CAP,
+  SHIFT_SWAPS,
+  TASKS,
   PRODUCT_ORDER,
   START_COINS,
   STORM_EVERY,
@@ -24,6 +31,7 @@ import {
   type Choke,
   type Product,
   type Raw,
+  type TaskKind,
   type UnitKind,
 } from "./content";
 
@@ -38,6 +46,11 @@ export type Slot =
   | { kind: "unit"; unit: UnitKind; level: number; recipe: number; progress: number };
 
 export type Contract = { id: number; product: Product; qty: number; reward: number; expiresAt: number };
+
+export type Task = { kind: TaskKind; target: number; progress: number; claimed: boolean; product?: Raw };
+
+/** Today's Daily Shift (UTC day), and the streak of full shifts on consecutive days. */
+export type Shift = { day: number; tasks: Task[]; swaps: number; bonusClaimed: boolean; streak: number; lastFull: number };
 
 export type Storm = { phase: "brace"; endsAt: number; order: number[]; step: number } | null;
 
@@ -64,6 +77,8 @@ export type Game = {
   contractsFilled: number;
   nextId: number;
   log: { at: number; text: string }[];
+  /** Missing on saves from before Daily Shift; the next tick deals one. */
+  shift?: Shift;
 };
 
 type Rng = () => number;
@@ -81,6 +96,58 @@ export const price = (g: Game, p: Product) => round(PRODUCTS[p].base * g.index[p
 export const barrelsWaiting = (g: Game) => g.slots.reduce((n, s) => (s.kind === "well" ? n + Math.floor(s.held) : n), 0);
 /** What selling everything in storage pays right now. */
 export const storageValue = (g: Game) => PRODUCT_ORDER.reduce((sum, p) => sum + Math.round(g.storage[p] * price(g, p)), 0);
+
+/* ---------------- daily shift ---------------- */
+
+const kindsFor = (level: number) => (Object.keys(TASKS) as TaskKind[]).filter((k) => level >= (TASKS[k].min ?? 1) && level <= (TASKS[k].max ?? LEVELS.length));
+
+function dealTask(level: number, kind: TaskKind, rng: Rng): Task {
+  const t: Task = { kind, target: TASKS[kind].target(level), progress: 0, claimed: false };
+  if (kind === "sellRaw") t.product = RAWS[Math.floor(rng() * RAWS.length)];
+  return t;
+}
+
+function dealShift(g: Game, day: number, rng: Rng) {
+  const pool = kindsFor(g.level);
+  const kinds: TaskKind[] = [];
+  while (kinds.length < SHIFT_SIZE && pool.length) kinds.push(pool.splice(Math.floor(rng() * pool.length), 1)[0]);
+  const prev = g.shift;
+  g.shift = {
+    day,
+    tasks: kinds.map((k) => dealTask(g.level, k, rng)),
+    swaps: SHIFT_SWAPS,
+    bonusClaimed: false,
+    streak: prev?.streak ?? 0,
+    lastFull: prev?.lastFull ?? -1,
+  };
+}
+
+/** Moves today's tasks forward. `product` narrows the tasks that ask for one product. */
+function bump(g: Game, kind: TaskKind, amount: number, product?: Product) {
+  for (const t of g.shift?.tasks ?? []) {
+    if (t.kind !== kind || t.claimed || (t.product && t.product !== product)) continue;
+    t.progress = Math.min(t.target, t.progress + amount);
+  }
+}
+
+export const taskLabel = (t: Task) => TASKS[t.kind].label(t.target, t.product);
+export const taskDone = (t: Task) => t.progress >= t.target;
+export const shiftReward = (g: Game) => SHIFT_REWARD[g.level - 1];
+/** The streak that counts today: it lapses after a day without a full shift. */
+export const shiftStreak = (g: Game, now: number) => (g.shift && g.shift.lastFull >= dayOf(now) - 1 ? g.shift.streak : 0);
+/** Bonus for finishing the whole shift today, with the streak it makes. */
+export function shiftBonus(g: Game, now: number) {
+  const s = g.shift;
+  const today = dayOf(now);
+  const streak = s && s.lastFull === today ? s.streak : s && s.lastFull === today - 1 ? s.streak + 1 : 1;
+  const pct = 10 * Math.min(streak, SHIFT_STREAK_CAP);
+  return { streak, pct, coins: Math.round(shiftReward(g) * SHIFT_BONUS * (1 + pct / 100)) };
+}
+/** Tasks finished but not yet claimed, plus the bonus once every task is claimed. */
+export const shiftReady = (g: Game) =>
+  (g.shift?.tasks.filter((t) => taskDone(t) && !t.claimed).length ?? 0) + (g.shift && !g.shift.bonusClaimed && g.shift.tasks.every((t) => t.claimed) ? 1 : 0);
+/** Seconds until the next shift is dealt, at 00:00 UTC. */
+export const shiftResetIn = (now: number) => ((dayOf(now) + 1) * 86_400_000 - now) / 1000;
 
 function log(g: Game, now: number, text: string) {
   g.log.unshift({ at: now, text });
@@ -131,6 +198,7 @@ function runDeck(g: Game, dt: number, now: number, live: boolean) {
       if (s.blown) return;
       const choke = CHOKES[live ? s.choke : "safe"];
       const w = WELLS[s.product];
+      if (live && s.choke === "overdrive") bump(g, "overdrive", dt);
       s.held = Math.min(w.holds, s.held + w.rate * choke.output * dt);
       const step = choke.speed * dt;
       s.pressure = s.pressure < choke.target ? Math.min(choke.target, s.pressure + step) : Math.max(choke.target, s.pressure - step);
@@ -155,6 +223,7 @@ function runDeck(g: Game, dt: number, now: number, live: boolean) {
           left -= need / speed;
           g.storage[r.input] -= r.inQty;
           g.storage[r.output] += 1;
+          if (live) bump(g, "refine", 1);
           s.progress = 0;
         } else {
           s.progress += (left * speed) / r.seconds;
@@ -219,6 +288,7 @@ function endStorm(g: Game, now: number) {
     g.coins += bonus;
     g.points += POINTS.storm;
     g.stormsHeld++;
+    bump(g, "storm", 1);
     log(g, now, `Rig held through the storm. Bonus +${bonus} coins.`);
   } else {
     const share = 0.3 * (1 - held);
@@ -239,6 +309,7 @@ export function tick(prev: Game, now: number, rng: Rng = Math.random): Game {
   const g = structuredClone(prev);
   let dt = (now - g.savedAt) / 1000;
   if (dt <= 0) return prev;
+  if (g.shift?.day !== dayOf(now)) dealShift(g, dayOf(now), rng);
 
   if (dt > 30) {
     // offline: production at Safe, capped, then pick up the clocks from now
@@ -284,6 +355,7 @@ export function drill(prev: Game, now: number, i: number, product: Raw): Result 
     if (g.coins < cost) return `!Drilling ${PRODUCTS[product].name.toLowerCase()} costs ${cost} coins.`;
     g.coins -= cost;
     g.slots[i] = { kind: "well", product, choke: "normal", pressure: 20, held: 0, blown: false };
+    bump(g, "drill", 1);
     log(g, now, `Struck ${PRODUCTS[product].name.toLowerCase()} in slot ${i + 1}.`);
     return `Struck ${PRODUCTS[product].name.toLowerCase()}!`;
   });
@@ -309,6 +381,7 @@ export function collect(prev: Game, now: number, i: number): Result {
     s.held -= take;
     g.storage[s.product] += take;
     g.points += take * POINTS.barrel;
+    bump(g, "collect", take);
     return `+${take} bbl ${PRODUCTS[s.product].name.toLowerCase()} to storage`;
   });
 }
@@ -324,6 +397,7 @@ export function collectAll(prev: Game, now: number): Result {
       g.storage[s.product] += take;
       g.points += take * POINTS.barrel;
       total += take;
+      bump(g, "collect", take);
     }
     if (!total) return storageFree(g) < 1 ? "!Storage is full. Sell, refine or upgrade the rig." : "!Nothing to collect yet.";
     return `+${total} bbl to storage`;
@@ -339,6 +413,7 @@ export function cap(prev: Game, now: number, i: number, drillDone: boolean): Res
       if (g.coins < CAP_COST) return `!Capping costs ${CAP_COST} coins, or run the capping drill.`;
       g.coins -= CAP_COST;
     }
+    if (drillDone) bump(g, "capHand", 1);
     s.blown = false;
     s.pressure = 20;
     s.choke = "normal";
@@ -362,6 +437,7 @@ export function build(prev: Game, now: number, i: number, unit: UnitKind): Resul
     if (g.coins < cost) return `!A ${UNITS[unit].name.toLowerCase()} unit costs ${cost} coins.`;
     g.coins -= cost;
     g.slots[i] = { kind: "unit", unit, level: 1, recipe: 0, progress: 0 };
+    bump(g, "build", 1);
     log(g, now, `Built a ${UNITS[unit].name.toLowerCase()} unit in slot ${i + 1}.`);
     return `${UNITS[unit].name} unit built`;
   });
@@ -376,6 +452,7 @@ export function upgradeUnit(prev: Game, now: number, i: number): Result {
     if (g.coins < cost) return `!The upgrade costs ${cost} coins.`;
     g.coins -= cost;
     s.level++;
+    bump(g, "build", 1);
     log(g, now, `${UNITS[s.unit].name} upgraded to level ${s.level}.`);
   });
 }
@@ -399,6 +476,9 @@ export function sell(prev: Game, now: number, p: Product): Result {
     const value = Math.round(qty * price(g, p));
     g.storage[p] = 0;
     g.coins += value;
+    bump(g, "sell", qty);
+    bump(g, "sellRaw", qty, p);
+    bump(g, "earn", value);
     log(g, now, `Sold ${qty} bbl ${PRODUCTS[p].name.toLowerCase()} at ${g.index[p].toFixed(2)}×: +${value} coins.`);
     return `Sold ${qty} bbl for +${value} coins`;
   });
@@ -410,8 +490,13 @@ export function sellAll(prev: Game, now: number): Result {
     const qty = storageUsed(g);
     if (!qty) return "!Nothing to sell.";
     const value = storageValue(g);
-    for (const p of PRODUCT_ORDER) g.storage[p] = 0;
+    for (const p of PRODUCT_ORDER) {
+      bump(g, "sellRaw", g.storage[p], p);
+      g.storage[p] = 0;
+    }
     g.coins += value;
+    bump(g, "sell", qty);
+    bump(g, "earn", value);
     log(g, now, `Sold all storage, ${qty} bbl: +${value} coins.`);
     return `Sold ${qty} bbl for +${value} coins`;
   });
@@ -436,6 +521,7 @@ export function exportBarrels(prev: Game, now: number, p: Product): Result {
     g.storage[p] -= qty;
     g.xom += earned;
     g.exported.bbl += qty;
+    bump(g, "export", qty);
     log(g, now, `Exported ${qty} bbl ${PRODUCTS[p].name.toLowerCase()}: +${earned.toFixed(8)} XOM.`);
     return `Exported ${qty} bbl for +${earned.toFixed(8)} XOM`;
   });
@@ -450,6 +536,8 @@ export function fill(prev: Game, now: number, id: number): Result {
     g.coins += c.reward;
     g.points += POINTS.contract;
     g.contractsFilled++;
+    bump(g, "contract", 1);
+    bump(g, "earn", c.reward);
     g.contracts = g.contracts.filter((x) => x.id !== id);
     log(g, now, `Contract filled: ${c.qty} bbl ${PRODUCTS[c.product].name.toLowerCase()} for +${c.reward} coins.`);
     return `Contract filled: +${c.reward} coins`;
@@ -463,6 +551,7 @@ export function upgradeRig(prev: Game, now: number): Result {
     if (g.coins < next.cost) return `!The next level costs ${next.cost} coins.`;
     g.coins -= next.cost;
     g.level++;
+    bump(g, "build", 1);
     log(g, now, `Rig upgraded to level ${g.level}: ${next.slots} deck slots, ${next.storage} bbl storage.`);
   });
 }
@@ -479,5 +568,54 @@ export function brace(prev: Game, now: number, valve: number): Result {
       s.endsAt -= 1000;
       return "Wrong valve! −1 second";
     }
+  });
+}
+
+/* ---------------- daily shift actions ---------------- */
+
+export function claimTask(prev: Game, now: number, i: number): Result {
+  return act(prev, now, (g) => {
+    const t = g.shift?.tasks[i];
+    if (!t) return "!That task is gone.";
+    if (t.claimed) return "!Already claimed.";
+    if (!taskDone(t)) return "!Finish the task first.";
+    const coins = shiftReward(g);
+    t.claimed = true;
+    g.coins += coins;
+    log(g, now, `Shift task done: ${taskLabel(t)}. +${coins} coins.`);
+    return `Task done: +${coins} coins`;
+  });
+}
+
+/** The bonus for a full shift, which also extends the streak. */
+export function claimShift(prev: Game, now: number): Result {
+  return act(prev, now, (g) => {
+    const s = g.shift;
+    if (!s) return "!No shift yet.";
+    if (s.bonusClaimed) return "!Today's bonus is already claimed.";
+    if (!s.tasks.every((t) => t.claimed)) return "!Claim every task first.";
+    const bonus = shiftBonus(g, now);
+    s.bonusClaimed = true;
+    s.streak = bonus.streak;
+    s.lastFull = dayOf(now);
+    g.coins += bonus.coins;
+    log(g, now, `Full shift! Day ${bonus.streak} streak: +${bonus.coins} coins.`);
+    return `Full shift! +${bonus.coins} coins · ${bonus.streak}-day streak`;
+  });
+}
+
+/** Swaps one unfinished task for another kind, SHIFT_SWAPS times a day. */
+export function swapTask(prev: Game, now: number, i: number, rng: Rng = Math.random): Result {
+  return act(prev, now, (g) => {
+    const s = g.shift;
+    const t = s?.tasks[i];
+    if (!s || !t) return "!That task is gone.";
+    if (s.swaps < 1) return "!No swaps left today.";
+    if (t.claimed || taskDone(t)) return "!That task is already done.";
+    const pool = kindsFor(g.level).filter((k) => !s.tasks.some((x) => x.kind === k));
+    if (!pool.length) return "!No other tasks to swap in.";
+    s.tasks[i] = dealTask(g.level, pool[Math.floor(rng() * pool.length)], rng);
+    s.swaps--;
+    return "Task swapped";
   });
 }

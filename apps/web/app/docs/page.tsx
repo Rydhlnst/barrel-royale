@@ -38,6 +38,7 @@ const toc = [
   { id: "selling", label: "Selling and export" },
   { id: "incidents", label: "Storms and sabotage" },
   { id: "progress", label: "Upgrades, fleet and shifts" },
+  { id: "daily", label: "Daily Shift" },
   { id: "village", label: "Royal Harbor" },
   { id: "crews", label: "Crews and seasons" },
   { id: "free", label: "Playing without a rig" },
@@ -86,6 +87,7 @@ export default function Docs() {
             ["Whitelist with referral ranks", "Live"],
             [`Rig access for ${site.token} holders`, "Live"],
             ["Royal Harbor: the shared village with live chat", "Live"],
+            ["Daily Shift: five random tasks a day with a streak bonus", "Live"],
             ["Wallet login, rig NFTs and rig classes", "On-chain game"],
             [`Rig class upgrades with ${site.token}`, "On-chain game"],
             [`${site.reward} claims from the reward vault`, "On-chain game"],
@@ -255,6 +257,19 @@ export default function Docs() {
             <b>Shifts</b>: each rig has 8 a day for active moves like bracing, capping a blowout and running Overdrive. Base production keeps running
             without them, so a short session still moves your rig forward.
           </li>
+        </ul>
+      </Section>
+
+      <Section id="daily" title="Daily Shift">
+        <p>
+          Every day at 00:00 UTC your rig gets a new <b>Daily Shift</b>: five tasks drawn at random, like collecting barrels, filling contracts,
+          holding through a storm, refining or exporting. Targets grow with your rig level. Open it with the Shift button at the top of the screen.
+        </p>
+        <ul>
+          <li>Each finished task pays coins when you claim it, more at higher rig levels.</li>
+          <li>Claim all five and the full-shift bonus pays out on top.</li>
+          <li>Full shifts on consecutive days build a streak: +10% on the bonus for every day, up to +100%. Miss a day and it starts again.</li>
+          <li>Not feeling a task? Swap one unfinished task a day for another.</li>
         </ul>
       </Section>
 

@@ -405,3 +405,83 @@ export function QuartersPanel({ store, game }: { store: GameStore; game: E.Game 
     </>
   );
 }
+
+const hhmm = (s: number) => `${Math.floor(s / 3600)}h ${String(Math.floor((s % 3600) / 60)).padStart(2, "0")}m`;
+
+/** Daily Shift: five random tasks a day, each paying coins, and a bonus for the full shift that grows with the streak. */
+export function ShiftPanel({ store, game, now }: { store: GameStore; game: E.Game; now: number }) {
+  const s = game.shift;
+  if (!s) return <p className="pixel-sm bg-white px-3 py-3 text-center">Dealing today&apos;s shift…</p>;
+  const reward = E.shiftReward(game);
+  const bonus = E.shiftBonus(game, now);
+  const streak = E.shiftStreak(game, now);
+  const claimed = s.tasks.filter((t) => t.claimed).length;
+  const all = claimed === s.tasks.length;
+  return (
+    <>
+      <p className="text-sm text-brand-ink-2">
+        Five random tasks, new every day at 00:00 UTC. Next shift in {hhmm(E.shiftResetIn(now))}.
+      </p>
+      <dl className="grid grid-cols-3 gap-2 text-center">
+        {[
+          ["Done", `${claimed}/${s.tasks.length}`],
+          ["Streak", `${streak} day${streak === 1 ? "" : "s"}`],
+          ["Per task", `+${fmt(reward)}`],
+        ].map(([k, v]) => (
+          <div key={k} className="pixel-sm bg-brand-sun-pale p-2">
+            <dt className="text-xs font-extrabold uppercase text-brand-ink-2">{k}</dt>
+            <dd className="font-display text-xl font-bold tabular-nums">{v}</dd>
+          </div>
+        ))}
+      </dl>
+      <ul className="flex flex-col gap-2">
+        {s.tasks.map((t, i) => {
+          const done = E.taskDone(t);
+          return (
+            <li key={`${t.kind}-${i}`} className={`pixel-sm flex flex-col gap-2 px-3 py-2 ${t.claimed ? "bg-[#d8f3e6]" : "bg-white"}`}>
+              <div className="flex items-start gap-2">
+                <span className="flex-1 font-bold leading-snug">{E.taskLabel(t)}</span>
+                <span className="font-display font-bold tabular-nums">+{fmt(reward)}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="flex-1">
+                  <Bar value={t.progress} max={t.target} color={t.claimed ? C.leaf : done ? C.sunDeep : C.sea} />
+                </div>
+                <span className="w-20 text-right text-xs font-bold tabular-nums text-brand-ink-2">
+                  {fmt(t.progress)}/{fmt(t.target)}
+                </span>
+                {t.claimed ? (
+                  <span className="w-[76px] text-center text-sm font-extrabold text-brand-leaf">Done</span>
+                ) : done ? (
+                  <button type="button" className="btn btn-red min-h-9! w-[76px] px-2! text-sm!" onClick={() => store.run((g, n) => E.claimTask(g, n, i))}>
+                    Claim
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="btn btn-white min-h-9! w-[76px] px-2! text-sm!"
+                    disabled={s.swaps < 1}
+                    title={s.swaps < 1 ? "No swaps left today" : "Swap this task for another one, once a day"}
+                    onClick={() => store.run((g, n) => E.swapTask(g, n, i))}
+                  >
+                    Swap
+                  </button>
+                )}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+      {s.bonusClaimed ? (
+        <p className="pixel-sm bg-[#d8f3e6] px-3 py-2 text-center font-bold">Full shift done. Day {s.streak} streak. See you tomorrow, roughneck.</p>
+      ) : (
+        <button type="button" className="btn btn-sun self-stretch justify-center" disabled={!all} onClick={() => store.run((g, n) => E.claimShift(g, n))}>
+          Full shift bonus · +{fmt(bonus.coins)} ({bonus.streak}-day streak, +{bonus.pct}%)
+        </button>
+      )}
+      <p className="text-xs text-brand-ink-2">
+        {s.swaps > 0 ? "You can swap one unfinished task today. " : ""}Finish every task on consecutive days to grow your streak: +10% on the bonus per day, up to +100%.
+      </p>
+    </>
+  );
+}
