@@ -1,7 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { site } from "@/lib/site";
+import { ROBINHOOD_CHAIN } from "@/lib/chain";
 
 // The browser wallets behind /play. Every installed wallet is found through EIP-6963 (each one announces
 // its name and icon), with window.ethereum as a fallback for older wallets and in-app wallet browsers.
@@ -25,13 +25,7 @@ export type DetectedWallet = { id: string; name: string; icon: string | null; pr
 
 type AnnounceEvent = CustomEvent<{ info: { uuid: string; name: string; icon: string; rdns: string }; provider: Eip1193 }>;
 
-export const ROBINHOOD_CHAIN = {
-  id: 4663,
-  hex: "0x1237",
-  name: "Robinhood Chain",
-  rpc: "https://rpc.mainnet.chain.robinhood.com",
-  explorer: site.explorer,
-};
+export { ROBINHOOD_CHAIN };
 
 export type WalletState = {
   /** checking: still listening for wallets. idle: wallets found, none connected. missing: no wallet in this browser. */
@@ -179,6 +173,15 @@ export async function connectWallet(id: string) {
       message: code === 4001 ? `The ${w.name} request was closed. Pick a wallet to try again.` : `${w.name} did not answer. Open it and pick it again.`,
     });
   }
+}
+
+/** Asks the connected wallet to sign a plain-text message (personal_sign). Signing is free and sends no transaction. */
+export async function signMessage(message: string) {
+  if (!active || !state.account) throw new Error("Connect your wallet first.");
+  const hex = "0x" + Array.from(new TextEncoder().encode(message), (b) => b.toString(16).padStart(2, "0")).join("");
+  const signature = await active.provider.request({ method: "personal_sign", params: [hex, state.account] });
+  if (typeof signature !== "string") throw new Error("The wallet did not return a signature.");
+  return signature;
 }
 
 /** Forget the wallet on this site; the next visit shows the picker again. */

@@ -51,6 +51,7 @@ const phases: { when: string; status: Status; title: string; icon: readonly stri
       { text: `Browser game open to ${site.token} holders, with a live chart in the game`, ok: true },
       { text: "Play from your phone: open the game in your wallet app, with touch controls", ok: true },
       { text: "Rig levels 6 to 8, with storage up to 540 bbl", ok: true },
+      { text: "Royal Harbor: a shared village where roughnecks meet and chat", ok: true },
       { text: "Rig mint: OG Roughnecks first, then Crew, then public; class seed hash posted before the first mint" },
     ],
     gate: `rig mint open and ${site.token} trading live`,

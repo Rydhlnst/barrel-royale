@@ -89,4 +89,5 @@ export const SPOTS: { id: Target; box: Box; reach: number; label: string }[] = [
   { id: "dispatch", box: { x: board.x, y: board.y - 4, w: board.w, h: board.h + 4 }, reach: 14, label: "Dispatch board" },
   { id: "storage", box: { x: tanks.x + 1, y: tanks.y - 8, w: 94, h: tanks.h + 8 }, reach: 14, label: "Storage tanks" },
   { id: "quarters", box: { x: quarters.x + 3 * TILE, y: quarters.y + quarters.h - 22, w: 2 * TILE, h: 22 }, reach: 12, label: "Crew quarters" },
+  { id: "harbor", box: px(BOAT), reach: 14, label: "Boat to Royal Harbor" },
 ];

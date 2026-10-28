@@ -38,6 +38,7 @@ const toc = [
   { id: "selling", label: "Selling and export" },
   { id: "incidents", label: "Storms and sabotage" },
   { id: "progress", label: "Upgrades, fleet and shifts" },
+  { id: "village", label: "Royal Harbor" },
   { id: "crews", label: "Crews and seasons" },
   { id: "free", label: "Playing without a rig" },
   { id: "whitelist", label: "Whitelist" },
@@ -84,6 +85,7 @@ export default function Docs() {
             ["Reward vault, rig NFT and treasury contracts on Robinhood Chain", "Live"],
             ["Whitelist with referral ranks", "Live"],
             [`Rig access for ${site.token} holders`, "Live"],
+            ["Royal Harbor: the shared village with live chat", "Live"],
             ["Wallet login, rig NFTs and rig classes", "On-chain game"],
             [`Rig class upgrades with ${site.token}`, "On-chain game"],
             [`${site.reward} claims from the reward vault`, "On-chain game"],
@@ -253,6 +255,25 @@ export default function Docs() {
             <b>Shifts</b>: each rig has 8 a day for active moves like bracing, capping a blowout and running Overdrive. Base production keeps running
             without them, so a short session still moves your rig forward.
           </li>
+        </ul>
+      </Section>
+
+      <Section id="village" title="Royal Harbor">
+        <p>
+          Royal Harbor is the village every rig shares: a boardwalk with a saloon, a lighthouse and a fire pit where roughnecks meet. Take the boat at
+          the end of your dock, or tap Village at the top of the screen. Your rig keeps pumping while you&apos;re away.
+        </p>
+        <ul>
+          <li>
+            The first time, your wallet asks you to sign a short message. It proves the wallet is yours, costs nothing and sends no transaction. The pass
+            lasts a day.
+          </li>
+          <li>Everyone in the harbor shows up with their wallet tag and rig level, and what they say pops up over their head.</li>
+          <li>
+            The chat is open to {site.token} holders. Links and wallet or contract addresses are blocked, the worst words are starred out, and you can post
+            once every few seconds. Be kind: the team can hide messages and take a wallet out of the chat.
+          </li>
+          <li>Step away for a few minutes and you&apos;re taken off the square until you come back.</li>
         </ul>
       </Section>
 
