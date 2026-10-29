@@ -131,7 +131,7 @@ export default function Play({ account, onDisconnect }: { account: string; onDis
                 setPanel(null);
                 setSide((o) => (o === "shift" ? null : "shift"));
               }}
-              className={`btn ${ready ? "btn-red" : "btn-white"} pointer-events-auto relative min-h-9! self-center px-3! text-sm!`}
+              className={`btn ${ready ? "btn-red" : "btn-white"} pointer-events-auto relative mr-2 min-h-9! self-center px-3! text-sm!`}
               aria-label={`Daily shift, ${tasksDone} of 5 tasks done${ready ? `, ${ready} ready to claim` : ""}`}
             >
               Shift {tasksDone}/5
@@ -143,7 +143,7 @@ export default function Play({ account, onDisconnect }: { account: string; onDis
                 setPanel(null);
                 setSide((o) => (o === "foreman" ? null : "foreman"));
               }}
-              className="btn btn-white pointer-events-auto relative min-h-9! self-center gap-2 px-3! text-sm!"
+              className="btn btn-white pointer-events-auto relative mr-2 min-h-9! self-center gap-2 px-3! text-sm!"
               aria-label={`Rig foreman, ${foremanOn ? "on duty" : "not on the rig"}${game.foreman?.unseen ? ", with news" : ""}`}
             >
               <span className={`inline-block h-2.5 w-2.5 ${foremanOn ? "bg-brand-leaf" : "bg-brand-ink-2"}`} />
