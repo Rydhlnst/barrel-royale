@@ -175,7 +175,13 @@ export default function Play({ account, onDisconnect }: { account: string; onDis
             </dl>
           </div>
 
-          {tanker && !tankerMine?.filled && !warning && !game.storm && !shown && !side && (
+          {game.gusher && !warning && !game.storm && (
+            <p role="status" className="pixel absolute left-1/2 top-[108px] z-10 w-max max-w-[calc(100%-32px)] -translate-x-1/2 bg-brand-ink px-4 py-2 text-center font-display font-bold text-brand-sun sm:top-20">
+              Gusher! Slot {game.gusher.slot + 1} is gushing for {Math.ceil(E.gusherLeft(game, now))}s. Collect it before it dies down!
+            </p>
+          )}
+
+          {tanker && !tankerMine?.filled && !game.gusher && !warning && !game.storm && !shown && !side && (
             <p role="status" className="pixel absolute left-1/2 top-[108px] z-10 w-max max-w-[calc(100%-32px)] -translate-x-1/2 bg-brand-sun px-4 py-2 text-center font-display font-bold sm:top-20">
               {tanker.name} is at the west rail: {tanker.qty} bbl {PRODUCTS[tanker.product].name.toLowerCase()} at {tanker.premium.toFixed(2)}x. Walk over and load it!
             </p>

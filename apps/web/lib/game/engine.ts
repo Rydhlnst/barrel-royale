@@ -8,6 +8,10 @@ import {
   EXPORT_BBL,
   EXPORT_DAILY_BBL,
   EXPORT_USD,
+  GUSHER_EVERY,
+  GUSHER_HOLDS,
+  GUSHER_OUTPUT,
+  GUSHER_SECONDS,
   FOREMAN_AWAY_CAP,
   FOREMAN_BRACE,
   FOREMAN_DAY,
@@ -111,6 +115,9 @@ export type Game = {
   shift?: Shift;
   /** Missing until the rig first meets its foreman. */
   foreman?: Foreman;
+  /** The well gushing now, and when the next one is due; missing on older saves until the next tick. */
+  gusher?: { slot: number; endsAt: number } | null;
+  nextGusherAt?: number;
   /** What this rig has loaded on the tanker berthed now (or last). */
   tanker?: { slot: number; loaded: number; filled: boolean };
 };
@@ -246,6 +253,33 @@ function foremanBrace(g: Game, now: number, rng: Rng) {
   endStorm(g, now, false);
   if (g.stormsHeld > wasHeld) foremanOf(g, now).report.storms++;
 }
+
+/* ---------------- gushers ---------------- */
+
+const gusherGap = (rng: Rng) => (GUSHER_EVERY[0] + rng() * (GUSHER_EVERY[1] - GUSHER_EVERY[0])) * 1000;
+
+/** Ends a gusher on time and starts the next one on a running well when it's due. */
+function runGusher(g: Game, now: number, rng: Rng) {
+  g.nextGusherAt ??= now + gusherGap(rng);
+  if (g.gusher && now >= g.gusher.endsAt) {
+    log(g, now, `The gusher in slot ${g.gusher.slot + 1} has died down.`);
+    g.gusher = null;
+    g.nextGusherAt = now + gusherGap(rng);
+  }
+  if (g.gusher || now < g.nextGusherAt) return;
+  const wells = g.slots.map((s, i) => (i < levelInfo(g).slots && s.kind === "well" && !s.blown ? i : -1)).filter((i) => i >= 0);
+  if (!wells.length) {
+    g.nextGusherAt = now + 60_000;
+    return;
+  }
+  const slot = wells[Math.floor(rng() * wells.length)];
+  g.gusher = { slot, endsAt: now + GUSHER_SECONDS * 1000 };
+  const s = g.slots[slot] as Extract<Slot, { kind: "well" }>;
+  log(g, now, `Gusher! The ${PRODUCTS[s.product].name.toLowerCase()} well in slot ${slot + 1} hit a pocket. Collect it fast!`);
+}
+
+/** Seconds left on the gusher, or 0. */
+export const gusherLeft = (g: Game, now: number) => (g.gusher ? Math.max(0, (g.gusher.endsAt - now) / 1000) : 0);
 
 /* ---------------- tanker day ---------------- */
 
@@ -394,7 +428,12 @@ function runDeck(g: Game, dt: number, now: number, live: boolean) {
       const choke = CHOKES[live ? s.choke : "safe"];
       const w = WELLS[s.product];
       if (live && s.choke === "overdrive") bump(g, "overdrive", dt);
-      s.held = Math.min(w.holds, s.held + w.rate * choke.output * dt);
+      // a gusher pumps faster into a bigger wellhead, and its pressure holds steady
+      if (live && g.gusher?.slot === i) {
+        s.held = Math.min(GUSHER_HOLDS, s.held + w.rate * choke.output * GUSHER_OUTPUT * dt);
+        return;
+      }
+      s.held = Math.min(Math.max(w.holds, Math.floor(s.held)), s.held + w.rate * choke.output * dt);
       const step = choke.speed * dt;
       s.pressure = s.pressure < choke.target ? Math.min(choke.target, s.pressure + step) : Math.max(choke.target, s.pressure - step);
       if (live && s.pressure >= BLOWOUT_AT) {
@@ -520,11 +559,14 @@ export function tick(prev: Game, now: number, rng: Rng = Math.random): Game {
     g.nextStormAt = Math.max(g.nextStormAt, now + 60_000);
     g.contracts = g.contracts.filter((c) => c.expiresAt > now);
     g.storm = null;
+    g.gusher = null;
+    g.nextGusherAt = Math.max(g.nextGusherAt ?? 0, now + 5 * 60_000);
     log(g, now, worked ? "Welcome back. Your foreman kept the rig running while you were away." : "Welcome back. Your wells kept pumping on Safe while you were away.");
     dt = 0;
   }
 
   if (dt > 0) runDeck(g, dt, now, true);
+  runGusher(g, now, rng);
   runMarket(g, now, rng);
   runContracts(g, now, rng);
   const foreman = foremanOn(g, now) ? foremanOf(g, now) : null;

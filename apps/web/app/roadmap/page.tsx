@@ -54,6 +54,7 @@ const phases: { when: string; status: Status; title: string; icon: readonly stri
       { text: "Royal Harbor: a shared village where roughnecks meet and chat", ok: true },
       { text: "Rig Foreman: runs your rig on rounds, even while the game is closed", ok: true },
       { text: "Tanker Day: a tanker every few hours buys in bulk at a premium", ok: true },
+      { text: "Gushers: a well that strikes a pocket and gushes for a minute and a half", ok: true },
       { text: "Rig mint: OG Roughnecks first, then Crew, then public; class seed hash posted before the first mint" },
     ],
     gate: `rig mint open and ${site.token} trading live`,

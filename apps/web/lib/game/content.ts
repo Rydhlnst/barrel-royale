@@ -139,6 +139,16 @@ export const FOREMAN_BRACE = 0.85;
  * Load what you have; fill the whole order for a bonus on top. The foreman leaves the tanker to you.
  */
 export const TANKER_EVERY = 4;
+
+/**
+ * Gushers: now and then, while you're playing, one well strikes a pocket and gushes for GUSHER_SECONDS: it
+ * pumps GUSHER_OUTPUT times faster, its wellhead holds GUSHER_HOLDS, and the pressure stays put. Collect it
+ * before it dies down. Gushers only strike while you play, never while the game is closed.
+ */
+export const GUSHER_EVERY = [15 * 60, 35 * 60] as const;
+export const GUSHER_SECONDS = 90;
+export const GUSHER_OUTPUT = 10;
+export const GUSHER_HOLDS = 150;
 export const TANKER_STAY = 20 * 60;
 /** The premium is drawn between these, the same for everyone on that ship. */
 export const TANKER_PREMIUM = [2, 2.5] as const;

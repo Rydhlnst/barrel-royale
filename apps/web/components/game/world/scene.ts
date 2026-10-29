@@ -34,6 +34,7 @@ export function rigScene(Phaser: Phaser, store: GameStore) {
     private boss!: Sprite;
     private ship!: PhaserNS.GameObjects.Image;
     private gangway!: PhaserNS.GameObjects.Graphics;
+    private spout!: PhaserNS.GameObjects.Graphics;
     private bossTag!: PhaserNS.GameObjects.Text;
     private pads: PadView[] = [];
     private facing: "down" | "up" | "side" = "down";
@@ -71,6 +72,7 @@ export function rigScene(Phaser: Phaser, store: GameStore) {
       this.textures.addCanvas("tanker", tankerPicture());
       this.ship = this.add.image(SHIP.x, SHIP.y, "tanker").setOrigin(0).setDepth(1).setVisible(false);
       this.gangway = this.add.graphics().setDepth(2);
+      this.spout = this.add.graphics().setDepth(8000);
       this.tweens.add({ targets: boat, y: boat.y + 1, duration: 900, yoyo: true, repeat: -1, ease: "Stepped" });
 
       PADS.forEach((b) => {
@@ -144,6 +146,7 @@ export function rigScene(Phaser: Phaser, store: GameStore) {
       this.move(time, delta);
       this.walkForeman(game, now, time);
       this.berthTanker(game, now, time);
+      this.drawGusher(game, time);
       this.drawPads(game, time);
       this.findNearby(time);
 
@@ -181,6 +184,46 @@ export function rigScene(Phaser: Phaser, store: GameStore) {
       p.setDepth(p.y);
       this.feet.setPosition(Math.round(p.x), Math.round(p.y) - 1).setDepth(p.y - 0.5);
       this.tag.setPosition(Math.round(p.x), Math.round(p.y) - 21 - (Math.floor(time / 500) % 2));
+    }
+
+    /** A gushing well: a wobbling column of oil out of the wellhead, a crown that fans out and rains drops on the pad. */
+    private drawGusher(game: E.Game, time: number) {
+      const g = this.spout;
+      g.clear();
+      if (!game.gusher) return;
+      const b = PADS[game.gusher.slot];
+      const cx = b.x * TILE + 10;
+      const base = (b.y + b.h) * TILE - 22;
+      const h = 52 + (Math.floor(time / 110) % 3) * 3;
+      const top = base - h;
+      // the column: ink edges, oil inside, wobbling as it rises, with an amber glint
+      for (let y = 0; y < h; y += 2) {
+        const w = 7 + Math.round(Math.sin(time / 90 + y / 5) * 1.5) + Math.round((1 - y / h) * 2);
+        const x = cx - Math.floor(w / 2) + Math.round(Math.sin(time / 160 + y / 9));
+        g.fillStyle(0x10131c).fillRect(x - 1, base - y - 2, w + 2, 2);
+        g.fillStyle(0x2a2a2a).fillRect(x, base - y - 2, w, 2);
+        if ((y + Math.floor(time / 60)) % 8 < 4) g.fillStyle(0xf2b21d).fillRect(x + 2, base - y - 2, 1, 2);
+      }
+      // the crown fanning out at the top
+      for (const [dx, dy, w] of [[-12, 2, 24], [-9, -2, 18], [-5, -5, 10]] as const) {
+        g.fillStyle(0x10131c).fillRect(cx + dx - 1, top + dy - 1, w + 2, 5);
+        g.fillStyle(0x2a2a2a).fillRect(cx + dx, top + dy, w, 3);
+      }
+      g.fillStyle(0xf2b21d).fillRect(cx - 4, top - 3, 3, 1);
+      // drops arcing out of the crown and raining onto the pad
+      for (let i = 0; i < 18; i++) {
+        const t = ((time / 900 + i * 0.173) % 1 + 1) % 1;
+        const side = i % 2 ? 1 : -1;
+        const spread = 6 + (i % 5) * 4;
+        const x = cx + side * (6 + t * spread);
+        const y = top + 2 - 10 * t + 70 * t * t;
+        if (y > base + 6) continue;
+        g.fillStyle(i % 5 === 0 ? 0xf2b21d : 0x10131c).fillRect(Math.round(x), Math.round(y), 2, 3);
+      }
+      // a splash at the wellhead and a pulsing gold ring on the pad
+      g.fillStyle(0x2a2a2a).fillRect(cx - 8, base - 1, 16, 3);
+      const pulse = Math.floor(time / 250) % 2;
+      g.lineStyle(2, 0xffd54a, 0.9).strokeRect(b.x * TILE - 3 - pulse, b.y * TILE - 3 - pulse, b.w * TILE + 6 + pulse * 2, b.h * TILE + 6 + pulse * 2);
     }
 
     /** The tanker sails in from the north when it berths, rides the swell while it's here and sails off after. */

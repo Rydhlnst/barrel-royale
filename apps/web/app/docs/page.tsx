@@ -8,6 +8,10 @@ import {
   FOREMAN_FREE_LEVEL,
   FOREMAN_ROUND,
   FOREMAN_ROUND_AWAY,
+  GUSHER_EVERY,
+  GUSHER_HOLDS,
+  GUSHER_OUTPUT,
+  GUSHER_SECONDS,
   LEVELS,
   TANKER_BONUS,
   TANKER_EVERY,
@@ -50,6 +54,7 @@ const toc = [
   { id: "daily", label: "Daily Shift" },
   { id: "foreman", label: "Rig Foreman" },
   { id: "tanker", label: "Tanker Day" },
+  { id: "gusher", label: "Gushers" },
   { id: "village", label: "Royal Harbor" },
   { id: "crews", label: "Crews and seasons" },
   { id: "free", label: "Playing without a rig" },
@@ -101,6 +106,7 @@ export default function Docs() {
             ["Daily Shift: five random tasks a day with a streak bonus", "Live"],
             ["Rig Foreman: runs your rig on rounds, even while the game is closed", "Live"],
             ["Tanker Day: a tanker every few hours buys in bulk at a premium", "Live"],
+            ["Gushers: a well that strikes a pocket and gushes for a minute and a half", "Live"],
             ["Wallet login, rig NFTs and rig classes", "On-chain game"],
             [`Rig class upgrades with ${site.token}`, "On-chain game"],
             [`${site.reward} claims from the reward vault`, "On-chain game"],
@@ -324,6 +330,18 @@ export default function Docs() {
           <li>Walk to the west rail and load what you have. The order is sized to your rig&apos;s storage, so bigger rigs fill bigger orders.</li>
           <li>Load it in one go or in parts. Fill the whole order and you get a bonus of {Math.round(TANKER_BONUS * 100)}% on top.</li>
           <li>The countdown to the next ship is in your HUD. The foreman leaves the tanker to you.</li>
+        </ul>
+      </Section>
+
+      <Section id="gusher" title="Gushers">
+        <p>
+          While you play, every {GUSHER_EVERY[0] / 60} to {GUSHER_EVERY[1] / 60} minutes one of your wells strikes a pocket and gushes. For{" "}
+          {GUSHER_SECONDS} seconds it pumps {GUSHER_OUTPUT}x faster, its wellhead holds up to {GUSHER_HOLDS} bbl, and its pressure holds steady.
+        </p>
+        <ul>
+          <li>You&apos;ll see oil shooting out of the wellhead and a banner with the seconds left. Collect as you go: storage still has its limit.</li>
+          <li>Whatever&apos;s left in the wellhead when it dies down stays there for you to collect.</li>
+          <li>Gushers only strike while you play, never while the game is closed.</li>
         </ul>
       </Section>
 
