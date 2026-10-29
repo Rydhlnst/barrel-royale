@@ -4,13 +4,13 @@ import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { C } from "@/lib/palette";
 import { site } from "@/lib/site";
-import { UNITS, BRACE_SECONDS } from "@/lib/game/content";
+import { BRACE_SECONDS, PRODUCTS, UNITS } from "@/lib/game/content";
 import * as E from "@/lib/game/engine";
 import { GameStore, type Target } from "@/lib/game/store";
 import { PixelIcon } from "@/components/pixel/sprite";
 import { logo, logoPalette } from "@/components/pixel/sprites";
 import { shortAddress } from "@/lib/wallet";
-import { Bar, DispatchPanel, ForemanPanel, MarketPanel, QuartersPanel, ShiftPanel, SlotPanel, StoragePanel, ValveDrill, fmt, mmss, secs } from "./panels";
+import { Bar, DispatchPanel, ForemanPanel, MarketPanel, QuartersPanel, ShiftPanel, TankerPanel, SlotPanel, StoragePanel, ValveDrill, fmt, mmss, secs } from "./panels";
 import { World } from "./world/world";
 import { RoyalChart } from "./royal-chart";
 import { Stick } from "./stick";
@@ -20,13 +20,15 @@ import { SPOTS } from "./world/map";
 // The play screen: the walkable rig fills the window, and the HUD, the prompt
 // for whatever you're standing at, the panels and the phone controls sit on top.
 
+/** Hours and minutes for a countdown, like 3h 05m. */
+const hours = (s: number) => `${Math.floor(s / 3600)}h ${String(Math.floor((s % 3600) / 60)).padStart(2, "0")}m`;
 const labelFor = (t: Target) => SPOTS.find((s) => s.id === t)?.label ?? "";
 const padIndex = (t: Target) => (t.startsWith("pad:") ? Number(t.slice(4)) : -1);
 
 /** What pressing E does at a spot, and what it's called. */
 function primaryFor(t: Target, g: E.Game): { label: string; quick?: (store: GameStore) => void } {
   const i = padIndex(t);
-  if (i < 0) return { label: { market: "Trade", dispatch: "Contracts", storage: "Storage & upgrades", quarters: "Crew log", harbor: "Row to the village" }[t as "market"] ?? "Use" };
+  if (i < 0) return { label: { market: "Trade", dispatch: "Contracts", storage: "Storage & upgrades", quarters: "Crew log", harbor: "Row to the village", tanker: "Load the tanker" }[t as "market"] ?? "Use" };
   if (i >= E.levelInfo(g).slots) return { label: "Locked" };
   const s = g.slots[i];
   if (s.kind === "empty") return { label: "Drill or build" };
@@ -93,6 +95,8 @@ export default function Play({ account, onDisconnect }: { account: string; onDis
   const prompt = nearby ? primaryFor(nearby, game) : null;
   const ready = E.shiftReady(game);
   const foremanOn = E.foremanOn(game, now);
+  const tanker = E.tankerNow(game, now);
+  const tankerMine = tanker ? E.tankerLoaded(game, tanker) : null;
   const tasksDone = game.shift?.tasks.filter((t) => t.claimed).length ?? 0;
   const nearPad = nearby ? padIndex(nearby) : -1;
   const nearSlot = nearPad >= 0 ? game.slots[nearPad] : null;
@@ -104,6 +108,9 @@ export default function Play({ account, onDisconnect }: { account: string; onDis
     { label: "Rig", value: `Lv ${game.level}`, tone: "bg-white" },
     { label: "Points", value: fmt(game.points), tone: "bg-white" },
     { label: game.storm ? "Storm" : "Storm in", value: game.storm ? "NOW" : mmss(stormIn), tone: game.storm || warning ? "bg-brand-red text-white" : "bg-white" },
+    tanker
+      ? { label: "Tanker", value: tankerMine?.filled ? "Filled" : `${mmss((tanker.leaves - now) / 1000)}`, tone: tankerMine?.filled ? "bg-[#d8f3e6]" : "bg-brand-sun" }
+      : { label: "Tanker in", value: hours((E.tankerNext(now) - now) / 1000), tone: "bg-white" },
   ];
 
   return (
@@ -167,6 +174,12 @@ export default function Play({ account, onDisconnect }: { account: string; onDis
               ))}
             </dl>
           </div>
+
+          {tanker && !tankerMine?.filled && !warning && !game.storm && !shown && !side && (
+            <p role="status" className="pixel absolute left-1/2 top-[108px] z-10 w-max max-w-[calc(100%-32px)] -translate-x-1/2 bg-brand-sun px-4 py-2 text-center font-display font-bold sm:top-20">
+              {tanker.name} is at the west rail: {tanker.qty} bbl {PRODUCTS[tanker.product].name.toLowerCase()} at {tanker.premium.toFixed(2)}x. Walk over and load it!
+            </p>
+          )}
 
           {warning && (
             <p role="status" className="pixel absolute left-1/2 top-[108px] z-10 w-max max-w-[calc(100%-32px)] -translate-x-1/2 bg-brand-red px-4 py-2 text-center font-display font-bold text-white sm:top-20">
@@ -259,6 +272,7 @@ export default function Play({ account, onDisconnect }: { account: string; onDis
                 {shown === "dispatch" && <DispatchPanel store={store} game={game} now={now} />}
                 {shown === "storage" && <StoragePanel store={store} game={game} />}
                 {shown === "quarters" && <QuartersPanel store={store} game={game} />}
+                {shown === "tanker" && <TankerPanel store={store} game={game} now={now} />}
               </div>
             </section>
           )}

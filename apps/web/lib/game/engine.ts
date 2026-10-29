@@ -28,6 +28,11 @@ import {
   TASKS,
   PRODUCT_ORDER,
   START_COINS,
+  TANKER_BONUS,
+  TANKER_EVERY,
+  TANKER_NAMES,
+  TANKER_PREMIUM,
+  TANKER_STAY,
   STORM_EVERY,
   STORM_WARNING,
   UNITS,
@@ -106,6 +111,8 @@ export type Game = {
   shift?: Shift;
   /** Missing until the rig first meets its foreman. */
   foreman?: Foreman;
+  /** What this rig has loaded on the tanker berthed now (or last). */
+  tanker?: { slot: number; loaded: number; filled: boolean };
 };
 
 type Rng = () => number;
@@ -239,6 +246,51 @@ function foremanBrace(g: Game, now: number, rng: Rng) {
   endStorm(g, now, false);
   if (g.stormsHeld > wasHeld) foremanOf(g, now).report.storms++;
 }
+
+/* ---------------- tanker day ---------------- */
+
+const SLOT_MS = TANKER_EVERY * 3_600_000;
+
+/** A small seeded generator, so every rig draws the same ship for the same slot. */
+function seeded(n: number) {
+  let s = (n * 2654435761) >>> 0 || 1;
+  const next = () => {
+    s ^= s << 13;
+    s >>>= 0;
+    s ^= s >> 17;
+    s ^= s << 5;
+    s >>>= 0;
+    return s / 4_294_967_296;
+  };
+  // the first few draws of a fresh seed are poorly mixed
+  for (let i = 0; i < 8; i++) next();
+  return next;
+}
+
+export type Tanker = { slot: number; name: string; product: Product; qty: number; premium: number; perBbl: number; arrives: number; leaves: number };
+
+/** The tanker for a time slot, sized to this rig's storage. */
+export function tankerFor(g: Game, slot: number): Tanker {
+  const r = seeded(slot + 7);
+  const refined = r() < 0.4;
+  const pool: Product[] = refined ? ["diesel", "jet", "lng"] : RAWS;
+  const product = pool[Math.floor(r() * pool.length)];
+  const premium = round(TANKER_PREMIUM[0] + r() * (TANKER_PREMIUM[1] - TANKER_PREMIUM[0]));
+  const room = levelInfo(g).storage;
+  const qty = refined ? Math.max(10, Math.round((room * 0.2) / 5) * 5) : Math.max(20, Math.round((room * 0.8) / 10) * 10);
+  const arrives = slot * SLOT_MS;
+  return { slot, name: TANKER_NAMES[Math.floor(r() * TANKER_NAMES.length)], product, qty, premium, perBbl: round(PRODUCTS[product].base * premium), arrives, leaves: arrives + TANKER_STAY * 1000 };
+}
+
+/** The tanker at the berth now, or null. */
+export function tankerNow(g: Game, now: number): Tanker | null {
+  const t = tankerFor(g, Math.floor(now / SLOT_MS));
+  return now < t.leaves ? t : null;
+}
+/** When the next tanker berths. */
+export const tankerNext = (now: number) => (Math.floor(now / SLOT_MS) + 1) * SLOT_MS;
+/** What this rig has loaded on the tanker at the berth. */
+export const tankerLoaded = (g: Game, t: Tanker) => (g.tanker?.slot === t.slot ? g.tanker : { slot: t.slot, loaded: 0, filled: false });
 
 /* ---------------- daily shift ---------------- */
 
@@ -808,5 +860,38 @@ export function readForemanReport(prev: Game, now: number): Result {
     const f = foremanOf(g, now);
     f.report = emptyReport(now);
     f.unseen = false;
+  });
+}
+
+/* ---------------- tanker day actions ---------------- */
+
+/** Loads what storage holds of the tanker's product, up to what's left of the order, at the tanker's price. */
+export function loadTanker(prev: Game, now: number): Result {
+  return act(prev, now, (g) => {
+    const t = tankerNow(g, now);
+    if (!t) return "!No tanker at the berth right now.";
+    const mine = tankerLoaded(g, t);
+    if (mine.filled) return "!You've filled this tanker's order.";
+    const qty = Math.min(g.storage[t.product], t.qty - mine.loaded);
+    if (qty < 1) return `!The tanker wants ${PRODUCTS[t.product].name.toLowerCase()}. You have none in storage.`;
+    const value = Math.round(qty * t.perBbl);
+    g.storage[t.product] -= qty;
+    g.coins += value;
+    bump(g, "sell", qty);
+    if (RAWS.includes(t.product as Raw)) bump(g, "sellRaw", qty, t.product);
+    bump(g, "earn", value);
+    const loaded = mine.loaded + qty;
+    const filled = loaded >= t.qty;
+    g.tanker = { slot: t.slot, loaded, filled };
+    if (filled) {
+      const bonus = Math.round(t.qty * t.perBbl * TANKER_BONUS);
+      g.coins += bonus;
+      g.points += POINTS.contract * 2;
+      bump(g, "earn", bonus);
+      log(g, now, `Tanker ${t.name} filled: ${t.qty} bbl ${PRODUCTS[t.product].name.toLowerCase()}. +${value + bonus} coins with the bonus.`);
+      return `Order filled! +${value} coins and a +${bonus} bonus`;
+    }
+    log(g, now, `Loaded ${qty} bbl ${PRODUCTS[t.product].name.toLowerCase()} on ${t.name}: +${value} coins.`);
+    return `Loaded ${qty} bbl for +${value} coins`;
   });
 }

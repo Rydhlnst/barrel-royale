@@ -3,8 +3,8 @@ import { C } from "@/lib/palette";
 import { PRODUCT_ORDER, UNITS, WELLS, BLOWOUT_AT, WARN_AT } from "@/lib/game/content";
 import * as E from "@/lib/game/engine";
 import type { GameStore } from "@/lib/game/store";
-import { barrelPicture, blownFrames, boatPicture, characterFrames, deckPicture, lockedPicture, palettes, rainTile, swellTile, unitPicture, waterFrames, wellFrames } from "./art";
-import { BOARD, BOAT, DECK, DOCK, KIOSK, LEGS, PADS, SPAWN, SPOTS, TILE, WORLD_H, WORLD_W, gap, isBlocked, type Box } from "./map";
+import { barrelPicture, blownFrames, boatPicture, characterFrames, tankerPicture, deckPicture, lockedPicture, palettes, rainTile, swellTile, unitPicture, waterFrames, wellFrames } from "./art";
+import { BOARD, BOAT, DECK, DOCK, KIOSK, LEGS, PADS, SHIP, SPAWN, SPOTS, TILE, WORLD_H, WORLD_W, gap, isBlocked, type Box } from "./map";
 
 // The walkable rig. Phaser draws the world and moves the roughneck; the game
 // rules stay in the engine, reached through the store. React draws everything
@@ -32,6 +32,8 @@ export function rigScene(Phaser: Phaser, store: GameStore) {
     private dim!: PhaserNS.GameObjects.Rectangle;
     private ring!: PhaserNS.GameObjects.Graphics;
     private boss!: Sprite;
+    private ship!: PhaserNS.GameObjects.Image;
+    private gangway!: PhaserNS.GameObjects.Graphics;
     private bossTag!: PhaserNS.GameObjects.Text;
     private pads: PadView[] = [];
     private facing: "down" | "up" | "side" = "down";
@@ -66,6 +68,9 @@ export function rigScene(Phaser: Phaser, store: GameStore) {
       this.foam = this.add.graphics().setDepth(0.5);
       this.add.image(0, 0, "deck").setOrigin(0).setDepth(0);
       const boat = this.add.image(BOAT.x * TILE, BOAT.y * TILE + 6, "boat").setOrigin(0).setDepth(1);
+      this.textures.addCanvas("tanker", tankerPicture());
+      this.ship = this.add.image(SHIP.x, SHIP.y, "tanker").setOrigin(0).setDepth(1).setVisible(false);
+      this.gangway = this.add.graphics().setDepth(2);
       this.tweens.add({ targets: boat, y: boat.y + 1, duration: 900, yoyo: true, repeat: -1, ease: "Stepped" });
 
       PADS.forEach((b) => {
@@ -138,6 +143,7 @@ export function rigScene(Phaser: Phaser, store: GameStore) {
 
       this.move(time, delta);
       this.walkForeman(game, now, time);
+      this.berthTanker(game, now, time);
       this.drawPads(game, time);
       this.findNearby(time);
 
@@ -175,6 +181,24 @@ export function rigScene(Phaser: Phaser, store: GameStore) {
       p.setDepth(p.y);
       this.feet.setPosition(Math.round(p.x), Math.round(p.y) - 1).setDepth(p.y - 0.5);
       this.tag.setPosition(Math.round(p.x), Math.round(p.y) - 21 - (Math.floor(time / 500) % 2));
+    }
+
+    /** The tanker sails in from the north when it berths, rides the swell while it's here and sails off after. */
+    private berthTanker(game: E.Game, now: number, time: number) {
+      const t = E.tankerNow(game, now);
+      this.gangway.clear();
+      this.ship.setVisible(Boolean(t));
+      if (!t) return;
+      const inFor = (now - t.arrives) / 1000;
+      const outIn = (t.leaves - now) / 1000;
+      const sail = inFor < 12 ? (12 - inFor) / 12 : outIn < 12 ? (12 - outIn) / 12 : 0;
+      const y = SHIP.y - Math.round(sail * sail * 320) + (Math.floor(time / 900) % 2);
+      this.ship.setY(y);
+      if (sail === 0) {
+        // the gangway from the ship to the rail
+        this.gangway.fillStyle(0x1e2a4a).fillRect(SHIP.x + SHIP.w - 6, y + 70, DECK.x * TILE - SHIP.x - SHIP.w + 14, 8);
+        this.gangway.fillStyle(0x9aa6b5).fillRect(SHIP.x + SHIP.w - 5, y + 72, DECK.x * TILE - SHIP.x - SHIP.w + 12, 4);
+      }
     }
 
     /** Back and forth between the rows of pads, stopping at each well like he's checking it. */

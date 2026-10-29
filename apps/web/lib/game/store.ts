@@ -8,7 +8,7 @@ const LEGACY_KEY = "barrel-royale-game-v1";
 const saveKey = (account: string) => `${LEGACY_KEY}:${account.toLowerCase()}`;
 const TICK_MS = 250;
 
-export type Target = "market" | "dispatch" | "storage" | "quarters" | "harbor" | `pad:${number}`;
+export type Target = "market" | "dispatch" | "storage" | "quarters" | "harbor" | "tanker" | `pad:${number}`;
 export type Toast = { id: number; text: string; tone: "good" | "bad" };
 
 type Snapshot = { game: E.Game; now: number; nearby: Target | null; toast: Toast | null };

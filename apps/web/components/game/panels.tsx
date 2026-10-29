@@ -12,6 +12,9 @@ import {
   FOREMAN_ROUND,
   FOREMAN_ROUND_AWAY,
   LEVELS,
+  TANKER_BONUS,
+  TANKER_EVERY,
+  TANKER_STAY,
   PRODUCTS,
   PRODUCT_ORDER,
   EXPORT_DAILY_BBL,
@@ -588,6 +591,62 @@ export function ForemanPanel({ store, game, now }: { store: GameStore; game: E.G
         He plays by your rules: the same storage, prices and contracts, and he misses a valve now and then like anyone. His work earns no points and
         doesn&apos;t count toward your Daily Shift.
       </p>
+    </>
+  );
+}
+
+export function TankerPanel({ store, game, now }: { store: GameStore; game: E.Game; now: number }) {
+  const t = E.tankerNow(game, now);
+  if (!t) {
+    const next = E.tankerNext(now);
+    return (
+      <>
+        <p className="pixel-sm bg-brand-sun-pale px-3 py-3 font-bold">The berth is empty.</p>
+        <p>
+          The next tanker berths at {new Date(next).toISOString().slice(11, 16)} UTC, in {hhmm((next - now) / 1000)}. It stays for {TANKER_STAY / 60}{" "}
+          minutes and buys one product in bulk, well above the market.
+        </p>
+        <p className="text-sm text-brand-ink-2">A tanker comes every {TANKER_EVERY} hours, the same ship for every rig, so watch the countdown in your HUD.</p>
+      </>
+    );
+  }
+  const mine = E.tankerLoaded(game, t);
+  const left = t.qty - mine.loaded;
+  const can = Math.min(game.storage[t.product], left);
+  const bonus = Math.round(t.qty * t.perBbl * TANKER_BONUS);
+  return (
+    <>
+      <div className="pixel-sm flex items-center gap-3 bg-brand-sun-pale px-3 py-2">
+        <BarrelIcon p={t.product} scale={3} />
+        <div className="flex-1">
+          <p className="font-display text-lg font-bold">{t.name}</p>
+          <p className="text-sm">
+            Wants <b>{t.qty} bbl {PRODUCTS[t.product].name.toLowerCase()}</b> at {t.perBbl.toFixed(2)} a barrel ({t.premium.toFixed(2)}x base)
+          </p>
+        </div>
+      </div>
+      <div className="flex flex-col gap-1">
+        <div className="flex justify-between text-sm font-bold">
+          <span>Loaded</span>
+          <span className="tabular-nums">
+            {mine.loaded}/{t.qty} bbl
+          </span>
+        </div>
+        <Bar value={mine.loaded} max={t.qty} color={mine.filled ? C.leaf : C.sunDeep} />
+        <p className="text-xs text-brand-ink-2">Sails in {mmss((t.leaves - now) / 1000)}</p>
+      </div>
+      {mine.filled ? (
+        <p className="pixel-sm bg-[#d8f3e6] px-3 py-2 text-center font-bold">Order filled. She sails with your barrels. See you next ship!</p>
+      ) : (
+        <>
+          <button type="button" className="btn btn-red self-start" disabled={can < 1} onClick={() => store.run((g, n) => E.loadTanker(g, n))}>
+            {can > 0 ? `Load ${can} bbl · +${fmt(can * t.perBbl)}` : `No ${PRODUCTS[t.product].name.toLowerCase()} in storage`}
+          </button>
+          <p className="text-sm">
+            Fill the whole order for a <b>+{fmt(bonus)}</b> bonus on top.
+          </p>
+        </>
+      )}
     </>
   );
 }

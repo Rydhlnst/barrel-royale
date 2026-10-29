@@ -205,6 +205,55 @@ export function barrelPicture(p: Product) {
 }
 
 /** The supply boat from the banner, doubled up to sit at the dock. */
+/** The tanker that berths off the west rail, seen from above: a long hull with a sharp bow, a red deck with the
+ * walkway and pipe run down the middle, round tank domes either side, and the white bridge aft. */
+export function tankerPicture() {
+  const W = 30;
+  const H = 84;
+  const { c, ctx } = canvas(W * 2, H * 2);
+  const f = (x: number, y: number, w: number, h: number, col: string) => {
+    ctx.fillStyle = col;
+    ctx.fillRect(x * 2, y * 2, w * 2, h * 2);
+  };
+  const ink = C.ink;
+  // hull: ink outline, dark grey sides, a sharp bow and a rounded stern
+  for (let y = 0; y < 14; y++) {
+    const half = Math.round(1 + (y / 13) * 13);
+    f(15 - half, y, half * 2, 1, ink);
+    if (y > 0) f(16 - half, y, half * 2 - 2, 1, "#4b5468");
+  }
+  f(1, 14, 28, 66, ink);
+  f(2, 14, 26, 65, "#4b5468");
+  f(3, 80, 24, 2, ink);
+  // the deck, inset from the sides
+  for (let y = 4; y < 14; y++) {
+    const half = Math.round((y / 13) * 11);
+    if (half > 0) f(15 - half, y, half * 2, 1, "#8f2620");
+  }
+  f(4, 14, 22, 50, "#8f2620");
+  // walkway and pipe run down the middle
+  f(14, 6, 2, 58, "#c7ced8");
+  f(12, 10, 1, 52, "#9aa6b5");
+  f(17, 10, 1, 52, "#9aa6b5");
+  // round tank domes either side
+  for (let y = 14; y < 60; y += 9)
+    for (const x of [7, 20]) {
+      f(x, y, 3, 1, ink);
+      f(x - 1, y + 1, 5, 3, ink);
+      f(x, y + 4, 3, 1, ink);
+      f(x, y + 1, 3, 3, "#c7ced8");
+      f(x, y + 1, 1, 1, "#ffffff");
+    }
+  // the bridge aft: white, with a row of windows across its front and the funnel behind
+  f(5, 63, 20, 13, ink);
+  f(6, 64, 18, 11, "#ffffff");
+  f(7, 65, 16, 2, C.sea);
+  f(12, 70, 6, 4, ink);
+  f(13, 71, 4, 2, C.sun);
+  f(8, 77, 14, 2, "#8f2620");
+  return c;
+}
+
 export function boatPicture() {
   const rows = [
     "..............KKKK..........",

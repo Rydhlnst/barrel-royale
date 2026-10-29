@@ -133,6 +133,19 @@ export const FOREMAN_AWAY_CAP = 6 * 60 * 60;
 /** Chance he closes every valve in a storm; otherwise he gets two or three of four, like anyone. */
 export const FOREMAN_BRACE = 0.85;
 
+/**
+ * Tanker Day: every TANKER_EVERY hours (on the UTC clock, so every rig sees the same ship) a tanker berths
+ * at the rig for TANKER_STAY seconds and buys one product in bulk at a fixed premium over its base price.
+ * Load what you have; fill the whole order for a bonus on top. The foreman leaves the tanker to you.
+ */
+export const TANKER_EVERY = 4;
+export const TANKER_STAY = 20 * 60;
+/** The premium is drawn between these, the same for everyone on that ship. */
+export const TANKER_PREMIUM = [2, 2.5] as const;
+/** Bonus for filling the whole order, as a share of what the order pays. */
+export const TANKER_BONUS = 0.25;
+export const TANKER_NAMES = ["MT Royal Crown", "MT Gulf Runner", "MT Salt Baron", "MT Northern Star", "MT Black Pearl", "MT Iron Tide"];
+
 export const TASKS: Record<TaskKind, { target: (level: number) => number; label: (n: number, product?: Raw) => string; min?: number; max?: number }> = {
   drill: { target: (l) => 2 + Math.floor(l / 3), label: (n) => `Strike ${n} new wells`, max: 3 },
   collect: { target: (l) => 20 + 30 * l, label: (n) => `Collect ${n} bbl from your wells` },

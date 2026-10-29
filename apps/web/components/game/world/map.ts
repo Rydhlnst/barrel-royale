@@ -29,6 +29,9 @@ export const PADS: Box[] = [14, 18, 22].flatMap((y) => [11, 16, 21, 26].map((x) 
 /** Where the rig's legs meet the water, for the foam. */
 export const LEGS = [8, 15, 32, 39].map((tx) => ({ x: tx * TILE + 5, y: (DECK.y + DECK.h) * TILE + 30 }));
 
+/** Where the tanker berths: in the water off the west rail, bow to the north. */
+export const SHIP: Box = { x: 24, y: 196, w: 60, h: 168 };
+
 export const SPAWN = { x: 24 * TILE + 8, y: 13 * TILE + 12 };
 
 export const px = (b: Box): Box => ({ x: b.x * TILE, y: b.y * TILE, w: b.w * TILE, h: b.h * TILE });
@@ -90,4 +93,5 @@ export const SPOTS: { id: Target; box: Box; reach: number; label: string }[] = [
   { id: "storage", box: { x: tanks.x + 1, y: tanks.y - 8, w: 94, h: tanks.h + 8 }, reach: 14, label: "Storage tanks" },
   { id: "quarters", box: { x: quarters.x + 3 * TILE, y: quarters.y + quarters.h - 22, w: 2 * TILE, h: 22 }, reach: 12, label: "Crew quarters" },
   { id: "harbor", box: px(BOAT), reach: 14, label: "Boat to Royal Harbor" },
+  { id: "tanker", box: { x: deck.x, y: SHIP.y + 30, w: 10, h: SHIP.h - 60 }, reach: 14, label: "Tanker berth" },
 ];
