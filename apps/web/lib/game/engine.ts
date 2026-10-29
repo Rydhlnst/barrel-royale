@@ -20,6 +20,10 @@ import {
   FOREMAN_ROUND_AWAY,
   LEVELS,
   MARKET_EVERY,
+  MEDALS,
+  MEDAL_REWARD,
+  MEDAL_TIERS,
+  type MedalStat,
   OFFLINE_CAP,
   POINTS,
   PRODUCTS,
@@ -118,6 +122,10 @@ export type Game = {
   /** The well gushing now, and when the next one is due; missing on older saves until the next tick. */
   gusher?: { slot: number; endsAt: number } | null;
   nextGusherAt?: number;
+  /** What you've done yourself, for medals; missing on older saves until the next tick. */
+  stats?: Partial<Record<MedalStat, number>>;
+  /** How many tiers of each medal you've claimed. */
+  medals?: Record<string, number>;
   /** What this rig has loaded on the tanker berthed now (or last). */
   tanker?: { slot: number; loaded: number; filled: boolean };
 };
@@ -281,6 +289,18 @@ function runGusher(g: Game, now: number, rng: Rng) {
 /** Seconds left on the gusher, or 0. */
 export const gusherLeft = (g: Game, now: number) => (g.gusher ? Math.max(0, (g.gusher.endsAt - now) / 1000) : 0);
 
+/* ---------------- medals ---------------- */
+
+export type Medal = (typeof MEDALS)[number];
+export const medalValue = (g: Game, m: Medal) => (m.stat === "level" ? g.level : (g.stats?.[m.stat] ?? 0));
+/** Tiers reached, and tiers claimed. */
+export const medalReached = (g: Game, m: Medal) => m.tiers.filter((t) => medalValue(g, m) >= t).length;
+export const medalClaimed = (g: Game, m: Medal) => g.medals?.[m.id] ?? 0;
+/** Medal tiers reached but not claimed yet. */
+export const medalsReady = (g: Game) => MEDALS.reduce((n, m) => n + Math.max(0, medalReached(g, m) - medalClaimed(g, m)), 0);
+export const medalsTotal = MEDALS.reduce((n, m) => n + m.tiers.length, 0);
+export const medalsClaimed = (g: Game) => MEDALS.reduce((n, m) => n + medalClaimed(g, m), 0);
+
 /* ---------------- tanker day ---------------- */
 
 const SLOT_MS = TANKER_EVERY * 3_600_000;
@@ -351,8 +371,15 @@ function dealShift(g: Game, day: number, rng: Rng) {
   };
 }
 
-/** Moves today's tasks forward. `product` narrows the tasks that ask for one product. */
+/** Adds to a medal stat. */
+function stat(g: Game, key: MedalStat, amount: number) {
+  g.stats ??= {};
+  g.stats[key] = (g.stats[key] ?? 0) + amount;
+}
+
+/** Moves today's tasks forward, and the medal stat of the same name. `product` narrows the tasks that ask for one product. */
 function bump(g: Game, kind: TaskKind, amount: number, product?: Product) {
+  if (kind !== "sellRaw") stat(g, kind, amount);
   for (const t of g.shift?.tasks ?? []) {
     if (t.kind !== kind || t.claimed || (t.product && t.product !== product)) continue;
     t.progress = Math.min(t.target, t.progress + amount);
@@ -547,6 +574,7 @@ export function tick(prev: Game, now: number, rng: Rng = Math.random): Game {
   let dt = (now - g.savedAt) / 1000;
   if (dt <= 0) return prev;
   if (g.shift?.day !== dayOf(now)) dealShift(g, dayOf(now), rng);
+  g.stats ??= { contract: g.contractsFilled, storm: g.stormsHeld, bestStreak: g.shift?.streak ?? 0 };
 
   if (dt > 30) {
     // offline: production at Safe, capped, then pick up the clocks from now. A foreman on the rig keeps
@@ -631,6 +659,7 @@ export function collect(prev: Game, now: number, i: number): Result {
     g.storage[s.product] += take;
     g.points += take * POINTS.barrel;
     bump(g, "collect", take);
+    if (g.gusher?.slot === i) stat(g, "gusher", take);
     return `+${take} bbl ${PRODUCTS[s.product].name.toLowerCase()} to storage`;
   });
 }
@@ -638,7 +667,7 @@ export function collect(prev: Game, now: number, i: number): Result {
 export function collectAll(prev: Game, now: number): Result {
   return act(prev, now, (g) => {
     let total = 0;
-    for (const s of g.slots) {
+    for (const [i, s] of g.slots.entries()) {
       if (s.kind !== "well") continue;
       const take = Math.min(Math.floor(s.held), storageFree(g));
       if (take < 1) continue;
@@ -647,6 +676,7 @@ export function collectAll(prev: Game, now: number): Result {
       g.points += take * POINTS.barrel;
       total += take;
       bump(g, "collect", take);
+      if (g.gusher?.slot === i) stat(g, "gusher", take);
     }
     if (!total) return storageFree(g) < 1 ? "!Storage is full. Sell, refine or upgrade the rig." : "!Nothing to collect yet.";
     return `+${total} bbl to storage`;
@@ -846,6 +876,8 @@ export function claimShift(prev: Game, now: number): Result {
     const bonus = shiftBonus(g, now);
     s.bonusClaimed = true;
     s.streak = bonus.streak;
+    stat(g, "fullShifts", 1);
+    g.stats!.bestStreak = Math.max(g.stats!.bestStreak ?? 0, bonus.streak);
     s.lastFull = dayOf(now);
     g.coins += bonus.coins;
     log(g, now, `Full shift! Day ${bonus.streak} streak: +${bonus.coins} coins.`);
@@ -926,6 +958,7 @@ export function loadTanker(prev: Game, now: number): Result {
     const filled = loaded >= t.qty;
     g.tanker = { slot: t.slot, loaded, filled };
     if (filled) {
+      stat(g, "tankers", 1);
       const bonus = Math.round(t.qty * t.perBbl * TANKER_BONUS);
       g.coins += bonus;
       g.points += POINTS.contract * 2;
@@ -935,5 +968,22 @@ export function loadTanker(prev: Game, now: number): Result {
     }
     log(g, now, `Loaded ${qty} bbl ${PRODUCTS[t.product].name.toLowerCase()} on ${t.name}: +${value} coins.`);
     return `Loaded ${qty} bbl for +${value} coins`;
+  });
+}
+
+/* ---------------- medal actions ---------------- */
+
+/** Claims the next tier of a medal you've reached. */
+export function claimMedal(prev: Game, now: number, id: string): Result {
+  return act(prev, now, (g) => {
+    const m = MEDALS.find((x) => x.id === id);
+    if (!m) return "!No such medal.";
+    const claimed = medalClaimed(g, m);
+    if (claimed >= medalReached(g, m)) return "!Not reached yet. Keep going!";
+    const coins = MEDAL_REWARD[claimed];
+    g.coins += coins;
+    g.medals = { ...g.medals, [m.id]: claimed + 1 };
+    log(g, now, `${MEDAL_TIERS[claimed]} ${m.name} medal: +${coins} coins.`);
+    return `${MEDAL_TIERS[claimed]} ${m.name}! +${coins} coins`;
   });
 }

@@ -13,6 +13,9 @@ import {
   GUSHER_OUTPUT,
   GUSHER_SECONDS,
   LEVELS,
+  MEDALS,
+  MEDAL_REWARD,
+  MEDAL_TIERS,
   TANKER_BONUS,
   TANKER_EVERY,
   TANKER_PREMIUM,
@@ -55,6 +58,7 @@ const toc = [
   { id: "foreman", label: "Rig Foreman" },
   { id: "tanker", label: "Tanker Day" },
   { id: "gusher", label: "Gushers" },
+  { id: "medals", label: "Medals" },
   { id: "village", label: "Royal Harbor" },
   { id: "crews", label: "Crews and seasons" },
   { id: "free", label: "Playing without a rig" },
@@ -107,6 +111,7 @@ export default function Docs() {
             ["Rig Foreman: runs your rig on rounds, even while the game is closed", "Live"],
             ["Tanker Day: a tanker every few hours buys in bulk at a premium", "Live"],
             ["Gushers: a well that strikes a pocket and gushes for a minute and a half", "Live"],
+            ["Medals: long-term goals in four tiers, with coin rewards", "Live"],
             ["Wallet login, rig NFTs and rig classes", "On-chain game"],
             [`Rig class upgrades with ${site.token}`, "On-chain game"],
             [`${site.reward} claims from the reward vault`, "On-chain game"],
@@ -343,6 +348,21 @@ export default function Docs() {
           <li>Whatever&apos;s left in the wellhead when it dies down stays there for you to collect.</li>
           <li>Gushers only strike while you play, never while the game is closed.</li>
         </ul>
+      </Section>
+
+      <Section id="medals" title="Medals">
+        <p>
+          Medals are long-term goals in up to four tiers: {MEDAL_TIERS.join(", ").toLowerCase()}. Open them with the Medals button at the top of the
+          screen and claim each tier when you reach it.
+        </p>
+        <Table
+          head={["Medal", "Tiers"]}
+          rows={MEDALS.map((m) => [m.name, m.tiers.map((t) => m.what(t)).join(" · ")])}
+        />
+        <p>
+          Each tier pays coins: {MEDAL_REWARD.map((c, i) => `${MEDAL_TIERS[i].toLowerCase()} ${fmt(c)}`).join(", ")}. Only what you do yourself
+          counts; the foreman&apos;s work doesn&apos;t.
+        </p>
       </Section>
 
       <Section id="village" title="Royal Harbor">

@@ -10,7 +10,7 @@ import { GameStore, type Target } from "@/lib/game/store";
 import { PixelIcon } from "@/components/pixel/sprite";
 import { logo, logoPalette } from "@/components/pixel/sprites";
 import { shortAddress } from "@/lib/wallet";
-import { Bar, DispatchPanel, ForemanPanel, MarketPanel, QuartersPanel, ShiftPanel, TankerPanel, SlotPanel, StoragePanel, ValveDrill, fmt, mmss, secs } from "./panels";
+import { Bar, DispatchPanel, ForemanPanel, MarketPanel, MedalsPanel, QuartersPanel, ShiftPanel, TankerPanel, SlotPanel, StoragePanel, ValveDrill, fmt, mmss, secs } from "./panels";
 import { World } from "./world/world";
 import { RoyalChart } from "./royal-chart";
 import { Stick } from "./stick";
@@ -46,7 +46,7 @@ export default function Play({ account, onDisconnect }: { account: string; onDis
   // the rig, or Royal Harbor, the village every rig shares; the rig keeps running while you're away
   const [place, setPlace] = useState<"rig" | "village">("rig");
   // the side panels opened from the HUD: today's shift, or the foreman
-  const [side, setSide] = useState<"shift" | "foreman" | null>(null);
+  const [side, setSide] = useState<"shift" | "foreman" | "medals" | null>(null);
   const { game, now, nearby, toast } = snap;
 
   useEffect(() => store.start(), [store]);
@@ -95,6 +95,7 @@ export default function Play({ account, onDisconnect }: { account: string; onDis
   const prompt = nearby ? primaryFor(nearby, game) : null;
   const ready = E.shiftReady(game);
   const foremanOn = E.foremanOn(game, now);
+  const medals = E.medalsReady(game);
   const tanker = E.tankerNow(game, now);
   const tankerMine = tanker ? E.tankerLoaded(game, tanker) : null;
   const tasksDone = game.shift?.tasks.filter((t) => t.claimed).length ?? 0;
@@ -156,6 +157,18 @@ export default function Play({ account, onDisconnect }: { account: string; onDis
               <span className={`inline-block h-2.5 w-2.5 ${foremanOn ? "bg-brand-leaf" : "bg-brand-ink-2"}`} />
               Foreman
               {game.foreman?.unseen && <span className="pixel-sm absolute -right-2 -top-2 grid h-6 min-w-6 place-items-center bg-brand-sun px-1 text-xs font-extrabold text-brand-ink">!</span>}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setPanel(null);
+                setSide((o) => (o === "medals" ? null : "medals"));
+              }}
+              className={`btn ${medals ? "btn-red" : "btn-white"} pointer-events-auto relative mr-2 min-h-9! self-center px-3! text-sm!`}
+              aria-label={`Medals, ${E.medalsClaimed(game)} of ${E.medalsTotal} claimed${medals ? `, ${medals} ready to claim` : ""}`}
+            >
+              Medals
+              {medals > 0 && <span className="pixel-sm absolute -right-2 -top-2 grid h-6 min-w-6 place-items-center bg-brand-sun px-1 text-xs font-extrabold text-brand-ink">{medals}</span>}
             </button>
             <button
               type="button"
@@ -239,6 +252,23 @@ export default function Play({ account, onDisconnect }: { account: string; onDis
               </header>
               <div className="flex flex-col gap-4 overflow-y-auto p-4">
                 <ShiftPanel store={store} game={game} now={now} />
+              </div>
+            </section>
+          )}
+
+          {side === "medals" && !shown && (
+            <section
+              aria-label="Medals"
+              className="box absolute inset-x-3 bottom-3 z-20 flex max-h-[68vh] flex-col overflow-hidden lg:inset-x-auto lg:bottom-auto lg:right-4 lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:w-[460px]"
+            >
+              <header className="flex items-center justify-between gap-3 border-b-[3px] border-brand-ink bg-brand-sun px-4 py-2">
+                <h2 className="font-display text-xl font-bold">Medals</h2>
+                <button type="button" className="btn btn-white min-h-9! px-3! text-base!" onClick={() => setSide(null)} aria-label="Close">
+                  ✕
+                </button>
+              </header>
+              <div className="flex flex-col gap-4 overflow-y-auto p-4">
+                <MedalsPanel store={store} game={game} />
               </div>
             </section>
           )}

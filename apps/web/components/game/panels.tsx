@@ -12,6 +12,9 @@ import {
   FOREMAN_ROUND,
   FOREMAN_ROUND_AWAY,
   LEVELS,
+  MEDALS,
+  MEDAL_REWARD,
+  MEDAL_TIERS,
   TANKER_BONUS,
   TANKER_EVERY,
   TANKER_STAY,
@@ -647,6 +650,70 @@ export function TankerPanel({ store, game, now }: { store: GameStore; game: E.Ga
           </p>
         </>
       )}
+    </>
+  );
+}
+
+const MEDAL_COLORS = ["#c47a3a", "#c7ced8", "#ffd54a", "#9be7ff"];
+
+/** A pixel medal on a ribbon, in the colour of the best tier claimed, or grey before the first. */
+function MedalIcon({ tier }: { tier: number }) {
+  const face = tier > 0 ? MEDAL_COLORS[tier - 1] : "#b7c3d3";
+  return (
+    <span className="relative inline-block h-12 w-10 shrink-0" aria-hidden>
+      <span className="absolute left-1 top-0 h-5 w-3 bg-brand-red" />
+      <span className="absolute right-1 top-0 h-5 w-3 bg-brand-sea" />
+      <span className="pixel-sm absolute bottom-0 left-0 grid h-9 w-10 place-items-center" style={{ background: face }}>
+        <span className="font-display text-sm font-bold text-brand-ink">{tier > 0 ? "★" : "?"}</span>
+      </span>
+    </span>
+  );
+}
+
+export function MedalsPanel({ store, game }: { store: GameStore; game: E.Game }) {
+  return (
+    <>
+      <p className="text-sm text-brand-ink-2">
+        Long-term goals in four tiers. Claim each tier for coins: {MEDAL_REWARD.map((c, i) => `${MEDAL_TIERS[i].toLowerCase()} ${fmt(c)}`).join(", ")}. Only what you do
+        yourself counts.
+      </p>
+      <p className="pixel-sm bg-brand-sun-pale px-3 py-2 text-center font-display font-bold">
+        {E.medalsClaimed(game)} of {E.medalsTotal} medals claimed
+      </p>
+      <ul className="flex flex-col gap-2">
+        {MEDALS.map((m) => {
+          const claimed = E.medalClaimed(game, m);
+          const reached = E.medalReached(game, m);
+          const done = claimed >= m.tiers.length;
+          const next = m.tiers[Math.min(claimed, m.tiers.length - 1)];
+          const value = E.medalValue(game, m);
+          return (
+            <li key={m.id} className={`pixel-sm flex gap-3 px-3 py-2 ${reached > claimed ? "bg-[#fff1c2]" : "bg-white"}`}>
+              <MedalIcon tier={claimed} />
+              <div className="flex min-w-0 flex-1 flex-col gap-1">
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="font-display font-bold">{m.name}</span>
+                  <span className="text-xs font-extrabold uppercase text-brand-ink-2">{done ? "All tiers" : MEDAL_TIERS[claimed]}</span>
+                </div>
+                <span className="text-sm leading-snug">{done ? m.what(m.tiers[m.tiers.length - 1]) : m.what(next)}</span>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1">
+                    <Bar value={Math.min(value, next)} max={next} color={done ? C.leaf : reached > claimed ? C.sunDeep : C.sea} />
+                  </div>
+                  <span className="w-24 text-right text-xs font-bold tabular-nums text-brand-ink-2">
+                    {fmt(Math.min(value, next))}/{fmt(next)}
+                  </span>
+                </div>
+              </div>
+              {reached > claimed ? (
+                <button type="button" className="btn btn-red min-h-9! self-center px-2! text-sm!" onClick={() => store.run((g, n) => E.claimMedal(g, n, m.id))}>
+                  Claim +{fmt(MEDAL_REWARD[claimed])}
+                </button>
+              ) : null}
+            </li>
+          );
+        })}
+      </ul>
     </>
   );
 }

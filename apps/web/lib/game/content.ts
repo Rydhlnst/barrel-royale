@@ -109,6 +109,31 @@ export type TaskKind =
   | "export"
   | "build";
 
+/**
+ * Medals: long-term goals in tiers (bronze, silver, gold, platinum), each paying coins when claimed. They
+ * count what you do yourself: the same actions that move Daily Shift tasks, plus tankers filled, gusher
+ * barrels, full shifts, your best streak and your rig level. The foreman's work doesn't count.
+ */
+export type MedalStat = TaskKind | "tankers" | "gusher" | "fullShifts" | "bestStreak" | "level";
+export const MEDAL_TIERS = ["Bronze", "Silver", "Gold", "Platinum"] as const;
+export const MEDAL_REWARD = [150, 750, 3_000, 12_000];
+const n = (v: number) => v.toLocaleString("en-US");
+export const MEDALS: { id: string; name: string; stat: MedalStat; tiers: number[]; what: (v: number) => string }[] = [
+  { id: "roughneck", name: "Roughneck", stat: "collect", tiers: [100, 1_000, 10_000, 100_000], what: (v) => `Collect ${n(v)} bbl from your wells` },
+  { id: "trader", name: "Trader", stat: "earn", tiers: [1_000, 10_000, 100_000, 1_000_000], what: (v) => `Earn ${n(v)} coins from sales, contracts and tankers` },
+  { id: "driller", name: "Driller", stat: "drill", tiers: [5, 25, 100], what: (v) => `Strike ${n(v)} wells` },
+  { id: "steady", name: "Steady hands", stat: "capHand", tiers: [1, 10, 50], what: (v) => (v === 1 ? "Cap a blowout with the capping drill" : `Cap ${n(v)} blowouts with the capping drill`) },
+  { id: "refiner", name: "Refiner", stat: "refine", tiers: [50, 500, 5_000], what: (v) => `Refine ${n(v)} bbl of diesel, jet fuel or LNG` },
+  { id: "dispatcher", name: "Dispatcher", stat: "contract", tiers: [5, 50, 250], what: (v) => `Fill ${n(v)} Dispatch contracts` },
+  { id: "storm", name: "Storm chaser", stat: "storm", tiers: [5, 25, 100], what: (v) => `Hold the rig through ${n(v)} storms yourself` },
+  { id: "exporter", name: "Exporter", stat: "export", tiers: [500, 5_000, 50_000], what: (v) => `Export ${n(v)} bbl for XOM` },
+  { id: "harbor", name: "Harbor master", stat: "tankers", tiers: [1, 10, 50], what: (v) => (v === 1 ? "Fill a tanker's whole order" : `Fill ${n(v)} tanker orders`) },
+  { id: "gusher", name: "Gusher hunter", stat: "gusher", tiers: [100, 1_000, 5_000], what: (v) => `Haul ${n(v)} bbl from gushers` },
+  { id: "shift", name: "Shift worker", stat: "fullShifts", tiers: [1, 7, 30], what: (v) => (v === 1 ? "Finish a full Daily Shift" : `Finish ${n(v)} full Daily Shifts`) },
+  { id: "streak", name: "Iron streak", stat: "bestStreak", tiers: [3, 7, 10], what: (v) => `Reach a ${n(v)}-day shift streak` },
+  { id: "master", name: "Rig master", stat: "level", tiers: [3, 5, 8], what: (v) => `Raise your rig to level ${n(v)}` },
+];
+
 export const SHIFT_SIZE = 5;
 export const SHIFT_SWAPS = 1;
 export const SHIFT_STREAK_CAP = 10;
