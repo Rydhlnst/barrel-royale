@@ -25,7 +25,7 @@ export const site = {
    */
   ca: addr(process.env.NEXT_PUBLIC_ROYAL_CA),
   /** Once the CA is set, /play opens for wallets holding at least this much $ROYAL (NEXT_PUBLIC_ROYAL_MIN_HOLD). */
-  minHold: Number(process.env.NEXT_PUBLIC_ROYAL_MIN_HOLD) > 0 ? Number(process.env.NEXT_PUBLIC_ROYAL_MIN_HOLD) : 1_000_000,
+  minHold: Number(process.env.NEXT_PUBLIC_ROYAL_MIN_HOLD) > 0 ? Number(process.env.NEXT_PUBLIC_ROYAL_MIN_HOLD) : 500_000,
   /**
    * Local development only: NEXT_PUBLIC_DEV_OPEN_PLAY=1 opens /play to any connected wallet, skipping the
    * launch wait and the $ROYAL hold. `next build` sets NODE_ENV to production, so a deployed site never skips them.

@@ -16,6 +16,7 @@ import {
   MEDAL_REWARD,
   MEDAL_TIERS,
   TANKER_BONUS,
+  DOUBLE_PAY,
   TANKER_EVERY,
   TANKER_STAY,
   PRODUCTS,
@@ -262,6 +263,15 @@ export function SlotPanel({ store, game, now, i }: { store: GameStore; game: E.G
   );
 }
 
+/** The Double Pay notice in the Market and Dispatch panels. */
+function DoublePayNote({ now }: { now: number }) {
+  return (
+    <p className="pixel-sm bg-brand-red px-3 py-2 text-sm font-bold text-white">
+      Double Pay is on: every sale, contract, tanker and export pays {DOUBLE_PAY.times}× for another {hhmm((DOUBLE_PAY.until - now) / 1000)}.
+    </p>
+  );
+}
+
 export function MarketPanel({ store, game, now }: { store: GameStore; game: E.Game; now: number }) {
   return (
     <>
@@ -269,6 +279,7 @@ export function MarketPanel({ store, game, now }: { store: GameStore; game: E.Ga
         Sell for coins at each product&apos;s index, between 0.5× and 2×; prices move every few seconds. Or export them for{" "}
         {site.reward}, up to a daily quota per rig.
       </p>
+      {E.doublePayOn(now) && <DoublePayNote now={now} />}
       <div className="pixel-sm flex flex-col gap-1.5 bg-brand-sun px-3 py-2 text-sm font-bold">
         <div className="flex items-center justify-between">
           <span>Export quota left today</span>
@@ -319,6 +330,7 @@ export function DispatchPanel({ store, game, now }: { store: GameStore; game: E.
   return (
     <>
       <p className="text-sm text-brand-ink-2">Fixed-price tanker contracts, 10 to 30% above base. A new one arrives every 45 seconds.</p>
+      {E.doublePayOn(now) && <DoublePayNote now={now} />}
       {game.contracts.length === 0 && <p className="pixel-sm bg-white px-3 py-3 text-center">No contracts right now. Check back shortly.</p>}
       <ul className="flex flex-col gap-2">
         {game.contracts.map((c) => {
@@ -334,7 +346,7 @@ export function DispatchPanel({ store, game, now }: { store: GameStore; game: E.
                   You have {have} · {mmss(Math.max(0, (c.expiresAt - now) / 1000))} left
                 </span>
               </div>
-              <span className="font-display font-bold">+{c.reward}</span>
+              <span className="font-display font-bold">+{E.contractPay(c, now)}</span>
               <button type="button" className="btn btn-red min-h-10! px-3! text-base!" disabled={have < c.qty} onClick={() => store.run((g, t) => E.fill(g, t, c.id))}>
                 Fill
               </button>
@@ -624,7 +636,7 @@ export function TankerPanel({ store, game, now }: { store: GameStore; game: E.Ga
         <div className="flex-1">
           <p className="font-display text-lg font-bold">{t.name}</p>
           <p className="text-sm">
-            Wants <b>{t.qty} bbl {PRODUCTS[t.product].name.toLowerCase()}</b> at {t.perBbl.toFixed(2)} a barrel ({t.premium.toFixed(2)}x base)
+            Wants <b>{t.qty} bbl {PRODUCTS[t.product].name.toLowerCase()}</b> at {t.perBbl.toFixed(2)} a barrel ({t.premium.toFixed(2)}x base{E.doublePayOn(now) ? `, ${DOUBLE_PAY.times}× Double Pay` : ""})
           </p>
         </div>
       </div>

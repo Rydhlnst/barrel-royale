@@ -8,6 +8,7 @@ import {
   FOREMAN_FREE_LEVEL,
   FOREMAN_ROUND,
   FOREMAN_ROUND_AWAY,
+  DOUBLE_PAY,
   GUSHER_EVERY,
   GUSHER_HOLDS,
   GUSHER_OUTPUT,
@@ -34,6 +35,8 @@ import { CONTRACTS } from "@/lib/contracts";
 import { DocPage, Formula, Note, Section, Table } from "@/components/doc/doc";
 
 const fmt = (n: number) => n.toLocaleString("en-US");
+const utc = (t: number) =>
+  `${new Date(t).toLocaleString("en-US", { timeZone: "UTC", weekday: "short", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", hourCycle: "h23" })} UTC`;
 const addr = (a: string) => (
   <a href={`${site.explorer}/address/${a}`} target="_blank" rel="noopener" className="break-all font-mono text-[13px]">
     {a}
@@ -347,6 +350,17 @@ export default function Docs() {
           <li>You&apos;ll see oil shooting out of the wellhead and a banner with the seconds left. Collect as you go: storage still has its limit.</li>
           <li>Whatever&apos;s left in the wellhead when it dies down stays there for you to collect.</li>
           <li>Gushers only strike while you play, never while the game is closed.</li>
+        </ul>
+      </Section>
+
+      <Section id="double-pay" title="Double Pay">
+        <p>
+          From {utc(DOUBLE_PAY.from)} to {utc(DOUBLE_PAY.until)} every rig earns {DOUBLE_PAY.times}× on what it sells and ships.
+        </p>
+        <ul>
+          <li>Spot sales, Dispatch contracts and tanker loads, the fill bonus included, all pay {DOUBLE_PAY.times}× the coins.</li>
+          <li>Exports pay {DOUBLE_PAY.times}× the {site.reward}. The daily export quota stays in barrels, so the same barrels earn twice as much.</li>
+          <li>Your foreman&apos;s sales count too. The countdown sits in your HUD while it&apos;s on.</li>
         </ul>
       </Section>
 

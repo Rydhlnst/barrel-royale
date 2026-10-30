@@ -90,6 +90,12 @@ export const EXPORT_DAILY_BBL = 5_000;
 export const XOM_USD = 115;
 
 /**
+ * Double Pay: inside this window (UTC) every coin sale (market, Dispatch, tankers and the foreman's
+ * sales) and every export pays DOUBLE_PAY.times as much.
+ */
+export const DOUBLE_PAY = { from: Date.UTC(2026, 9, 30, 13), until: Date.UTC(2026, 10, 1, 13), times: 2 };
+
+/**
  * Daily Shift: every UTC day a rig gets SHIFT_SIZE tasks drawn at random from
  * this pool, with targets that grow with the rig level. Each task pays coins
  * when claimed; finishing the whole shift pays a bonus that grows with the

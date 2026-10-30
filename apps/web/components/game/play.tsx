@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { C } from "@/lib/palette";
 import { site } from "@/lib/site";
-import { BRACE_SECONDS, PRODUCTS, UNITS } from "@/lib/game/content";
+import { BRACE_SECONDS, DOUBLE_PAY, PRODUCTS, UNITS } from "@/lib/game/content";
 import * as E from "@/lib/game/engine";
 import { GameStore, type Target } from "@/lib/game/store";
 import { PixelIcon } from "@/components/pixel/sprite";
@@ -103,6 +103,7 @@ export default function Play({ account, onDisconnect }: { account: string; onDis
   const nearSlot = nearPad >= 0 ? game.slots[nearPad] : null;
 
   const stats = [
+    ...(E.doublePayOn(now) ? [{ label: `${DOUBLE_PAY.times}× pay`, value: hours((DOUBLE_PAY.until - now) / 1000), tone: "bg-brand-red text-white" }] : []),
     { label: site.reward, value: game.xom.toFixed(8), tone: "bg-brand-sun" },
     { label: "Coins", value: fmt(game.coins), tone: "bg-white" },
     { label: "Storage", value: `${used}/${info.storage}`, tone: used >= info.storage ? "bg-[#ffd9d4]" : "bg-white" },

@@ -3,6 +3,7 @@ import {
   BRACE_SECONDS,
   CAP_COST,
   CHOKES,
+  DOUBLE_PAY,
   CONTRACT_EVERY,
   CONTRACT_SLOTS,
   EXPORT_BBL,
@@ -140,7 +141,13 @@ const dayOf = (now: number) => Math.floor(now / 86_400_000);
 export const levelInfo = (g: Game) => LEVELS[g.level - 1];
 export const storageUsed = (g: Game) => PRODUCT_ORDER.reduce((sum, p) => sum + g.storage[p], 0);
 export const storageFree = (g: Game) => levelInfo(g).storage - storageUsed(g);
-export const price = (g: Game, p: Product) => round(PRODUCTS[p].base * g.index[p]);
+/** How many times over sales and exports pay at `now`: DOUBLE_PAY.times during Double Pay, else 1. */
+export const payTimes = (now: number) => (now >= DOUBLE_PAY.from && now < DOUBLE_PAY.until ? DOUBLE_PAY.times : 1);
+export const doublePayOn = (now: number) => payTimes(now) > 1;
+
+export const price = (g: Game, p: Product) => round(PRODUCTS[p].base * g.index[p] * payTimes(g.savedAt));
+/** What a contract pays if it's filled at `now`. */
+export const contractPay = (c: Contract, now: number) => Math.round(c.reward * payTimes(now));
 /** Whole barrels waiting in every wellhead, ready to collect. */
 export const barrelsWaiting = (g: Game) => g.slots.reduce((n, s) => (s.kind === "well" ? n + Math.floor(s.held) : n), 0);
 /** What selling everything in storage pays right now. */
@@ -209,11 +216,12 @@ function foremanRound(g: Game, now: number, away: boolean) {
     for (const c of [...g.contracts]) {
       if (c.expiresAt <= now || g.storage[c.product] < c.qty) continue;
       g.storage[c.product] -= c.qty;
-      g.coins += c.reward;
+      const pay = contractPay(c, now);
+      g.coins += pay;
       g.contractsFilled++;
       g.contracts = g.contracts.filter((x) => x.id !== c.id);
       rep.contracts++;
-      rep.coins += c.reward;
+      rep.coins += pay;
     }
   if (f.jobs.sell && storageUsed(g) >= levelInfo(g).storage * f.sellAt) {
     const keep = f.keepForUnits ? unitReserve(g) : zeroes();
@@ -339,7 +347,7 @@ export function tankerFor(g: Game, slot: number): Tanker {
 /** The tanker at the berth now, or null. */
 export function tankerNow(g: Game, now: number): Tanker | null {
   const t = tankerFor(g, Math.floor(now / SLOT_MS));
-  return now < t.leaves ? t : null;
+  return now < t.leaves ? { ...t, perBbl: round(t.perBbl * payTimes(now)) } : null;
 }
 /** When the next tanker berths. */
 export const tankerNext = (now: number) => (Math.floor(now / SLOT_MS) + 1) * SLOT_MS;
@@ -785,7 +793,7 @@ export function sellAll(prev: Game, now: number): Result {
 export const exportLeft = (g: Game, now: number) => (g.exported.day === dayOf(now) ? Math.max(0, EXPORT_DAILY_BBL - g.exported.bbl) : EXPORT_DAILY_BBL);
 
 /** XOM paid for a number of exported barrels, at the reference XOM price. */
-export const xomFor = (bbl: number) => ((bbl / EXPORT_BBL) * EXPORT_USD) / XOM_USD;
+export const xomFor = (bbl: number, now: number) => (((bbl / EXPORT_BBL) * EXPORT_USD) / XOM_USD) * payTimes(now);
 
 /** Ship barrels out through the export terminal for XOM, up to the daily quota. */
 export function exportBarrels(prev: Game, now: number, p: Product): Result {
@@ -795,7 +803,7 @@ export function exportBarrels(prev: Game, now: number, p: Product): Result {
     const left = exportLeft(g, now);
     if (left <= 0) return `!Today's export quota of ${EXPORT_DAILY_BBL.toLocaleString("en-US")} bbl is full. It resets at 00:00 UTC.`;
     const qty = Math.min(have, left);
-    const earned = xomFor(qty);
+    const earned = xomFor(qty, now);
     if (g.exported.day !== dayOf(now)) g.exported = { day: dayOf(now), bbl: 0 };
     g.storage[p] -= qty;
     g.xom += earned;
@@ -811,15 +819,16 @@ export function fill(prev: Game, now: number, id: number): Result {
     const c = g.contracts.find((x) => x.id === id);
     if (!c) return "!That contract is gone.";
     if (g.storage[c.product] < c.qty) return `!You need ${c.qty} bbl ${PRODUCTS[c.product].name.toLowerCase()}.`;
+    const pay = contractPay(c, now);
     g.storage[c.product] -= c.qty;
-    g.coins += c.reward;
+    g.coins += pay;
     g.points += POINTS.contract;
     g.contractsFilled++;
     bump(g, "contract", 1);
-    bump(g, "earn", c.reward);
+    bump(g, "earn", pay);
     g.contracts = g.contracts.filter((x) => x.id !== id);
-    log(g, now, `Contract filled: ${c.qty} bbl ${PRODUCTS[c.product].name.toLowerCase()} for +${c.reward} coins.`);
-    return `Contract filled: +${c.reward} coins`;
+    log(g, now, `Contract filled: ${c.qty} bbl ${PRODUCTS[c.product].name.toLowerCase()} for +${pay} coins.`);
+    return `Contract filled: +${pay} coins`;
   });
 }
 
