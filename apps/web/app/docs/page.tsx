@@ -9,6 +9,7 @@ import {
   FOREMAN_ROUND,
   FOREMAN_ROUND_AWAY,
   DOUBLE_PAY,
+  OIL_BONUS,
   GUSHER_EVERY,
   GUSHER_HOLDS,
   GUSHER_OUTPUT,
@@ -361,6 +362,24 @@ export default function Docs() {
           <li>Spot sales, Dispatch contracts and tanker loads, the fill bonus included, all pay {DOUBLE_PAY.times}× the coins.</li>
           <li>Exports pay {DOUBLE_PAY.times}× the {site.reward}. The daily export quota stays in barrels, so the same barrels earn twice as much.</li>
           <li>Your foreman&apos;s sales count too. The countdown sits in your HUD while it&apos;s on.</li>
+        </ul>
+      </Section>
+
+      <Section id="oil-bonus" title="Oil Bonus">
+        <p>
+          Every holder wallet gets a one-time Oil Bonus: ${OIL_BONUS.usd.toFixed(2)} worth of {site.reward} ({OIL_BONUS.xom} {site.reward}), paid from the
+          reward vault straight to your wallet.
+        </p>
+        <ul>
+          <li>Open the ${OIL_BONUS.usd.toFixed(2)} {site.reward} button at the top of the game and sign up. It&apos;s a free signature, not a transaction.</li>
+          <li>
+            Each weekly vault round pays the next wallets in line, as many as the round can hold. A round can use up to {VAULT.roundPct}% of the vault&apos;s
+            free balance.
+          </li>
+          <li>
+            Claims open {VAULT.claimDelayDays} days after a round is posted, and the full list is published at the same time. Then claim your {site.reward}{" "}
+            to your wallet in one transaction.
+          </li>
         </ul>
       </Section>
 

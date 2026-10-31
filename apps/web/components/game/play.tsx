@@ -4,7 +4,8 @@ import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { C } from "@/lib/palette";
 import { site } from "@/lib/site";
-import { BRACE_SECONDS, DOUBLE_PAY, PRODUCTS, UNITS } from "@/lib/game/content";
+import { BRACE_SECONDS, DOUBLE_PAY, OIL_BONUS, PRODUCTS, UNITS } from "@/lib/game/content";
+import { BonusPanel, bonusWaiting, useBonus } from "@/components/game/bonus";
 import * as E from "@/lib/game/engine";
 import { GameStore, type Target } from "@/lib/game/store";
 import { PixelIcon } from "@/components/pixel/sprite";
@@ -46,7 +47,8 @@ export default function Play({ account, onDisconnect }: { account: string; onDis
   // the rig, or Royal Harbor, the village every rig shares; the rig keeps running while you're away
   const [place, setPlace] = useState<"rig" | "village">("rig");
   // the side panels opened from the HUD: today's shift, or the foreman
-  const [side, setSide] = useState<"shift" | "foreman" | "medals" | null>(null);
+  const [side, setSide] = useState<"shift" | "foreman" | "medals" | "bonus" | null>(null);
+  const bonus = useBonus(account);
   const { game, now, nearby, toast } = snap;
 
   useEffect(() => store.start(), [store]);
@@ -171,6 +173,20 @@ export default function Play({ account, onDisconnect }: { account: string; onDis
               Medals
               {medals > 0 && <span className="pixel-sm absolute -right-2 -top-2 grid h-6 min-w-6 place-items-center bg-brand-sun px-1 text-xs font-extrabold text-brand-ink">{medals}</span>}
             </button>
+            {bonus.status && bonus.status.state !== "claimed" && bonus.status.state !== "expired" && (
+              <button
+                type="button"
+                onClick={() => {
+                  setPanel(null);
+                  setSide((o) => (o === "bonus" ? null : "bonus"));
+                }}
+                className={`btn ${bonusWaiting(bonus.status) ? "btn-sun pl-3! pr-5!" : "btn-white px-3!"} pointer-events-auto relative mr-2 min-h-9! self-center text-sm!`}
+                aria-label={`Oil Bonus, $${OIL_BONUS.usd.toFixed(2)} of ${site.reward}${bonusWaiting(bonus.status) ? ", waiting for you" : ""}`}
+              >
+                ${OIL_BONUS.usd.toFixed(2)} {site.reward}
+                {bonusWaiting(bonus.status) && <span className="pixel-sm absolute -right-2 -top-2 grid h-6 min-w-6 place-items-center bg-brand-red px-1 text-xs font-extrabold text-white">!</span>}
+              </button>
+            )}
             <button
               type="button"
               onClick={onDisconnect}
@@ -270,6 +286,23 @@ export default function Play({ account, onDisconnect }: { account: string; onDis
               </header>
               <div className="flex flex-col gap-4 overflow-y-auto p-4">
                 <MedalsPanel store={store} game={game} />
+              </div>
+            </section>
+          )}
+
+          {side === "bonus" && !shown && (
+            <section
+              aria-label="Oil Bonus"
+              className="box absolute inset-x-3 bottom-3 z-20 flex max-h-[68vh] flex-col overflow-hidden lg:inset-x-auto lg:bottom-auto lg:right-4 lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:w-[440px]"
+            >
+              <header className="flex items-center justify-between gap-3 border-b-[3px] border-brand-ink bg-brand-sun px-4 py-2">
+                <h2 className="font-display text-xl font-bold">Oil Bonus</h2>
+                <button type="button" className="btn btn-white min-h-9! px-3! text-base!" onClick={() => setSide(null)} aria-label="Close">
+                  ✕
+                </button>
+              </header>
+              <div className="flex flex-col gap-4 overflow-y-auto p-4">
+                <BonusPanel wallet={account} bonus={bonus} />
               </div>
             </section>
           )}

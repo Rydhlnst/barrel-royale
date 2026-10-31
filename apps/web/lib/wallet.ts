@@ -184,6 +184,15 @@ export async function signMessage(message: string) {
   return signature;
 }
 
+/** Sends a transaction from the connected wallet on Robinhood Chain; returns its hash. The wallet shows it first. */
+export async function sendTransaction(tx: { to: string; data: string }) {
+  if (!active || !state.account) throw new Error("Connect your wallet first.");
+  await switchToRobinhood(active.provider);
+  const hash = await active.provider.request({ method: "eth_sendTransaction", params: [{ from: state.account, to: tx.to, data: tx.data, value: "0x0" }] });
+  if (typeof hash !== "string") throw new Error("The wallet did not send the transaction.");
+  return hash;
+}
+
 /** Forget the wallet on this site; the next visit shows the picker again. */
 export const disconnectWallet = forget;
 

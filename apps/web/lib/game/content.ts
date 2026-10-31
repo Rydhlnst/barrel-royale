@@ -96,6 +96,13 @@ export const XOM_USD = 115;
 export const DOUBLE_PAY = { from: Date.UTC(2026, 9, 30, 13), until: Date.UTC(2026, 10, 1, 13), times: 2 };
 
 /**
+ * Oil Bonus: once per holder wallet, $0.10 worth of XOM (XOM at about $182, 30 Oct 2026), paid from the reward
+ * vault. Wallets sign up in the game; each weekly vault round pays the next wallets in line, as many as the round
+ * can hold (a round can take at most 10% of the vault free balance).
+ */
+export const OIL_BONUS = { usd: 0.1, xom: 0.00055, wei: "550000000000000" };
+
+/**
  * Daily Shift: every UTC day a rig gets SHIFT_SIZE tasks drawn at random from
  * this pool, with targets that grow with the rig level. Each task pays coins
  * when claimed; finishing the whole shift pays a bonus that grows with the
