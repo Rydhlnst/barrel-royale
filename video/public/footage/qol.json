@@ -1,0 +1,14 @@
+{
+  "marks": {
+    "deck": 0.078,
+    "walk-tanks": 1.08,
+    "tanks": 3.962,
+    "collect": 5.543,
+    "collected": 8.02,
+    "walk-market": 10.682,
+    "market": 15.273,
+    "sell": 16.949,
+    "sold": 18.526,
+    "end": 21.137
+  }
+}

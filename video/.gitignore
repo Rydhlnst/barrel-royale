@@ -1,0 +1,4 @@
+node_modules/
+out/
+# recorded footage is rebuilt with `npm run record`; its step marks (json) stay
+public/footage/*.mp4

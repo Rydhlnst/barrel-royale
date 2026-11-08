@@ -1,0 +1,16 @@
+{
+  "version": "1.0",
+  "chainId": "4663",
+  "createdAt": 1793495949437,
+  "meta": {
+    "name": "Barrel Royale: execute vault withdrawal 1",
+    "description": "executeWithdrawal(0). Upload only after the 7-day timelock has passed."
+  },
+  "transactions": [
+    {
+      "to": "0x2B858234005FaD8f044CBad3bD7De8F89e6239F7",
+      "value": "0",
+      "data": "0x24f13a760000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ]
+}

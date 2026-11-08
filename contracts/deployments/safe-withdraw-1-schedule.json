@@ -1,0 +1,16 @@
+{
+  "version": "1.0",
+  "chainId": "4663",
+  "createdAt": 1793495949435,
+  "meta": {
+    "name": "Barrel Royale: schedule vault withdrawal 1",
+    "description": "scheduleWithdrawal(0x8F3EbbD1614D04c6e2854dfAb2246Ece6e0db070, 100675074865848695) = 0.10067507486584869 XOM, 20% of the free balance. Executable after the 7-day timelock."
+  },
+  "transactions": [
+    {
+      "to": "0x2B858234005FaD8f044CBad3bD7De8F89e6239F7",
+      "value": "0",
+      "data": "0x6b7b58830000000000000000000000008f3ebbd1614d04c6e2854dfab2246ece6e0db0700000000000000000000000000000000000000000000000000165ab727b1d6177"
+    }
+  ]
+}

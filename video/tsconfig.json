@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "lib": ["DOM", "ES2022"],
+    "baseUrl": ".",
+    "paths": { "@/*": ["../apps/web/*"] }
+  },
+  "include": ["src", "../apps/web/lib/palette.ts", "../apps/web/components/pixel", "../apps/web/components/scenes", "../apps/web/lib/game/content.ts"]
+}

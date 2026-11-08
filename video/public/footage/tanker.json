@@ -1,0 +1,15 @@
+{
+  "marks": {
+    "deck": 0.123,
+    "walk": 2.627,
+    "open": 10.012,
+    "load": 11.888,
+    "filled": 12.628,
+    "sail": 16.966,
+    "end": 30.011
+  },
+  "order": {
+    "qty": 190,
+    "product": "light"
+  }
+}

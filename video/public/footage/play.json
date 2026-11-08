@@ -1,0 +1,26 @@
+{
+  "marks": {
+    "deck": 0.084,
+    "walk-pad": 2.609,
+    "open-pad": 3.527,
+    "drilled": 6.649,
+    "walk-well": 8.965,
+    "collect": 10.006,
+    "manage": 11.516,
+    "overdrive": 14.425,
+    "blowout": 25.965,
+    "drill": 29.081,
+    "capped": 30.973,
+    "walk-market": 33.394,
+    "market": 36.095,
+    "sold": 39.86,
+    "exported": 43.447,
+    "walk-unit": 46.464,
+    "refinery": 47.523,
+    "jet": 50.624,
+    "walk-dispatch": 53.652,
+    "dispatch": 60.386,
+    "filled": 63.7,
+    "end": 67.635
+  }
+}

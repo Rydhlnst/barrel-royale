@@ -1,0 +1,16 @@
+{
+  "version": "1.0",
+  "chainId": "4663",
+  "createdAt": 1793497708368,
+  "meta": {
+    "name": "Barrel Royale: post reward round 1",
+    "description": "postRound(week 1, total 0.050337537432924344 XOM) for 0x8F3EbbD1614D04c6e2854dfAb2246Ece6e0db070. Claims open 2 days after this is executed."
+  },
+  "transactions": [
+    {
+      "to": "0x2B858234005FaD8f044CBad3bD7De8F89e6239F7",
+      "value": "0",
+      "data": "0x011532d30000000000000000000000000000000000000000000000000000000000000001c18b126190a445978bc2fabd1390b0a1b49d5f66946045e3f4512d82d1a5495900000000000000000000000000000000000000000000000000b2d5b93d8eb0bb"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "marks": {
+    "picker": 0.062,
+    "connect": 1.574,
+    "deck": 5.845,
+    "walk-pad": 8.051,
+    "open-pad": 10.188,
+    "drilled": 13.56,
+    "walk-well": 17.53,
+    "collect": 20.829,
+    "manage": 23.5,
+    "overdrive": 27.474,
+    "walk-market": 31.131,
+    "market": 37.687,
+    "sold": 42.136,
+    "sold-gas": 45.009,
+    "end": 50.143
+  }
+}
