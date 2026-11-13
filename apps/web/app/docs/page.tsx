@@ -50,7 +50,7 @@ export const metadata: Metadata = {
 };
 
 const toc = [
-  { id: "status", label: "What's live today" },
+  { id: "status", label: "What the game included" },
   { id: "start", label: "Getting started" },
   { id: "rigs", label: "Rigs" },
   { id: "wells", label: "Wells and pressure" },
@@ -84,16 +84,19 @@ export default function Docs() {
       lede={`Everything a roughneck needs: how rigs work, how to run a well hard without blowing it, what the refinery makes, and how barrels turn into ${site.reward}.`}
       toc={{ title: "Docs", items: toc }}
     >
-      <Note title="The rig is open.">
-        The browser game is live at <a href={site.links.play}>Play</a> for wallets holding {fmt(site.minHold)} {site.token} or more. Connect your wallet
-        and start drilling. On-chain play rolls out in stages along the{" "}
-        <a href={site.links.roadmap}>roadmap</a>, and the numbers below are tuned with every community playtest.
+      <Note title="Barrel Royale has wound down.">
+        The game and the weekly {site.reward} rewards have ended. The reward vault&apos;s remaining free balance (~0.5 {site.reward}) is being withdrawn by
+        the team rather than distributed to holders, and no {site.reward} is currently owed to players. Every withdrawal is public on the{" "}
+        <a href={`${site.explorer}/address/${CONTRACTS.vault}`} target="_blank" rel="noopener">
+          Robinhood Chain explorer
+        </a>
+        . The documentation below describes how {site.name} worked while it was live.
       </Note>
 
-      <Section id="status" title="What's live today">
+      <Section id="status" title="What the game included">
         <p>
-          The browser game is the first stage of {site.name}. Everything marked <b>Live</b> can be played right now; the rest arrives with the on-chain
-          game and is listed on the <a href={site.links.roadmap}>roadmap</a>.
+          The browser game was the first stage of {site.name}. The features below were part of it; the ones marked for the on-chain game and seasons were
+          planned but did not ship before the project wound down.
         </p>
         <Table
           head={["Feature", "Status"]}
@@ -367,18 +370,18 @@ export default function Docs() {
 
       <Section id="oil-bonus" title="Oil Bonus">
         <p>
-          Every holder wallet gets a one-time Oil Bonus: ${OIL_BONUS.usd.toFixed(2)} worth of {site.reward} ({OIL_BONUS.xom} {site.reward}), paid from the
-          reward vault straight to your wallet.
+          While {site.name} was live, the Oil Bonus offered every holder wallet a one-time ${OIL_BONUS.usd.toFixed(2)} of {site.reward} ({OIL_BONUS.xom}{" "}
+          {site.reward}) from the reward vault. With the project wound down, the bonus is no longer offered and no further rounds will be posted.
         </p>
         <ul>
-          <li>Open the ${OIL_BONUS.usd.toFixed(2)} {site.reward} button at the top of the game and sign up. It&apos;s a free signature, not a transaction.</li>
+          <li>Holders signed up with a free signature from the button at the top of the game, not a transaction.</li>
           <li>
-            Each weekly vault round pays the next wallets in line, as many as the round can hold. A round can use up to {VAULT.roundPct}% of the vault&apos;s
-            free balance.
+            Each weekly vault round paid the next wallets in line, as many as the round could hold, using up to {VAULT.roundPct}% of the vault&apos;s free
+            balance.
           </li>
           <li>
-            Claims open {VAULT.claimDelayDays} days after a round is posted, and the full list is published at the same time. Then claim your {site.reward}{" "}
-            to your wallet in one transaction.
+            Claims opened {VAULT.claimDelayDays} days after a round was posted, with the full list published at the same time, and were claimed to the
+            wallet in one transaction.
           </li>
         </ul>
       </Section>
@@ -507,21 +510,21 @@ export default function Docs() {
           head={["Class", "Production", `Total ${site.token} from Jack-up`]}
           rows={CLASS_COSTS.map((c) => [c.name, c.mult, c.cost ? `${fmt(c.cost)} ${site.token}` : "Starting class"])}
         />
-        <h3>How value flows</h3>
+        <h3>How value flowed</h3>
         <ol>
-          <li>Players trade {site.token} and mint rigs, which funds the treasury.</li>
+          <li>Players traded {site.token} and minted rigs, which funded the treasury.</li>
           <li>
-            The treasury buys {site.reward} for the reward vault and buys back and burns {site.token}.
+            The treasury bought {site.reward} for the reward vault and bought back and burned {site.token}.
           </li>
-          <li>Players pump, refine and export barrels. New {site.reward} lands every week, and they claim it whenever they like.</li>
-          <li>Holders burn {site.token} to raise their rig&apos;s class, which lifts every barrel the rig produces.</li>
+          <li>Players pumped, refined and exported barrels. New {site.reward} landed every week, claimed whenever they liked.</li>
+          <li>Holders burned {site.token} to raise their rig&apos;s class, which lifted every barrel the rig produced.</li>
         </ol>
       </Section>
 
       <Section id="xom" title={`${site.reward} rewards`}>
         <p>
-          The export terminal turns barrels straight into {site.reward}. Every rig&apos;s exports add up through the week, and the treasury fills the
-          reward vault with {site.reward} bought from revenue.
+          While the game was live, the export terminal turned barrels straight into {site.reward}: every rig&apos;s exports added up through the week, and
+          the treasury filled the reward vault with {site.reward} bought from revenue. Rewards have now ended.
         </p>
         <ul>
           <li>Each rig has a daily export quota. It resets at 00:00 UTC.</li>
@@ -538,7 +541,8 @@ export default function Docs() {
 
       <Section id="vault" title="The reward vault">
         <p>
-          The {site.name} {site.reward}RewardVault keeps two balances apart, and the rules for each are written into the contract.
+          The {site.name} {site.reward}RewardVault kept two balances apart, with the rules for each written into the contract. The vault is still on-chain;
+          what follows is how it worked.
         </p>
         <Table
           head={["Balance", "What it is", "Who can move it"]}
@@ -666,9 +670,10 @@ export default function Docs() {
         </p>
         <h3>Can the team take the {site.reward} in the vault?</h3>
         <p>
-          Not the {site.reward} owed to players. The treasury can withdraw only from the free balance, at most {VAULT.withdrawPct}% per{" "}
-          {VAULT.withdrawWindowDays} days, and every withdrawal waits {VAULT.timelockDays} days on-chain and is listed in the treasury report. See{" "}
-          <a href="#vault">the reward vault</a>.
+          While {site.name} was live, only from the free balance, at most {VAULT.withdrawPct}% per {VAULT.withdrawWindowDays} days after a{" "}
+          {VAULT.timelockDays}-day timelock; {site.reward} owed to players was never withdrawable by the team. Now that the project has wound down, the team
+          is withdrawing the remaining free balance ({site.reward} no player had earned yet) through that same timelocked process, and it is not being
+          distributed to holders. See <a href="#vault">the reward vault</a>.
         </p>
         <h3>Is {site.reward} a share in Exxon Mobil?</h3>
         <p>It is a token on Robinhood Chain that tracks the Exxon Mobil share price.</p>
